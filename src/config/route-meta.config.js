@@ -1,16 +1,5 @@
 export const routeMetaConfig = [
-  {
-    basePath: "/master/vendor-code",
-    breadcrumbs: ["Master", "Vendor Code"],
-  },
-  {
-    basePath: "/master/vendor-code/new",
-    breadcrumbs: ["Master", "Vendor Code", "New"],
-  },
-  {
-    basePath: "/master/vendor-code/[id]",
-    breadcrumbs: ["Master", "Vendor Code", "Edit"],
-  },
+  //settings
   {
     basePath: "/settings/company-details",
     breadcrumbs: ["Settings", "Company Details"],
@@ -38,5 +27,26 @@ export const routeMetaConfig = [
   {
     basePath: "/settings/project-code/[id]",
     breadcrumbs: ["Settings", "Update Project Details"],
+  },
+  {
+    basePath: "/settings/role-designation",
+    breadcrumbs: ["Settings", "Role & Designation"],
+  },
+  {
+    basePath: "/settings/approval-path",
+    breadcrumbs: ["Settings", "Approval Path Line"],
+  },
+  //master
+  {
+    basePath: "/master/vendor-code",
+    breadcrumbs: ["Master", "Vendor Code"],
+  },
+  {
+    basePath: "/master/vendor-code/new",
+    breadcrumbs: ["Master", "Vendor Code", "New"],
+  },
+  {
+    basePath: "/master/vendor-code/[id]",
+    breadcrumbs: ["Master", "Vendor Code", "Edit"],
   },
 ];
