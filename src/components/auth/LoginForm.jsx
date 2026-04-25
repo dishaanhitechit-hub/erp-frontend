@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
-import { setCookie } from "@/lib/cookies";
+import { getCookie, setCookie } from "@/lib/cookies";
 import { ROLE } from "@/config/role.config";
 
 const LoginForm = () => {
@@ -66,11 +66,26 @@ const LoginForm = () => {
     setCookie("userName", user.username);
     setCookie("role", user.role);
     if(user.role ===ROLE.SUPER_ADMIN){
-      setCookie("companyId",user.companyId);
+      let resp = await apiRequest({
+      url: API_ENDPOINTS.GET_COMPANIES,
+      method: "GET", 
+    });
+      setCookie("companyId",resp?.data?.[0]?.companyId);
     }
     toast.success("Login successful");
 
-    router.push("/");
+    const token = getCookie("token");
+    const role = getCookie("role");
+
+    if (token) {
+    if (role === ROLE.SUPER_ADMIN) {
+      router.replace("/settings/company-details");
+    } else if (role === ROLE.ADMIN) {
+      router.replace("/master/vendor-code");
+    } else {
+      router.replace("/");
+    }
+  }
 
   } catch (error) {
     setErrorMessage(error.message || "Login failed");
@@ -79,6 +94,21 @@ const LoginForm = () => {
     setLoading(false);
   }
 };
+
+useEffect(()=>{
+    const token = getCookie("token");
+    const role = getCookie("role");
+
+    if (token) {
+    if (role === ROLE.SUPER_ADMIN) {
+      router.replace("/settings/company-details");
+    } else if (role === ROLE.ADMIN) {
+      router.replace("/master/vendor-code");
+    } else {
+      router.replace("/");
+    }
+  }
+},[])
 
   return (
     <div className="min-h-screen bg-[#ececec] flex items-center justify-center px-4 py-6">

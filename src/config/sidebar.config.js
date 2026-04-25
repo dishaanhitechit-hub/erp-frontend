@@ -25,7 +25,7 @@ export const sidebarConfig = [
         title: "Project Code",
         path: "/settings/project-code",
       },
-      { title: "Roles & Designation", path: "/settings/roles" },
+      { title: "Roles & Designation", path: "/settings/role-designation" },
       { title: "Rights & Access", path: "/settings/rights" },
       { title: "Approval Path Line", path: "/settings/approval-path" },
     ],

@@ -18,7 +18,6 @@ export const apiRequest = async ({
   requireAuth = true,
 }) => {
   const { token } = getAuth();
-
   const isFormData = data instanceof FormData;
 
   const query =

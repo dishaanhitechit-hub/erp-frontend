@@ -2,6 +2,7 @@ const API_BASE_URL = "https://erpbackend-production.up.railway.app"; //change he
 
 export const API_ENDPOINTS = {
     LOGIN: "/auth/login",
+    GET_COMPANIES:"/compny/my-companies",//only for super admin
     SETTINGS :{
         CREATE_COMPANY:"/compny/company", //used for update also
         GET_COMPANY_DETAILS_BY_ID:"/compny/company",
@@ -11,6 +12,9 @@ export const API_ENDPOINTS = {
         GET_ALL_PROJECTS :"/setting/project-list",
         CREATE_PROJECT:"/setting/create-project",
         GET_PROJECT_BY_ID:"/setting/project",//get and put for update
+        ADD_DESIGNATION:"/setting/designation",
+        UPDATE_PROJECT_ROLES:"/setting/project-role" //project code also used for get 
+
     }
     
 };

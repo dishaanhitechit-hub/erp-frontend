@@ -1,13 +1,17 @@
 "use client"
+import ProtectedLayoutAuth from "@/components/common/ProtectedLayoutAuth";
 import AppNavbar from "@/components/layout/AppNavbar";
 import AppSidebar from "@/components/layout/AppSidebar";
 import { usePathname } from "next/navigation";
-
 export default function ProtectedLayout({ children }) {
   const pathname = usePathname();
 
   const isHome = pathname === "/";
+  
   return (
+    <ProtectedLayoutAuth>
+
+    
     <div className="min-h-screen flex flex-col bg-[#f5f5f5]">
       
       <div className="shrink-0">
@@ -24,5 +28,6 @@ export default function ProtectedLayout({ children }) {
 
       </div>
     </div>
+    </ProtectedLayoutAuth>
   );
 }
