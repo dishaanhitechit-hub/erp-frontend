@@ -28,7 +28,7 @@ export const useAuthGuard = () => {
       if (role === "super_admin") {
         router.replace("/settings/company-details");
       } else if (role === "admin") {
-        router.replace("/master/vendor-code");
+        router.replace("/master/ledger-code");
       } else {
         router.replace("/");
       }

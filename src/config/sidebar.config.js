@@ -36,12 +36,12 @@ export const sidebarConfig = [
     icon: Database,
     basePath: "/master",
     children: [
-      { title: "Vendor Code", path: "/master/vendor-code" },
+      { title: "Ledger Code", path: "/master/ledger-code" },
       { title: "Item Code", path: "/master/item-code" },
       { title: "Asset Code", path: "/master/asset-code" },
       { title: "Unit", path: "/master/unit" },
-      { title: "Cost Center Code", path: "/master/cost-center" },
-      { title: "Category", path: "/master/category" },
+      { title: "Cost Center Code", path: "/master/cc-code" },
+      { title: "Category & Group", path: "/master/category-group" },
     ],
   },
 

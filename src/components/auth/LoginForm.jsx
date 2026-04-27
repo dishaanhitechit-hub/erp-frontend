@@ -81,7 +81,7 @@ const LoginForm = () => {
     if (role === ROLE.SUPER_ADMIN) {
       router.replace("/settings/company-details");
     } else if (role === ROLE.ADMIN) {
-      router.replace("/master/vendor-code");
+      router.replace("/master/ledger-code");
     } else {
       router.replace("/");
     }
@@ -103,7 +103,7 @@ useEffect(()=>{
     if (role === ROLE.SUPER_ADMIN) {
       router.replace("/settings/company-details");
     } else if (role === ROLE.ADMIN) {
-      router.replace("/master/vendor-code");
+      router.replace("/master/ledger-code");
     } else {
       router.replace("/");
     }

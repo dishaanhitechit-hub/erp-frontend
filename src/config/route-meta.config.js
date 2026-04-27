@@ -14,7 +14,7 @@ export const routeMetaConfig = [
   },
   {
     basePath: "/settings/user-id-password/[id]",
-    breadcrumbs: ["Settings", "Update User ID & Password"],
+    breadcrumbs: ["Settings", "User ID & Password","Edit"],
   },
   {
     basePath: "/settings/project-code",
@@ -26,7 +26,7 @@ export const routeMetaConfig = [
   },
   {
     basePath: "/settings/project-code/[id]",
-    breadcrumbs: ["Settings", "Update Project Details"],
+    breadcrumbs: ["Settings", "Project Details","Edit"],
   },
   {
     basePath: "/settings/role-designation",
@@ -38,15 +38,40 @@ export const routeMetaConfig = [
   },
   //master
   {
-    basePath: "/master/vendor-code",
-    breadcrumbs: ["Master", "Vendor Code"],
+    basePath: "/master/ledger-code",
+    breadcrumbs: ["Master", "Ledger Code List"],
   },
   {
-    basePath: "/master/vendor-code/new",
-    breadcrumbs: ["Master", "Vendor Code", "New"],
+    basePath: "/master/ledger-code/new",
+    breadcrumbs: ["Master", "Ledger Code", "New"],
   },
   {
-    basePath: "/master/vendor-code/[id]",
-    breadcrumbs: ["Master", "Vendor Code", "Edit"],
+    basePath: "/master/ledger-code/[id]",
+    breadcrumbs: ["Master", "Ledger Code", "Edit"],
   },
+  {
+    basePath: "/master/cc-code",
+    breadcrumbs: ["Master", "CC Code List" ],
+  },
+  {
+    basePath: "/master/cc-code/new",
+    breadcrumbs: ["Master", "CC Code", "New"],
+  },
+  {
+    basePath: "/master/cc-code/[id]",
+    breadcrumbs: ["Master", "CC Code", "Edit"],
+  },
+  {
+    basePath: "/master/item-code",
+    breadcrumbs: ["Master", "Item Code List" ],
+  },
+  {
+    basePath: "/master/item-code/new",
+    breadcrumbs: ["Master", "Item Code", "New"],
+  },
+  {
+    basePath: "/master/item-code/[id]",
+    breadcrumbs: ["Master", "Item Code", "Edit"],
+  },
+  
 ];

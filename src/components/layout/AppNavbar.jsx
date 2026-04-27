@@ -7,7 +7,7 @@ import { getBreadcrumbs } from "@/lib/breadcrumbs";
 import Image from "next/image";
 import { routeMetaConfig } from "@/config/route-meta.config";
 import { toast } from "sonner";
-import { setCookie } from "@/lib/cookies";
+import { clearAuthCookies, setCookie } from "@/lib/cookies";
 import { getCookie } from "@/lib/cookies";
 
 export default function AppNavbar() {
@@ -197,7 +197,9 @@ export default function AppNavbar() {
 
         {/* ACTION ICONS */}
         <div className="flex items-center gap-2">
-          <button className="cursor-pointer"><Image src="/assets/icons/home.png" alt="" width={32} height={32} /></button>
+          <button className="cursor-pointer"><Image src="/assets/icons/home.png" alt="" width={32} height={32} onClick={()=>{
+            clearAuthCookies();
+          }}/></button>
           <button className="cursor-pointer"><Image src="/assets/icons/left-arrow.png" alt="" width={32} height={32} /></button>
           <button className="cursor-pointer"><Image src="/assets/icons/file-download.png" alt="" width={32} height={32} /></button>
           <button className="cursor-pointer"><Image src="/assets/icons/database.png" alt="" width={32} height={32} /></button>

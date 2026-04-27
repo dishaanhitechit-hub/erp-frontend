@@ -24,7 +24,7 @@ export default function HomePage() {
     }
 
     if (role === ROLE.ADMIN) {
-      router.replace("/master/vendor-code");
+      router.replace("/master/ledger-code");
       return;
     }
 

@@ -30,7 +30,6 @@ const Page = () => {
 
         setProjectData(formData);
       } catch (err) {
-        console.log(err)
         toast.error("Failed to fetch project details");
       } finally {
         setLoading(false);
