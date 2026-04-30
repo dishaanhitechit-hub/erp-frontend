@@ -114,40 +114,45 @@ useEffect(()=>{
     <div className="min-h-screen bg-[#ececec] flex items-center justify-center px-4 py-6">
       <div className="w-full max-w-350 grid lg:grid-cols-[1fr_1.35fr] gap-8 items-center">
         {/* LEFT SIDE */}
-        <div className="space-y-10">
+        <div className="space-y-20">
           <div className="space-y-2">
-            <p className="text-[#0c3472] text-[28px] font-medium">Welcome to</p>
+            <div className="space-y-7">
+              <p className="text-[#0c3472] text-[28px] font-medium ">Welcome to</p>
 
             <div className="leading-none">
-              <h1 className="text-[72px] font-black tracking-tight text-[#002b6f]">
+              <h1 className="text-[50px] font-black tracking-tight text-[#002b6f]">
                 PRAX
               </h1>
 
               <div className="flex items-end gap-3 flex-wrap">
-                <p className="text-[30px] font-black tracking-tight text-black">
+                <p className="text-[25px] font-black tracking-tight text-black">
                   CONSTRUCTION
                 </p>
-                <p className="text-[30px] font-black text-red-600">ERP</p>
+                <p className="text-[25px] font-black text-red-600">ERP</p>
               </div>
-            </div>
-
-            <p className="text-[22px] text-black pt-2">
+              <p className="text-[22px] text-black pt-2">
               Company Name:{" "}
               <span className="font-semibold">
                 Dishaan Hi-tech (India) Pvt. Ltd.
               </span>
             </p>
+            </div>
+
+            </div>
+            
+
+            
           </div>
 
-          <form onSubmit={handleSubmit} className="max-w-130">
-            <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="max-w-130 ">
+            <div className="space-y-3">
               <div className="grid grid-cols-[170px_1fr] items-center gap-4">
                 <Label className="text-[22px] font-normal">Log in ID</Label>
                 <Input
                   name="loginId"
                   value={formData.loginId}
                   onChange={handleChange}
-                  className="h-12 bg-white border-gray-400 text-[20px] font-medium"
+                  className="h-10 bg-white border-gray-400 text-[20px] font-medium"
                 />
               </div>
 
@@ -158,7 +163,7 @@ useEffect(()=>{
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="h-12 bg-white border-gray-400 text-[20px] font-medium"
+                  className="h-10 bg-white border-gray-400 text-[20px] font-medium"
                 />
               </div>
             </div>

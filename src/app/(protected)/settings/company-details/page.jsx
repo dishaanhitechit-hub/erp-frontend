@@ -218,10 +218,10 @@ export default function CompanyDetailsPage() {
     "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm";
 
   const labelClass =
-    "w-[250px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
+    "w-[250px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-md rounded-sm";
 
   const activeLabelClass =
-    "w-[250px] px-3 py-1 bg-[#6fd1e3] border border-[#2f8fa3] text-sm rounded-sm";
+    "w-[250px] px-3 py-1 bg-[#6fd1e3] border border-[#2f8fa3] text-md rounded-sm";
 
   const errorText = "text-red-500 text-[10px] h-[14px] mt-[2px]";
 
@@ -234,7 +234,7 @@ export default function CompanyDetailsPage() {
   }
 
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-2">
       {/* COMPANY NAME */}
       <div>
         <div className="md:flex md:items-center">
@@ -246,10 +246,11 @@ export default function CompanyDetailsPage() {
             className={`${inputClass} flex-1 -ml-px`}
           />
         </div>
-        <p className={errorText}>{errors.companyName?.message}</p>
+        {/* <p className={errorText}>{errors.companyName?.message}</p> */}
       </div>
 
-      {/* REGISTERED ADDRESS */}
+      <div className="mt-5">
+          {/* REGISTERED ADDRESS */}
       <div>
         <div className="md:flex md:items-center">
           <div className={labelClass}>Registered Address</div>
@@ -259,7 +260,7 @@ export default function CompanyDetailsPage() {
             className={`${inputClass} flex-1 -ml-px`}
           />
         </div>
-        <p className={errorText}>{errors.registeredAddress?.message}</p>
+        {/* <p className={errorText}>{errors.registeredAddress?.message}</p> */}
       </div>
 
       {/* CORPORATE ADDRESS */}
@@ -272,10 +273,15 @@ export default function CompanyDetailsPage() {
             className={`${inputClass} flex-1 -ml-px`}
           />
         </div>
-        <p className={errorText}>{errors.corporateAddress?.message}</p>
+        {/* <p className={errorText}>{errors.corporateAddress?.message}</p> */}
       </div>
+      </div>
+      
 
-      {/* PAN */}
+      <div className="mt-5">
+          <div>
+
+          {/* PAN */}
       <div>
         <div className="md:flex md:items-center gap-2">
           <div className="md:flex md:items-center">
@@ -289,7 +295,7 @@ export default function CompanyDetailsPage() {
             />
           </div>
 
-          <button className="md:ml-4 px-3 py-1  bg-[#8e7cc3] text-white text-sm rounded-sm">
+          <button className="md:ml-[250px] px-3 py-1  bg-[#8e7cc3] text-white text-sm rounded-sm">
             Attached PAN
           </button>
 
@@ -324,8 +330,8 @@ export default function CompanyDetailsPage() {
           />
         </div>
 
-        <p className={errorText}>{errors.pan?.message}</p>
-        <p className={errorText}>{panFileError}</p>
+        {/* <p className={errorText}>{errors.pan?.message}</p>
+        <p className={errorText}>{panFileError}</p> */}
       </div>
 
       {/* GSTN */}
@@ -341,7 +347,7 @@ export default function CompanyDetailsPage() {
             />
           </div>
 
-          <button className="md:ml-4 px-3 py-1 bg-[#8e7cc3] text-white text-sm rounded-sm">
+          <button className="md:ml-[250px] px-3 py-1 bg-[#8e7cc3] text-white text-sm rounded-sm">
             Attached GSTN
           </button>
 
@@ -378,11 +384,15 @@ export default function CompanyDetailsPage() {
           />
         </div>
 
-        <p className={errorText}>{errors.gstn?.message}</p>
-        <p className={errorText}>{gstFileError}</p>
+        {/* <p className={errorText}>{errors.gstn?.message}</p>
+        <p className={errorText}>{gstFileError}</p> */}
       </div>
+        
+      </div>
+      
 
-      {/* STATE + CODE */}
+      <div> 
+            {/* STATE + CODE */}
       <div>
         <div className="md:flex md:items-center">
           <div className={labelClass}>State</div>
@@ -392,7 +402,7 @@ export default function CompanyDetailsPage() {
             className={`${inputClass} w-65 -ml-px`}
           />
 
-          <div className={`${labelClass} md:ml-4`}>State Code</div>
+          <div className={`w-[100px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm md:ml-4`}>State Code</div>
           <Input
             {...register("stateCode")}
             disabled={!isEditing || isSubmitting}
@@ -400,9 +410,9 @@ export default function CompanyDetailsPage() {
           />
         </div>
 
-        <p className={errorText}>
+        {/* <p className={errorText}>
           {errors.state?.message || errors.stateCode?.message}
-        </p>
+        </p> */}
       </div>
 
       {/* GST TYPE */}
@@ -415,11 +425,13 @@ export default function CompanyDetailsPage() {
             className={`${inputClass} w-65 -ml-px`}
           />
         </div>
-        <p className={errorText}>{errors.gstnType?.message}</p>
+        {/* <p className={errorText}>{errors.gstnType?.message}</p> */}
       </div>
-
+      </div>
+      </div>
+      
       {/* CONTACT */}
-      <div className="space-y-1 pt-3">
+      <div className=" pt-3">
         <div>
           <div className="md:flex md:items-center">
             <div className={labelClass}>Contact Person</div>
@@ -429,7 +441,7 @@ export default function CompanyDetailsPage() {
               className={`${inputClass} w-65 -ml-px`}
             />
           </div>
-          <p className={errorText}>{errors.contactPerson?.message}</p>
+          {/* <p className={errorText}>{errors.contactPerson?.message}</p> */}
         </div>
 
         <div>
@@ -441,7 +453,7 @@ export default function CompanyDetailsPage() {
               className={`${inputClass} w-65 -ml-px`}
             />
           </div>
-          <p className={errorText}>{errors.contactNumber?.message}</p>
+          {/* <p className={errorText}>{errors.contactNumber?.message}</p> */}
         </div>
 
         <div>
@@ -453,7 +465,7 @@ export default function CompanyDetailsPage() {
               className={`${inputClass} w-65 -ml-px`}
             />
           </div>
-          <p className={errorText}>{errors.whatsappNumber?.message}</p>
+          {/* <p className={errorText}>{errors.whatsappNumber?.message}</p> */}
         </div>
 
         <div>
@@ -465,7 +477,7 @@ export default function CompanyDetailsPage() {
               className={`${inputClass} w-65 -ml-px`}
             />
           </div>
-          <p className={errorText}>{errors.email?.message}</p>
+          {/* <p className={errorText}>{errors.email?.message}</p> */}
         </div>
       </div>
 

@@ -8,7 +8,6 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { roleMap } from "@/config/role.config";
 
 export default function Page() {
   const router = useRouter();
@@ -16,45 +15,44 @@ export default function Page() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+
   
+
+  //  INITIAL LOAD 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchItems = async () => {
       try {
         const res = await apiRequest({
-          url: API_ENDPOINTS.SETTINGS.GET_ALL_USERS,
+          url: API_ENDPOINTS.MASTER.GET_ALL_ITEM,
           method: "GET",
         });
 
-        // adjust based on your backend response
-        const users = res.data || [];
+        const assets = res.data || [];
 
-        // map API → table format
-        const formatted = users.map((item, index) => ({
-          id:item.id,
-          sl:  index + 1,
-          username: item.userName,
-          category: roleMap[item.role] || item.role, // or map if needed
-          email: item.email,
-          mobile: item.mobile,
-          whatsapp: item.whatsapp,
-          status: item.status ? "ACTIVE" : "SUSPENDED",
+        const formatted = assets.map((p, index) => ({
+          itemId: p.itemId, 
+          sl: index + 1,
+          itemCode: p.itemCode,
+          itemName: p.itemName,
+          itemCategoryName: p.itemCategoryName,
+          hsnSac: p.hsnSac,
+          gstPercentage:p.gstPercentage,
         }));
 
         setData(formatted);
         setFilteredData(formatted);
       } catch (err) {
-        toast.error("Failed to fetch users");
+        toast.error(err.message || "Failed to fetch asset deatils.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchItems();
   }, []);
 
-  // ✅ SEARCH HANDLER
+  // SEARCH HANDLER
   const handleSearch = ({ search }) => {
-    //  TODO: Replace with API search call
 
     if (!search) {
       setFilteredData(data);
@@ -73,18 +71,17 @@ export default function Page() {
   //  TABLE COLUMNS
   const columns = [
     { header: "Sl. no", accessor: "sl" },
-    { header: "User Name", accessor: "username" },
-    { header: "User Category", accessor: "category" },
-    { header: "Email", accessor: "email" },
-    { header: "Mobile", accessor: "mobile" },
-    { header: "WhatsApp", accessor: "whatsapp" },
-    { header: "Status", accessor: "status" ,width:"85px"},
+    { header: "Asset Code", accessor: "assetCode" },
+    { header: "Asset Name", accessor: "assetName" },
+    { header: "Category", accessor: "assetCategoryName" },
+    { header: "Unit", accessor: "assetCategoryName" },
+    { header: "HSN", accessor: "hsnSac" },
+    { header: "GST%", accessor: "gstPercentage" },
   ];
 
-  // LOADER 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-75">
+      <div className="flex justify-center items-center h-[300px]">
         <Loader2 className="animate-spin w-6 h-6" />
       </div>
     );
@@ -98,9 +95,10 @@ export default function Page() {
         onSearch={handleSearch}
         actions={[
           {
-            label: "+ Add User",
-            onClick: () => router.push("/settings/user-id-password/new"),
+            label: "+ New Item Code",
+            onClick: () => router.push("/master/asset-code/new"),
           },
+          
         ]}
       />
 
@@ -109,7 +107,7 @@ export default function Page() {
         columns={columns}
         data={filteredData}
         onRowClick={(row) => {
-          router.push(`/settings/user-id-password/${row.id}`);
+          router.push(`/master/asset-code/${row.itemId}`);
         }}
       />
     </div>

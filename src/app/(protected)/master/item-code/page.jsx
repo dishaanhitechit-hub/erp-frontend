@@ -42,7 +42,7 @@ export default function Page() {
         setData(formatted);
         setFilteredData(formatted);
       } catch (err) {
-        toast.error(err.message || "Failed to fetch ledger deatils.");
+        toast.error(err.message || "Failed to fetch item details.");
       } finally {
         setLoading(false);
       }

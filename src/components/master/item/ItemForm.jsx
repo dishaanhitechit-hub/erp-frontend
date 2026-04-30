@@ -105,16 +105,16 @@ export default function ItemForm({
   };
 
   const handleCancel = () => {
-  if (!initialData) return;
+    if (!initialData) return;
 
-  reset({
-    ...initialData,
-    itemCategoryId: String(initialData.itemCategoryId),
-    ccCodeId: String(initialData.ccCodeId),
-  });
+    reset({
+      ...initialData,
+      itemCategoryId: String(initialData.itemCategoryId),
+      ccCodeId: String(initialData.ccCodeId),
+    });
 
-  setIsEditing(false);
-};
+    setIsEditing(false);
+  };
 
   const label =
     "w-[220px] px-3 py-1 bg-[#d6e6f2] border rounded-sm text-sm";
@@ -123,7 +123,7 @@ export default function ItemForm({
   const error = "text-red-500 text-[10px]";
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-4 flex flex-col gap-7">
 
       {/* ITEM CODE */}
       <div className="flex gap-2">
@@ -131,65 +131,69 @@ export default function ItemForm({
         <Input {...register("itemCode")} disabled className="w-[200px]" placeholder="[Auto]" />
       </div>
 
-      {/* CATEGORY */}
-      <div className="flex flex-col">
-        <div className="flex gap-2">
-          <div className={label}>Item Category</div>
+      <div className="space-y-1">
+        {/* CATEGORY */}
+        <div className="flex flex-col">
+          <div className="flex gap-2">
+            <div className={label}>Item Category</div>
 
-          <select
-            {...register("itemCategoryId")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${inputClass} ${errors.itemCategoryId && "border-red-500"} disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed`}
-          >
-            <option value="">Select</option>
-            {categories.map((c) => (
-              <option key={c.categoryId} value={c.categoryId}>
-                {c.categoryName}
-              </option>
-            ))}
-          </select>
+            <select
+              {...register("itemCategoryId")}
+              disabled={!isEditing || isSubmitting}
+              className={`flex-1 ${inputClass} ${errors.itemCategoryId && "border-red-500"} disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed`}
+            >
+              <option value="">Select</option>
+              {categories.map((c) => (
+                <option key={c.categoryId} value={c.categoryId}>
+                  {c.categoryName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* <p className={error}>{errors.itemCategoryId?.message}</p> */}
         </div>
-        <p className={error}>{errors.itemCategoryId?.message}</p>
+
+        {/* CC */}
+        <div className="flex flex-col">
+          <div className="flex gap-2">
+            <div className={label}>CC Name</div>
+
+            <select
+              {...register("ccCodeId")}
+              disabled={!isEditing || isSubmitting}
+              className={`flex-1 ${inputClass} ${errors.ccCodeId && "border-red-500"} disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed`}
+            >
+              <option value="">Select</option>
+              {ccList.map((c) => (
+                <option key={c.ccId} value={c.ccId}>
+                  {c.ccName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* <p className={error}>{errors.ccCodeId?.message}</p> */}
+        </div>
       </div>
 
-      {/* CC */}
-      <div className="flex flex-col">
-        <div className="flex gap-2">
-          <div className={label}>CC Name</div>
 
-          <select
-            {...register("ccCodeId")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${inputClass} ${errors.ccCodeId && "border-red-500"} disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed`}
-          >
-            <option value="">Select</option>
-            {ccList.map((c) => (
-              <option key={c.ccId} value={c.ccId}>
-                {c.ccName}
-              </option>
-            ))}
-          </select>
+      <div className="space-y-1">
+        {/* NAME */}
+        <div className="flex flex-col">
+          <div className="flex gap-2">
+            <div className={label}>Item Name</div>
+            <Input {...register("itemName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+          </div>
+          {/* <p className={error}>{errors.itemName?.message}</p> */}
         </div>
-        <p className={error}>{errors.ccCodeId?.message}</p>
-      </div>
 
-      {/* NAME */}
-      <div className="flex flex-col">
-        <div className="flex gap-2">
-          <div className={label}>Item Name</div>
-          <Input {...register("itemName")} disabled={!isEditing || isSubmitting} className="flex-1" />
-        </div>
-        <p className={error}>{errors.itemName?.message}</p>
-      </div>
-
-      {/* DESC */}
-      <div className="flex flex-col">
-        <div className="flex gap-2 items-start">
-          <div className={label}>Item Description</div>
-<textarea
-  {...register("itemDescription")}
-  disabled={!isEditing || isSubmitting}
-  className={`
+        {/* DESC */}
+        <div className="flex flex-col">
+          <div className="flex gap-2 items-start">
+            <div className={label}>Item Description</div>
+            <textarea
+              {...register("itemDescription")}
+              disabled={!isEditing || isSubmitting}
+              className={`
     flex-1
     border border-[#8f8f8f]
     text-sm
@@ -200,58 +204,60 @@ export default function ItemForm({
     disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
     ${errors.itemDescription && "border-red-500"}
   `}
-  placeholder="Text"
-/>        </div>
-        <p className={error}>{errors.itemDescription?.message}</p>
+              placeholder="Text"
+            />        </div>
+          {/* <p className={error}>{errors.itemDescription?.message}</p> */}
+        </div>
       </div>
+
 
       {/* BOTTOM LEFT */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 mt-7">
 
-  <div className="space-y-2">
+        <div className="space-y-2">
 
-    {/* UNIT */}
-    <div className="flex flex-col">
-      <div className="flex gap-2">
-        <div className={label}>Unit</div>
-        <Input
-          {...register("unit")}
-          disabled={!isEditing || isSubmitting}
-          className={`flex-1 ${inputClass} ${errors.unit && "border-red-500"}`}
-        />
+          {/* UNIT */}
+          <div className="flex flex-col">
+            <div className="flex gap-2">
+              <div className={label}>Unit</div>
+              <Input
+                {...register("unit")}
+                disabled={!isEditing || isSubmitting}
+                className={`flex-1 ${inputClass} ${errors.unit && "border-red-500"}`}
+              />
+            </div>
+            {/* <p className={error}>{errors.unit?.message}</p> */}
+          </div>
+
+          {/* HSN */}
+          <div className="flex flex-col">
+            <div className="flex gap-2">
+              <div className={label}>HSN/SAC</div>
+              <Input
+                {...register("hsnSac")}
+                disabled={!isEditing || isSubmitting}
+                className={`flex-1 ${inputClass} ${errors.hsnSac && "border-red-500"}`}
+              />
+            </div>
+            {/* <p className={error}>{errors.hsnSac?.message}</p> */}
+          </div>
+
+          {/* GST */}
+          <div className="flex flex-col">
+            <div className="flex gap-2">
+              <div className={label}>GST %</div>
+              <Input
+                {...register("gstPercentage")}
+                disabled={!isEditing || isSubmitting}
+                className={`flex-1 ${inputClass} ${errors.gstPercentage && "border-red-500"}`}
+              />
+            </div>
+            {/* <p className={error}>{errors.gstPercentage?.message}</p> */}
+          </div>
+
+        </div>
+
       </div>
-      <p className={error}>{errors.unit?.message}</p>
-    </div>
-
-    {/* HSN */}
-    <div className="flex flex-col">
-      <div className="flex gap-2">
-        <div className={label}>HSN/SAC</div>
-        <Input
-          {...register("hsnSac")}
-          disabled={!isEditing || isSubmitting}
-          className={`flex-1 ${inputClass} ${errors.hsnSac && "border-red-500"}`}
-        />
-      </div>
-      <p className={error}>{errors.hsnSac?.message}</p>
-    </div>
-
-    {/* GST */}
-    <div className="flex flex-col">
-      <div className="flex gap-2">
-        <div className={label}>GST %</div>
-        <Input
-          {...register("gstPercentage")}
-          disabled={!isEditing || isSubmitting}
-          className={`flex-1 ${inputClass} ${errors.gstPercentage && "border-red-500"}`}
-        />
-      </div>
-      <p className={error}>{errors.gstPercentage?.message}</p>
-    </div>
-
-  </div>
-
-</div>
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-10">
@@ -262,7 +268,7 @@ export default function ItemForm({
         />
 
         {mode === "edit" && (
-          <EditButton onClick={isEditing ? handleCancel : () => setIsEditing(true)}>
+          <EditButton onClick={isEditing ? handleCancel : () => setIsEditing(true)} disabled={isSubmitting}>
             {isEditing ? "Cancel" : "Edit"}
           </EditButton>
         )}

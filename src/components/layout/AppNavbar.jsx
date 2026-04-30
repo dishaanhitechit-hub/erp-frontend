@@ -99,18 +99,22 @@ export default function AppNavbar() {
             {/* LEFT ICONS */}
             <div className="flex items-center gap-2">
               <button className="cursor-pointer">
-                <Image src="/assets/icons/home.png" alt="" width={32} height={32} />
+                <Image src="/assets/icons/computer-monitor.png" alt="" width={32} height={32} />
+              </button>
+              <button className="cursor-pointer">
+                <Image src="/assets/icons/database.png" alt="" width={32} height={32} />
               </button>
               <button className="cursor-pointer">
                 <Image src="/assets/icons/settings.png" alt="" width={32} height={32} />
               </button>
               <button className="cursor-pointer">
-                <Image src="/assets/icons/computer-monitor.png" alt="" width={32} height={32} />
+                <Image src="/assets/icons/project-list.png" alt="" width={32} height={32} />
               </button>
+              
             </div>
 
-            {/* 🔥 SPACE BETWEEN ICONS AND TCODE */}
-            <div className="ml-10 lg:ml-16 flex items-center gap-2">
+            {/* SPACE BETWEEN ICONS AND TCODE */}
+            <div className="ml-10 lg:ml-80 flex items-center gap-2">
               <span className="text-sm">T. Code</span>
 
               <input
@@ -121,7 +125,7 @@ export default function AppNavbar() {
 
               <button onClick={handleTCodeNavigate} className="cursor-pointer">
                 <Image
-                  src="/assets/icons/red-right-arrow.png"
+                  src="/assets/icons/green-right-arrow.png"
                   alt=""
                   width={28}
                   height={28}
@@ -132,10 +136,10 @@ export default function AppNavbar() {
         </div>
 
         {/* RIGHT */}
-        <div className="w-full lg:w-150 text-[13px] lg:text-[14px] leading-5 lg:leading-6">
+        <div className="w-full lg:w-150 text-[13px] lg:text-[14px] space-y-0.5">
 
           {/* ROW */}
-          <div className="flex">
+          <div className="flex items-center leading-none">
             <span className="min-w-27.5 lg:min-w-32.5 font-bold">
               Project Code
             </span>
@@ -145,7 +149,7 @@ export default function AppNavbar() {
             </span>
           </div>
 
-          <div className="flex">
+          <div className="flex items-center leading-none">
             <span className="min-w-[110px] lg:min-w-[130px] font-bold">
               Client Name
             </span>
@@ -155,7 +159,7 @@ export default function AppNavbar() {
             </span>
           </div>
 
-          <div className="flex">
+          <div className="flex items-center leading-none">
             <span className="min-w-[110px] lg:min-w-[130px] font-bold">
               Project Name
             </span>
@@ -165,7 +169,7 @@ export default function AppNavbar() {
             </span>
           </div>
 
-          <div className="flex">
+          <div className="flex items-center leading-none">
             <span className="min-w-[110px] lg:min-w-[130px] font-bold">
               User
             </span>
@@ -197,12 +201,17 @@ export default function AppNavbar() {
 
         {/* ACTION ICONS */}
         <div className="flex items-center gap-2">
-          <button className="cursor-pointer"><Image src="/assets/icons/home.png" alt="" width={32} height={32} onClick={()=>{
+          <button className="cursor-pointer"><Image src="/assets/icons/timeline.png" alt="" width={32} height={32} /></button>
+          <button className="cursor-pointer"><Image src="/assets/icons/approval-action.png" alt="" width={32} height={32} /></button>
+          <div className="h-[38px] w-[1px] bg-black"></div>
+          <button className="cursor-pointer"><Image src="/assets/icons/home1.png" alt="" width={32} height={32} onClick={()=>{
             clearAuthCookies();
           }}/></button>
-          <button className="cursor-pointer"><Image src="/assets/icons/left-arrow.png" alt="" width={32} height={32} /></button>
+          <button className="cursor-pointer"><Image src="/assets/icons/left-arrow1.png" alt="" width={32} height={32} /></button>
+          <div className="h-[38px] w-[1px] bg-black"></div>
           <button className="cursor-pointer"><Image src="/assets/icons/file-download.png" alt="" width={32} height={32} /></button>
-          <button className="cursor-pointer"><Image src="/assets/icons/database.png" alt="" width={32} height={32} /></button>
+          <button className="cursor-pointer"><Image src="/assets/icons/printer.png" alt="" width={32} height={32} /></button>
+          
         </div>
       </div>
     </div>

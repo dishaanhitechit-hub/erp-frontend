@@ -128,3 +128,7 @@
     @apply font-sans;
   }
 }
+
+body {
+  font-family: "Bahnschrift", "Segoe UI", system-ui, sans-serif;
+}
