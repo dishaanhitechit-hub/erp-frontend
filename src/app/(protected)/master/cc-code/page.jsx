@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const router = useRouter();
@@ -15,6 +17,13 @@ export default function Page() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+    
+  const actions = getPageActions({
+    
+        onHome: () => router.push("/dashboard"),
+        onBack: () => router.back(),
+    
+      });
 
   
 
@@ -85,7 +94,11 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
+    <>
+        <PageHeader
+                            actions={actions}
+                              />
+      <div className="p-3">
 
       {/*  SEARCH SECTION */}
       <SearchSection
@@ -108,5 +121,8 @@ export default function Page() {
         }}
       />
     </div>
+    
+    </>
+    
   );
 }

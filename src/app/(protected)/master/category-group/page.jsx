@@ -1,11 +1,26 @@
 "use client";
 
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 import GroupCategorySection from "@/components/master/group-category/GroupCategorySection";
 import { API_ENDPOINTS } from "@/config/api.config";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+  
+    const actions = getPageActions({
+  
+      onHome: () => router.push("/dashboard"),
+      onBack: () => router.back(),
+  
+    });
   return (
-    <div className="p-4 grid md:grid-cols-2 gap-10">
+    <>
+        <PageHeader
+                    actions={actions}
+                      />
+        <div className="p-4 grid md:grid-cols-2 gap-10">
 
       {/* GROUP */}
       <GroupCategorySection
@@ -32,5 +47,7 @@ export default function Page() {
       />
 
     </div>
+    </>
+    
   );
 }

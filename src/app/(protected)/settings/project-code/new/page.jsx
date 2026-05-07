@@ -1,12 +1,26 @@
+"use client"
+import { getPageActions } from '@/components/common/PageActionButtons'
+import PageHeader from '@/components/layout/PageHeader'
 import ProjectForm from '@/components/project-code/ProjectCodeForm'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
+  const actions = getPageActions({
+        
+        onHome: () => router.push("/dashboard"),
+        onBack: () => router.back(),
+        
+      });
   return (
     <div>
+      <PageHeader
+                      actions={actions}
+                        />
         <ProjectForm />
     </div>
   )
 }
 
-export default page
+export default Page

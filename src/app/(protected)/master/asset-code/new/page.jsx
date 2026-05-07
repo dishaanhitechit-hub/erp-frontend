@@ -5,10 +5,22 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import AssetForm from "@/components/master/asset/AssetForm";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import { useRouter } from "next/navigation";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const actions = getPageActions({
+        
+        onHome: () => router.push("/dashboard"),
+        onBack: () => router.back(),
+        
+      });
+   
 
   useEffect(() => {
     const load = async () => {
@@ -23,7 +35,17 @@ export default function Page() {
     load();
   }, []);
 
+  
+
   if (loading) return <Loader2 className="animate-spin m-auto mt-10" />;
 
-  return <AssetForm mode="create" categories={categories} />;
+  return (
+  <>
+      <PageHeader
+                  actions={actions}
+                    />
+                      <AssetForm mode="create" categories={categories} />;
+  </>
+  )
+  
 }

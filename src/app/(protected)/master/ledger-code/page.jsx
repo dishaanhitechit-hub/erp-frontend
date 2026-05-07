@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const router = useRouter();
@@ -16,9 +18,12 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+  const actions = getPageActions({
+    onHome: () => router.push("/dashboard"),
+    onBack: () => router.back(),
+  });
 
-  //  INITIAL LOAD 
+  //  INITIAL LOAD
   useEffect(() => {
     const fetchLedgers = async () => {
       try {
@@ -30,7 +35,7 @@ export default function Page() {
         const ledgers = res.data || [];
 
         const formatted = ledgers.map((p, index) => ({
-          ledgerId: p.ledgerId, 
+          ledgerId: p.ledgerId,
           sl: index + 1,
           ledgerCode: p.ledgerCode,
           primaryContactPerson: p.primaryContactPerson,
@@ -52,7 +57,6 @@ export default function Page() {
 
   // SEARCH HANDLER
   const handleSearch = ({ search }) => {
-
     if (!search) {
       setFilteredData(data);
       return;
@@ -60,8 +64,8 @@ export default function Page() {
 
     const filtered = data.filter((item) =>
       Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
+        String(val).toLowerCase().includes(search.toLowerCase()),
+      ),
     );
 
     setFilteredData(filtered);
@@ -85,28 +89,30 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
+    <>
+      <PageHeader actions={actions} />
 
-      {/*  SEARCH SECTION */}
-      <SearchSection
-        onSearch={handleSearch}
-        actions={[
-          {
-            label: "+ New Ledger",
-            onClick: () => router.push("/master/ledger-code/new"),
-          },
-          
-        ]}
-      />
+      <div className="p-3">
+        {/*  SEARCH SECTION */}
+        <SearchSection
+          onSearch={handleSearch}
+          actions={[
+            {
+              label: "+ New Ledger",
+              onClick: () => router.push("/master/ledger-code/new"),
+            },
+          ]}
+        />
 
-      {/*  TABLE */}
-      <DataTable
-        columns={columns}
-        data={filteredData}
-        onRowClick={(row) => {
-          router.push(`/master/ledger-code/${row.ledgerId}`);
-        }}
-      />
-    </div>
+        {/*  TABLE */}
+        <DataTable
+          columns={columns}
+          data={filteredData}
+          onRowClick={(row) => {
+            router.push(`/master/ledger-code/${row.ledgerId}`);
+          }}
+        />
+      </div>
+    </>
   );
 }

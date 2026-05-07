@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import PageHeader from "@/components/layout/PageHeader";
+import { getPageActions } from "@/components/common/PageActionButtons";
 
 export default function Page() {
   const router = useRouter();
@@ -16,7 +18,7 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+
 
   //  INITIAL LOAD 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function Page() {
         const projects = res.data || [];
 
         const formatted = projects.map((p, index) => ({
-          id: p.id, 
+          id: p.id,
           sl: index + 1,
           projectcode: p.projectCode,
           customer: p.clientName,
@@ -41,10 +43,10 @@ export default function Page() {
             p.status === "ongoing"
               ? "Ongoing"
               : p.status === "hold"
-              ? "Hold"
-              : p.status === "completed"
-              ? "Completed"
-              : p.status,
+                ? "Hold"
+                : p.status === "completed"
+                  ? "Completed"
+                  : p.status,
         }));
 
         setData(formatted);
@@ -86,6 +88,12 @@ export default function Page() {
     { header: "GSTN", accessor: "gstn" },
     { header: "Status", accessor: "status" },
   ];
+  const actions = getPageActions({
+
+    onHome: () => router.push("/dashboard"),
+    onBack: () => router.back(),
+
+  });
 
   if (loading) {
     return (
@@ -96,28 +104,34 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
-
-      {/*  SEARCH SECTION */}
-      <SearchSection
-        onSearch={handleSearch}
-        actions={[
-          {
-            label: "+ Add Project Code",
-            onClick: () => router.push("/settings/project-code/new"),
-          },
-          
-        ]}
+    <>
+      <PageHeader
+        actions={actions}
       />
+      <div className="p-3 ">
 
-      {/*  TABLE */}
-      <DataTable
-        columns={columns}
-        data={filteredData}
-        onRowClick={(row) => {
-          router.push(`/settings/project-code/${row.id}`);
-        }}
-      />
-    </div>
+        {/*  SEARCH SECTION */}
+        <SearchSection
+          onSearch={handleSearch}
+          actions={[
+            {
+              label: "+ Add Project Code",
+              onClick: () => router.push("/settings/project-code/new"),
+            },
+
+          ]}
+        />
+
+        {/*  TABLE */}
+        <DataTable
+          columns={columns}
+          data={filteredData}
+          onRowClick={(row) => {
+            router.push(`/settings/project-code/${row.id}`);
+          }}
+        />
+      </div>
+    </>
+
   );
 }

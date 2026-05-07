@@ -1,18 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import UserForm from "@/components/user-id-password/UserForm";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import PageHeader from "@/components/layout/PageHeader";
+import { getPageActions } from "@/components/common/PageActionButtons";
 
 const Page = () => {
   const { id } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const router = useRouter();
+  const actions = getPageActions({
+          
+          onHome: () => router.push("/dashboard"),
+          onBack: () => router.back(),
+          
+        });
 
   // FETCH USER 
   useEffect(() => {
@@ -50,6 +59,9 @@ const Page = () => {
   //  FORM 
   return (
     <div>
+      <PageHeader
+                  actions={actions}
+                    />
       <UserForm mode="edit" data={userData} />
     </div>
   );

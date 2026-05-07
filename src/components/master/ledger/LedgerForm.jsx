@@ -137,9 +137,9 @@ export default function LedgerForm({ mode = "create", ledgerId, initialData, cat
     allowedFields.forEach((key) => {
       let value = values[key];
 
-      if (key === "categoryId") {
-        value = value ? Number(value) : "";
-      }
+    //   if (key === "categoryId") {
+    //     value = value ? (value) : "";
+    //   }
 
       formData.append(key, value ?? "");
     });
@@ -206,7 +206,7 @@ export default function LedgerForm({ mode = "create", ledgerId, initialData, cat
         );
     }
 
-    const label = "w-[220px] px-3 py-1 bg-[#d6e6f2] border rounded-md";
+    const label = "w-[220px] px-3 py-1 bg-[#d6e6f2] border border-black rounded-md";
     const inputClass = "border h-[30px] px-2 text-sm";
     const error = "text-red-500 text-[10px]";
 
@@ -215,7 +215,7 @@ export default function LedgerForm({ mode = "create", ledgerId, initialData, cat
             <div className="px-3 py-1 bg-[#8e7cc3] text-white md:min-w-50 rounded-md">{labelText}</div>
 
             {isEditing && (
-                <button onClick={() => ref.current?.click()} className="bg-[#f6c85f] px-3 py-1 rounded cursor-pointer">@</button>
+                <button onClick={() => ref.current?.click()} className="bg-[#f6c85f] px-3 py-1 rounded cursor-pointer" disabled={isSubmitting}>@</button>
             )}
 
             {isEditing ? (
@@ -269,45 +269,50 @@ export default function LedgerForm({ mode = "create", ledgerId, initialData, cat
 };
 
     return (
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-5">
 
-            {/* ROW 1 */}
-            <div className="flex gap-2">
-                <div className={label}>Ledger Code</div>
-                <Input {...register("ledgerCode")} disabled className="w-[200px]" />
-            </div>
+            <div className="space-y-0.5">
 
-            {/* ROW 2 */}
-            <div className="flex flex-col">
+            
+                {/* ROW 1 */}
                 <div className="flex gap-2">
-                    <div className={label}>Ledger Name</div>
-                    <Input {...register("ledgerName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                    <div className={label}>Ledger Code</div>
+                    <Input {...register("ledgerCode")} disabled className="w-[200px]" />
                 </div>
-                <p className={error}>{errors.ledgerName?.message}</p>
-            </div>
 
-            {/* ROW 3 */}
-            <div className="flex flex-col">
-                <div className="flex gap-2">
-                    <div className={label}>Registered Address</div>
-                    <Input {...register("registeredAddress")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                {/* ROW 2 */}
+                <div className="flex flex-col">
+                    <div className="flex gap-2">
+                        <div className={label}>Ledger Name</div>
+                        <Input {...register("ledgerName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                    </div>
+                    {/* <p className={error}>{errors.ledgerName?.message}</p> */}
                 </div>
-                <p className={error}>{errors.registeredAddress?.message}</p>
-            </div>
 
-            {/* ROW 4 */}
-            <div className="flex flex-col">
-                <div className="flex gap-2">
-                    <div className={label}>Corporate Address</div>
-                    <Input {...register("corporateAddress")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                {/* ROW 3 */}
+                <div className="flex flex-col">
+                    <div className="flex gap-2">
+                        <div className={label}>Registered Address</div>
+                        <Input {...register("registeredAddress")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                    </div>
+                    {/* <p className={error}>{errors.registeredAddress?.message}</p> */}
                 </div>
-                <p className={error}>{errors.corporateAddress?.message}</p>
+
+                {/* ROW 4 */}
+                <div className="flex flex-col">
+                    <div className="flex gap-2">
+                        <div className={label}>Corporate Address</div>
+                        <Input {...register("corporateAddress")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                    </div>
+                    {/* <p className={error}>{errors.corporateAddress?.message}</p> */}
+                </div>
+
             </div>
 
             {/* VENDOR CATEGORY */}
             <div className="flex flex-col">
                 <div className="flex gap-2">
-                    <div className={label}>Vendor Category</div>
+                    <div className={label}>Ledger Category</div>
 
                     <select
                         {...register("categoryId")}
@@ -318,137 +323,155 @@ export default function LedgerForm({ mode = "create", ledgerId, initialData, cat
                         <option value="">Select</option>
 
                         {categories.map((item) => (
-                            <option key={item.categoryId} value={String(item.categoryId)}>
-                                {item.categoryName}
+                            <option key={item.value} value={String(item.value)}>
+                                {item.label}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                <p className={error}>{errors.categoryId?.message}</p>
+                {/* <p className={error}>{errors.categoryId?.message}</p> */}
             </div>
 
             {/*  TWO COLUMN SECTION  */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2 mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10  ">
 
                 {/* LEFT SIDE */}
-                <div className="space-y-2">
+                <div className="space-y-5">
+                    <div className="space-y-0.5">
+                            {/* PAN */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>PAN</div>
+                                    <Input {...register("pan")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.pan?.message}</p> */}
+                            </div>
 
-                    {/* PAN */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>PAN</div>
-                            <Input {...register("pan")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.pan?.message}</p>
+                            {/* GSTN */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>GSTN</div>
+                                    <Input {...register("gstin")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.gstin?.message}</p> */}
+                            </div>
+
                     </div>
 
-                    {/* GSTN */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>GSTN</div>
-                            <Input {...register("gstin")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.gstin?.message}</p>
-                    </div>
+                    <div className="space-y-0.5">
 
-                    {/* PRIMARY CONTACT PERSON */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Primary Contact Person</div>
-                            <Input {...register("primaryContactPerson")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                        {/* PRIMARY CONTACT PERSON */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>Primary Contact Person</div>
+                                <Input {...register("primaryContactPerson")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.primaryContactPerson?.message}</p> */}
                         </div>
-                        <p className={error}>{errors.primaryContactPerson?.message}</p>
-                    </div>
 
-                    {/* PRIMARY CONTACT NUMBER */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Primary Contact Number</div>
-                            <Input {...register("primaryContactNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                        {/* PRIMARY CONTACT NUMBER */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>Primary Contact Number</div>
+                                <Input {...register("primaryContactNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.primaryContactNumber?.message}</p> */}
                         </div>
-                        <p className={error}>{errors.primaryContactNumber?.message}</p>
-                    </div>
 
-                    {/* BANK A/C */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Bank A/c Number</div>
-                            <Input {...register("bankAccountNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.bankAccountNumber?.message}</p>
                     </div>
+                    <div className="space-y-0.5">
 
-                    {/* BANK NAME */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Bank Name</div>
-                            <Input {...register("bankName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                    
+                        {/* BANK A/C */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>Bank A/c Number</div>
+                                <Input {...register("bankAccountNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.bankAccountNumber?.message}</p> */}
                         </div>
-                        <p className={error}>{errors.bankName?.message}</p>
-                    </div>
 
-                    {/* BRANCH */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Branch Name</div>
-                            <Input {...register("branchName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                        {/* BANK NAME */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>Bank Name</div>
+                                <Input {...register("bankName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.bankName?.message}</p> */}
                         </div>
-                        <p className={error}>{errors.branchName?.message}</p>
-                    </div>
 
-                    {/* IFSC */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>IFSC Code</div>
-                            <Input {...register("ifscCode")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                        {/* BRANCH */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>Branch Name</div>
+                                <Input {...register("branchName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.branchName?.message}</p> */}
                         </div>
-                        <p className={error}>{errors.ifscCode?.message}</p>
+
+                        {/* IFSC */}
+                        <div className="flex flex-col">
+                            <div className="flex gap-2">
+                                <div className={label}>IFSC Code</div>
+                                <Input {...register("ifscCode")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                            </div>
+                            {/* <p className={error}>{errors.ifscCode?.message}</p> */}
+                        </div>
+
                     </div>
 
                 </div>
 
                 {/* RIGHT SIDE */}
-                <div className="space-y-2">
+                <div className="space-y-5">
 
-                    {/* STATE CODE */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>State Code</div>
-                            <Input {...register("stateCode")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.stateCode?.message}</p>
+                    <div className="space-y-0.5">
+
+                            {/* STATE CODE */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>State Code</div>
+                                    <Input {...register("stateCode")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.stateCode?.message}</p> */}
+                            </div>
+
+                            {/* STATE NAME */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>State Name</div>
+                                    <Input {...register("stateName")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.stateName?.message}</p> */}
+                            </div>
+
                     </div>
 
-                    {/* STATE NAME */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>State Name</div>
-                            <Input {...register("stateName")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.stateName?.message}</p>
-                    </div>
+                    <div className="space-y-0.5">
 
-                    {/* DESIGNATION */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>Designation</div>
-                            <Input {...register("designation")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.designation?.message}</p>
-                    </div>
+                            {/* DESIGNATION */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>Designation</div>
+                                    <Input {...register("designation")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.designation?.message}</p> */}
+                            </div>
 
-                    {/* WHATSAPP */}
-                    <div className="flex flex-col">
-                        <div className="flex gap-2">
-                            <div className={label}>WhatsApp Number</div>
-                            <Input {...register("whatsappNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
-                        </div>
-                        <p className={error}>{errors.whatsappNumber?.message}</p>
+                            {/* WHATSAPP */}
+                            <div className="flex flex-col">
+                                <div className="flex gap-2">
+                                    <div className={label}>WhatsApp Number</div>
+                                    <Input {...register("whatsappNumber")} disabled={!isEditing || isSubmitting} className="flex-1" />
+                                </div>
+                                {/* <p className={error}>{errors.whatsappNumber?.message}</p> */}
+                            </div>
+
                     </div>
 
                     {/* FILE SECTION */}
-                    <div className="pt-4 space-y-2">
+                    <div className=" space-y-0.5">
                         {renderFile("trade", tradeRef, "Trade Licence")}
                         {renderFile("pan", panRef, "PAN")}
                         {renderFile("gstn", gstnRef, "GSTN")}

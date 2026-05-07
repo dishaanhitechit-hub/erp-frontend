@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const router = useRouter();
@@ -79,6 +81,13 @@ export default function Page() {
     { header: "GST%", accessor: "gstPercentage" },
   ];
 
+  const actions = getPageActions({
+      
+      onHome: () => router.push("/dashboard"),
+      onBack: () => router.back(),
+      
+    });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[300px]">
@@ -88,7 +97,11 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
+    <>
+        <PageHeader
+            actions={actions}
+              />
+        <div className="p-3">
 
       {/*  SEARCH SECTION */}
       <SearchSection
@@ -110,6 +123,8 @@ export default function Page() {
           router.push(`/master/asset-code/${row.itemId}`);
         }}
       />
-    </div>
+    </div>    
+    </>
+    
   );
 }

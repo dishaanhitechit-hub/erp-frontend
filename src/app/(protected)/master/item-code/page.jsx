@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const router = useRouter();
@@ -16,9 +18,12 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+  const actions = getPageActions({
+    onHome: () => router.push("/dashboard"),
+    onBack: () => router.back(),
+  });
 
-  //  INITIAL LOAD 
+  //  INITIAL LOAD
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -30,13 +35,13 @@ export default function Page() {
         const items = res.data || [];
 
         const formatted = items.map((p, index) => ({
-          itemId: p.itemId, 
+          itemId: p.itemId,
           sl: index + 1,
           itemCode: p.itemCode,
           itemName: p.itemName,
           itemCategoryName: p.itemCategoryName,
           hsnSac: p.hsnSac,
-          gstPercentage:p.gstPercentage,
+          gstPercentage: p.gstPercentage,
         }));
 
         setData(formatted);
@@ -53,7 +58,6 @@ export default function Page() {
 
   // SEARCH HANDLER
   const handleSearch = ({ search }) => {
-
     if (!search) {
       setFilteredData(data);
       return;
@@ -61,8 +65,8 @@ export default function Page() {
 
     const filtered = data.filter((item) =>
       Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
+        String(val).toLowerCase().includes(search.toLowerCase()),
+      ),
     );
 
     setFilteredData(filtered);
@@ -87,28 +91,29 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
+    <>
+      <PageHeader actions={actions} />
+      <div className="p-3">
+        {/*  SEARCH SECTION */}
+        <SearchSection
+          onSearch={handleSearch}
+          actions={[
+            {
+              label: "+ New Item Code",
+              onClick: () => router.push("/master/item-code/new"),
+            },
+          ]}
+        />
 
-      {/*  SEARCH SECTION */}
-      <SearchSection
-        onSearch={handleSearch}
-        actions={[
-          {
-            label: "+ New Item Code",
-            onClick: () => router.push("/master/item-code/new"),
-          },
-          
-        ]}
-      />
-
-      {/*  TABLE */}
-      <DataTable
-        columns={columns}
-        data={filteredData}
-        onRowClick={(row) => {
-          router.push(`/master/item-code/${row.itemId}`);
-        }}
-      />
-    </div>
+        {/*  TABLE */}
+        <DataTable
+          columns={columns}
+          data={filteredData}
+          onRowClick={(row) => {
+            router.push(`/master/item-code/${row.itemId}`);
+          }}
+        />
+      </div>
+    </>
   );
 }

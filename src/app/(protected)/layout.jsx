@@ -38,7 +38,7 @@ export default function ProtectedLayout({ children }) {
           )}
 
           {/* MAIN CONTENT */}
-          <div className="flex-1 overflow-auto p-2">
+          <div className="flex-1 overflow-auto ">
             {children}
           </div>
 

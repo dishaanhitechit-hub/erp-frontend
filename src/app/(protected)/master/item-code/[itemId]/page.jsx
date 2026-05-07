@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import ItemForm from "@/components/master/item/ItemForm";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function Page() {
   const { itemId } = useParams();
@@ -14,17 +17,23 @@ export default function Page() {
   const [categories, setCategories] = useState([]);
   const [ccList, setCcList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const actions = getPageActions({
+    onHome: () => router.push("/dashboard"),
+    onBack: () => router.back(),
+  });
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [itemRes, c, cc] = await Promise.all([
+      const [itemRes, cc] = await Promise.all([
         apiRequest({ url: `${API_ENDPOINTS.MASTER.GET_ITEM_BY_ID}/${itemId}` }),
-        apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CATEGORY }),
+        // apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CATEGORY }),
         apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CC_CODE }),
       ]);
-
+      const itemOptions = CATEGORY_OPTIONS.itemCategory;
       setData(itemRes.data[0]);
-      setCategories(c.data || []);
+      setCategories(itemOptions || []);
       setCcList(cc.data || []);
       setLoading(false);
     };
@@ -35,12 +44,15 @@ export default function Page() {
   if (loading) return <Loader2 className="animate-spin m-auto mt-10" />;
 
   return (
-    <ItemForm
-      mode="edit"
-      itemId={itemId}
-      initialData={data}
-      categories={categories}
-      ccList={ccList}
-    />
+    <>
+      <PageHeader actions={actions} />
+      <ItemForm
+        mode="edit"
+        itemId={itemId}
+        initialData={data}
+        categories={categories}
+        ccList={ccList}
+      />
+    </>
   );
 }

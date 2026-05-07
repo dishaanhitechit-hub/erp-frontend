@@ -8,13 +8,16 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { getCookie, setCookie } from "@/lib/cookies";
+import { clearAuthCookies, getCookie, setCookie } from "@/lib/cookies";
 import { Paperclip } from "lucide-react";
 import { openFileWithAuth } from "@/lib/fileViewer";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import PageHeader from "@/components/layout/PageHeader";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import { useRouter } from "next/navigation";
 
 // ---------------- SCHEMA ----------------
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -54,6 +57,7 @@ export default function CompanyDetailsPage() {
   const [panFileError, setPanFileError] = useState("");
   const [gstFileError, setGstFileError] = useState("");
   const [loadingData, setLoadingData] = useState(true);
+   const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -236,6 +240,12 @@ export default function CompanyDetailsPage() {
     "w-[250px] px-3 py-1 bg-[#6fd1e3] border border-[#2f8fa3] text-md rounded-sm";
 
   const errorText = "text-red-500 text-[10px] h-[14px] mt-[2px]";
+   const actions = getPageActions({
+    
+    onHome: () => clearAuthCookies(),
+    onBack: () => router.back(),
+    
+  });
 
   if (loadingData) {
     return (
@@ -246,6 +256,10 @@ export default function CompanyDetailsPage() {
   }
 
   return (
+    <>
+    <PageHeader
+    actions={actions}
+      />
     <div className="p-4 space-y-2">
       {/* COMPANY NAME */}
       <div>
@@ -506,5 +520,7 @@ export default function CompanyDetailsPage() {
         </EditButton>
       </div>
     </div>
+    </>
+    
   );
 }

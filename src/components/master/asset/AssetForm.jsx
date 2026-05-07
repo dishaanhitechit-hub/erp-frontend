@@ -110,7 +110,7 @@ export default function AssetForm({
       const v = getValues();
 
       const payload = {
-        itemCategoryId: Number(v.itemCategoryId),
+        itemCategoryId: (v.itemCategoryId),
         ccCodeId: Number(v.ccCodeId),
         assetName: v.assetName,
         assetDescription: v.assetDescription,
@@ -150,7 +150,7 @@ export default function AssetForm({
   };
 
   const label =
-    "w-[220px] h-[30px] flex items-center px-3 bg-[#d6e6f2] border rounded-sm text-sm";
+    "w-[220px] h-[30px] flex items-center px-3 bg-[#d6e6f2] border border-black rounded-sm text-sm";
   const inputClass =
     "border border-[#8f8f8f] h-[30px] text-sm rounded-sm px-2";
 

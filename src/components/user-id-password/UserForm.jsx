@@ -190,7 +190,7 @@ export default function UserForm({ mode = "create", data }) {
   const errorText = "text-red-500 text-[10px] h-[14px] mt-[2px]";
 
   return (
-    <div className="p-4 space-y-1">
+    <div className="p-4 ">
 
       {/* USERNAME + ROLE */}
       <div className="md:flex md:items-center">
@@ -224,7 +224,7 @@ export default function UserForm({ mode = "create", data }) {
           <option value={ROLE.ADMIN}>Admin</option>
         </select>
       </div>
-      <p className={errorText}>{errors.username?.message}</p>
+      {/* <p className={errorText}>{errors.username?.message}</p> */}
 
       {/* OTHER FIELDS */}
       {[
@@ -242,7 +242,7 @@ export default function UserForm({ mode = "create", data }) {
             : label;
 
         return (
-          <div key={key}>
+          <div key={key} className={`${(key =="password") || (key=="email") ? "mt-3":""}`}>
             <div className="md:flex md:items-center">
               <div className={labelClass}>{finalLabel}</div>
 
@@ -253,7 +253,7 @@ export default function UserForm({ mode = "create", data }) {
               />
             </div>
 
-            <p className={errorText}>{errors[key]?.message}</p>
+            {/* <p className={errorText}>{errors[key]?.message}</p> */}
           </div>
         );
       })}
@@ -274,11 +274,11 @@ export default function UserForm({ mode = "create", data }) {
           </select>
         </div>
 
-        <p className={errorText}>{errors.status?.message}</p>
+        {/* <p className={errorText}>{errors.status?.message}</p> */}
       </div>
 
       {/* SIGNATURE */}
-      <div className="pt-2">
+      <div className="pt-2 mt-3">
         <div className="flex items-center gap-2">
 
           <div className="px-3 py-1 min-w-37.5 text-center bg-[#8e7cc3] text-white text-md rounded-sm">

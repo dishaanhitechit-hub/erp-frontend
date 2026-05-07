@@ -1,5 +1,27 @@
+"use client"
+import { getPageActions } from "@/components/common/PageActionButtons";
+import PageHeader from "@/components/layout/PageHeader";
 import CCForm from "@/components/master/cc-code/CCForm";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  return <CCForm mode="create" />;
+  const router = useRouter();
+
+  const actions = getPageActions({
+
+    onHome: () => router.push("/dashboard"),
+    onBack: () => router.back(),
+
+  });
+  return (
+  <>
+  <PageHeader
+                              actions={actions}
+                                />
+  <CCForm mode="create" />
+  </>
+  
+  
+  
+  );
 }

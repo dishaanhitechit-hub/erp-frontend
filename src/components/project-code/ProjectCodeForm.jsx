@@ -329,7 +329,7 @@ export default function ProjectForm({ mode = "create", data ,projectId}) {
                     <textarea
                         {...register("projectDetails")}
                         disabled={!isEditing || isSubmitting}
-                        className={`border text-sm rounded-sm w-full p-2 ${errors.projectDetails ? "border-red-500" : "border-[#8f8f8f]"
+                        className={`border text-sm rounded-sm w-full p-2 bg-white ${errors.projectDetails ? "border-red-500" : "border-[#8f8f8f]"
                             } disabled:bg-gray-100 
     disabled:text-gray-500 
     `}

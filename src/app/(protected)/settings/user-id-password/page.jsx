@@ -9,6 +9,8 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { roleMap } from "@/config/role.config";
+import PageHeader from "@/components/layout/PageHeader";
+import { getPageActions } from "@/components/common/PageActionButtons";
 
 export default function Page() {
   const router = useRouter();
@@ -70,6 +72,13 @@ export default function Page() {
     setFilteredData(filtered);
   };
 
+  const actions = getPageActions({
+      
+      onHome: () => router.push("/dashboard"),
+      onBack: () => router.back(),
+      
+    });
+
   //  TABLE COLUMNS
   const columns = [
     { header: "Sl. no", accessor: "sl" },
@@ -91,7 +100,11 @@ export default function Page() {
   }
 
   return (
-    <div className="p-3">
+    <>
+        <PageHeader
+            actions={actions}
+              />
+              <div className="p-3">
 
       {/*  SEARCH SECTION */}
       <SearchSection
@@ -113,5 +126,7 @@ export default function Page() {
         }}
       />
     </div>
+    </>
+    
   );
 }

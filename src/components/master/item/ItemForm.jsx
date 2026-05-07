@@ -61,7 +61,7 @@ export default function ItemForm({
 
       const v = getValues();
       const payload = {
-        itemCategoryId: Number(v.itemCategoryId),
+        itemCategoryId: (v.itemCategoryId),
         ccCodeId: Number(v.ccCodeId),
         itemName: v.itemName,
         itemDescription: v.itemDescription,
@@ -117,7 +117,7 @@ export default function ItemForm({
   };
 
   const label =
-    "w-[220px] px-3 py-1 bg-[#d6e6f2] border rounded-sm text-sm";
+    "w-[220px] px-3 py-1 bg-[#d6e6f2] border border-black rounded-sm text-sm";
   const inputClass =
     "border border-[#8f8f8f] h-[30px] text-sm rounded-sm px-2";
   const error = "text-red-500 text-[10px]";
@@ -144,8 +144,8 @@ export default function ItemForm({
             >
               <option value="">Select</option>
               {categories.map((c) => (
-                <option key={c.categoryId} value={c.categoryId}>
-                  {c.categoryName}
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>

@@ -68,7 +68,7 @@ export default function AppNavbar() {
   return (
     <div className="w-full border border-[#c4d1df] bg-[#efefef]">
       {/* TOP SECTION */}
-      <div className="flex flex-col lg:flex-row justify-between px-4 lg:px-6 pt-2 gap-4">
+      <div className="flex flex-col lg:flex-row justify-between px-4 lg:px-6 pt-2 gap-4 mb-3.5">
 
         {/* LEFT */}
         <div className="flex flex-col">
@@ -183,37 +183,34 @@ export default function AppNavbar() {
       </div>
 
       {/* BOTTOM */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-6 py-2 gap-2">
-
-        {/* BREADCRUMB */}
-        <div className="text-[14px] lg:text-[16px] font-semibold">
-          <span>Modules : </span>
-
-          {breadcrumbs.map((crumb, index) => (
-            <span key={crumb}>
-              {index !== 0 && " > "}
-              <span className={index === breadcrumbs.length - 1 ? "text-red-600" : ""}>
-                {crumb}
-              </span>
-            </span>
-          ))}
-        </div>
-
-        {/* ACTION ICONS */}
-        <div className="flex items-center gap-2">
-          <button className="cursor-pointer"><Image src="/assets/icons/timeline.png" alt="" width={32} height={32} /></button>
-          <button className="cursor-pointer"><Image src="/assets/icons/approval-action.png" alt="" width={32} height={32} /></button>
-          <div className="h-[38px] w-[1px] bg-black"></div>
-          <button className="cursor-pointer"><Image src="/assets/icons/home1.png" alt="" width={32} height={32} onClick={()=>{
-            clearAuthCookies();
-          }}/></button>
-          <button className="cursor-pointer"><Image src="/assets/icons/left-arrow1.png" alt="" width={32} height={32} /></button>
-          <div className="h-[38px] w-[1px] bg-black"></div>
-          <button className="cursor-pointer"><Image src="/assets/icons/file-download.png" alt="" width={32} height={32} /></button>
-          <button className="cursor-pointer"><Image src="/assets/icons/printer.png" alt="" width={32} height={32} /></button>
-          
-        </div>
-      </div>
+        
+      
     </div>
   );
 }
+
+
+
+// {/* <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-6 py-2 gap-2">
+
+//          {/* BREADCRUMB */}
+//          <div className="text-[14px] lg:text-[16px] font-semibold">
+//          <span>Modules : </span>
+
+//           {/* ACTION ICONS */}
+//         <div className="flex items-center gap-2">
+//           <button className="cursor-pointer"><Image src="/assets/icons/timeline.png" alt="" width={32} height={32} /></button>
+//           <button className="cursor-pointer"><Image src="/assets/icons/approval-action.png" alt="" width={32} height={32} /></button>
+//           <div className="h-[38px] w-[1px] bg-black"></div>
+//           <button className="cursor-pointer"><Image src="/assets/icons/home1.png" alt="" width={32} height={32} onClick={()=>{
+//             clearAuthCookies();
+//           }}/></button>
+//           <button className="cursor-pointer"><Image src="/assets/icons/left-arrow1.png" alt="" width={32} height={32} /></button>
+//           <div className="h-[38px] w-[1px] bg-black"></div>
+//           <button className="cursor-pointer"><Image src="/assets/icons/file-download.png" alt="" width={32} height={32} /></button>
+//           <button className="cursor-pointer"><Image src="/assets/icons/printer.png" alt="" width={32} height={32} /></button>
+          
+//         </div>
+//       </div>
+//       </div>
+//   */}

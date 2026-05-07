@@ -9,6 +9,9 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
+import PageHeader from "@/components/layout/PageHeader";
+import { useRouter } from "next/navigation";
+import { getPageActions } from "@/components/common/PageActionButtons";
 
 export default function ProjectRolePage() {
   const [projectCode, setProjectCode] = useState("");
@@ -27,6 +30,8 @@ export default function ProjectRolePage() {
     designationName: "",
     teamId: "",
   });
+  const router = useRouter();
+
 
   const inputClass =
     "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm";
@@ -207,8 +212,20 @@ export default function ProjectRolePage() {
     </div>
   );
 
+  const actions = getPageActions({
+        
+        onHome: () => router.push("/dashboard"),
+        onBack: () => router.back(),
+        
+      });
+
   return (
-    <div className="p-4 space-y-2">
+    <>
+    <PageHeader
+                actions={actions}
+                  />
+
+      <div className="p-4 space-y-2">
 
       {/* TOP ROW */}
       <div className="md:flex md:justify-between">
@@ -321,5 +338,8 @@ export default function ProjectRolePage() {
       </Dialog>
 
     </div>
+    
+    </>
+    
   );
 }

@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 
 const schema = z.object({
   ccName: z.string().min(1, "Required"),
@@ -45,13 +46,15 @@ export default function CCForm({ mode = "create", ccId ,data}) {
   useEffect(() => {
     
     const loadMaster = async () => {
-      const [g, c] = await Promise.all([
-        apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_GROUP }),
-        apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CATEGORY }),
-      ]);
-
+      // const [g, c] = await Promise.all([
+      //   apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_GROUP }),
+      //   apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CATEGORY }),
+      // ]);
+      const g = await 
+        apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_GROUP });
+      const ccOptions = CATEGORY_OPTIONS.ccCategory;
       setGroups(g.data || []);
-      setCategories(c.data || []);
+      setCategories(ccOptions|| []);
       if(data && mode ==="edit"){
         console.log(data)
         reset(data);
@@ -105,7 +108,7 @@ export default function CCForm({ mode = "create", ccId ,data}) {
         ccCode: values.ccCode,
         ccName: values.ccName,
         groupId: Number(values.groupId),
-        categoryId: Number(values.categoryId),
+        categoryId: (values.categoryId),
       };
 
       if (mode === "create") {
@@ -231,8 +234,8 @@ export default function CCForm({ mode = "create", ccId ,data}) {
           >
             <option value="">Select</option>
             {categories.map((c) => (
-              <option key={c.categoryId} value={c.categoryId}>
-                {c.categoryName}
+              <option key={c.value} value={c.value}>
+                {c.label}
               </option>
             ))}
           </select>
