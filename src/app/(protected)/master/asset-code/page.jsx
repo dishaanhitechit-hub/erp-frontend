@@ -34,9 +34,10 @@ export default function Page() {
         const formatted = assets.map((p, index) => ({
           itemId: p.assetId, 
           sl: index + 1,
-          itemCode: p.assetCode,
-          itemName: p.assetName,
-          itemCategoryName: p.assetCategoryName,
+          assetCode: p.assetCode,
+          assetName: p.assetName,
+          assetCategoryName: p.assetCategoryName,
+          unit:p.unit,
           hsnSac: p.hsnSac,
           gstPercentage:p.gstPercentage,
         }));
@@ -76,7 +77,7 @@ export default function Page() {
     { header: "Asset Code", accessor: "assetCode" },
     { header: "Asset Name", accessor: "assetName" },
     { header: "Category", accessor: "assetCategoryName" },
-    { header: "Unit", accessor: "assetCategoryName" },
+    { header: "Unit", accessor: "unit" },
     { header: "HSN", accessor: "hsnSac" },
     { header: "GST%", accessor: "gstPercentage" },
   ];
