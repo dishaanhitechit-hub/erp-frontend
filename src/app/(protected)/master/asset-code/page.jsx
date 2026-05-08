@@ -32,7 +32,7 @@ export default function Page() {
         const assets = res.data || [];
 
         const formatted = assets.map((p, index) => ({
-          itemId: p.assetId, 
+          assetId: p.assetId, 
           sl: index + 1,
           assetCode: p.assetCode,
           assetName: p.assetName,
