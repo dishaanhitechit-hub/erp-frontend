@@ -93,6 +93,19 @@ export const routeMetaConfig = [
     basePath: "/master/category-group",
     breadcrumbs: ["Master", "Category & Group"],
   },
+  //unit
+  {
+    basePath: "/master/unit",
+    breadcrumbs: ["Master", "Unit List" ],
+  },
+  {
+    basePath: "/master/unit/new",
+    breadcrumbs: ["Master", "Unit", "New"],
+  },
+  {
+    basePath: "/master/unit/[id]",
+    breadcrumbs: ["Master", "Unit", "Edit"],
+  },
   
   {
     basePath: "/resource-management/procurement/indent",

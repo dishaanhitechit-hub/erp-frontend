@@ -63,27 +63,27 @@ export const CATEGORY_OPTIONS = {
   unitCategory: [
     {
       label: "Length",
-      value: "UNT_LEN_001",
+      value: "UNIT_001",
     },
     {
       label: "Area",
-      value: "UNT_AREA_001",
+      value: "UNIT_002",
     },
     {
       label: "Volumn",
-      value: "UNT_VOL_001",
+      value: "UNIT_003",
     },
     {
       label: "Time",
-      value: "UNT_TIME_001",
+      value: "UNIT_004",
     },
     {
       label: "Wight",
-      value: "UNT_WGT_001",
+      value: "UNIT_005",
     },
     {
       label: "Count",
-      value: "UNT_CNT_001",
+      value: "UNIT_006",
     },
   ],
   assetCategory :[

@@ -42,6 +42,11 @@ export const API_ENDPOINTS = {
         GET_ASSET_BY_ID:"/master/asset",
         UPDATE_ASSET_BY_ID:"/master/asset/update",
         CREATE_ASSET:"/master/asset/create",
+        //unit
+        GET_ALL_UNIT:"/master/unit/list",//unitType ,categoryId filter options
+        CREATE_UNIT:"/master/unit/create",
+        UPDATE_UNIT_BY_ID:"/master/unit/update",//unitId
+        GET_UNIT_BY_ID:"/master/unit",//unitId
     },
     // resource/indent
     RESOURCE:{
