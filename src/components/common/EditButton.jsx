@@ -13,6 +13,7 @@ export default function EditButton({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={isDisabled}
       className={`
