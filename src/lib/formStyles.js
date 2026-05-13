@@ -10,7 +10,7 @@ export const getInputClass = (
      hasError
        ? "border-red-500 bg-red-50 focus-visible:ring-red-500"
        : disabled
-       ? "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed]"
+       ? "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed] disabled:text-gray-500"
        : "border-[#8f8f8f] bg-white"
    }`;
 

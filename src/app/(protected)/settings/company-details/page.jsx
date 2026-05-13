@@ -207,7 +207,10 @@ export default function CompanyDetailsPage() {
         isUpdate ? "Updating company details..." : "Saving company details...",
       );
 
-      const values = getValues();
+      const values = {
+        ...getValues(),
+        stateCode: getStateCodeByName(getValues().state || ""),
+      };
       const formDataPayload = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
@@ -463,11 +466,6 @@ export default function CompanyDetailsPage() {
               <div>
                 <div className="md:flex md:items-center">
                   <div className={labelClass}>State</div>
-                  {/* <Input
-                {...register("state")}
-                disabled={!isEditing || isSubmitting}
-                className={`${getInputClass(errors.state)} w-65 -ml-px`}
-              /> */}
                   <select
                     {...register("state")}
                     disabled={!isEditing || isSubmitting}
