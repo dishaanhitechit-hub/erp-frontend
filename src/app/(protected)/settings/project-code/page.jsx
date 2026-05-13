@@ -53,7 +53,7 @@ export default function Page() {
         setData(formatted);
         setFilteredData(formatted);
       } catch (err) {
-        toast.error("Failed to fetch projects");
+        toast.error(err.message || "Failed to fetch projects");
       } finally {
         setLoading(false);
       }

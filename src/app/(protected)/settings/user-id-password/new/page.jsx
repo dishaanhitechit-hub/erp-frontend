@@ -15,13 +15,13 @@ export default function Page() {
         
       });
   return (
-    <div>
+    <>
       <HeaderWrapper
       header={<PageHeader actions={actions} />}
     >
       <UserForm />
       </HeaderWrapper>
-    </div>
+    </>
   )
 }
 

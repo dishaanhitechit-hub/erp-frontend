@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getCookie, setCookie } from "@/lib/cookies";
 import { ROLE } from "@/config/role.config";
+import { setLocalStorage } from "@/lib/localStorage";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ const LoginForm = () => {
 
     setCookie("token", user.token);
     setCookie("userId", user.id);
-    setCookie("userName", user.username);
+    setLocalStorage("userName", user.username);
     setCookie("role", user.role);
     if(user.role ===ROLE.SUPER_ADMIN){
       let resp = await apiRequest({

@@ -5,10 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { tcodeConfig } from "@/config/tcode.config";
 import { getBreadcrumbs } from "@/lib/breadcrumbs";
 import Image from "next/image";
-import { routeMetaConfig } from "@/config/route-meta.config";
 import { toast } from "sonner";
 import { clearAuthCookies, setCookie } from "@/lib/cookies";
 import { getCookie } from "@/lib/cookies";
+import { getLocalStorage } from "@/lib/localStorage";
 
 export default function AppNavbar() {
   const pathname = usePathname();
@@ -30,8 +30,8 @@ export default function AppNavbar() {
 
     // safe client-only logic
     try {
-      const storedProject = setCookie("projectInfo");
-      const storedUser = getCookie("userName");
+      const storedProject = getLocalStorage("projectInfo");
+      const storedUser = getLocalStorage("userName") || "";
 
       if (storedProject) {
         const parsed = JSON.parse(storedProject);
@@ -178,8 +178,6 @@ export default function AppNavbar() {
       </div>
 
       {/* BOTTOM */}
-        
-      
     </div>
   );
 }

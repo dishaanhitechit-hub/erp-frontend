@@ -15,13 +15,13 @@ const Page = () => {
         
       });
   return (
-    <div>
+    <>
       <HeaderWrapper
             header={<PageHeader actions={actions} />}
           >
         <ProjectForm />
         </HeaderWrapper>
-    </div>
+    </>
   )
 }
 

@@ -59,13 +59,13 @@ const Page = () => {
 
   //  FORM 
   return (
-    <div>
+    <>
       <HeaderWrapper
       header={<PageHeader actions={actions} />}
     >
       <UserForm mode="edit" data={userData} />
       </HeaderWrapper>
-    </div>
+    </>
   );
 };
 

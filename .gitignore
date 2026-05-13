@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE / Editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.xml

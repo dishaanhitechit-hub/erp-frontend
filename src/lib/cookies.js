@@ -38,4 +38,5 @@ export const clearAuthCookies = () => {
   deleteCookie("userId");
   deleteCookie("userName");
   deleteCookie("role");
+  
 };
