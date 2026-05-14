@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { sidebarConfig } from "@/config/sidebar.config";
-import { X, Settings, Database } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function MapUserModal({
                                          open,
@@ -25,131 +25,280 @@ export default function MapUserModal({
         permissionType,
         checked
     ) => {
+
         setPermissions((prev) => ({
+
             ...prev,
 
             [path]: {
+
                 ...prev[path],
 
                 [permissionType]: checked,
+
             },
+
         }));
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+
+        <Dialog
+            open={open}
+            onOpenChange={onOpenChange}
+        >
 
             <DialogContent
                 showCloseButton={false}
                 className="
-                        !w-[95vw]
-                        !max-w-[1400px]
-                        !p-0
-                        !overflow-hidden
-                        !rounded-2xl
-                        !border-0
-            ">
+                    !w-[95vw]
+                    !max-w-[900px]
+                    !p-0
+                    !overflow-hidden
+                    !rounded-sm
+                    !border
+                    !border-[#cfcfcf]
+                    bg-[#efefef]
+                "
+            >
 
-                <div>
-                    {/* HEADER */}
-                    <DialogHeader className="flex flex-row items-center justify-between border-b bg-white px-7 py-5">
+                {/* HEADER */}
+                <DialogHeader
+                    className="
+                        flex
+                        flex-row
+                        items-center
+                        justify-between
+                        border-b
+                        border-[#cfcfcf]
+                        bg-white
+                        px-3
+                        py-2
+                    "
+                >
 
-                        <DialogTitle className="text-[20px] font-bold text-[#11295b] tracking-wide">
-                            Module Permission Mapping
-                        </DialogTitle>
+                    <DialogTitle
+                        className="
+                            text-[14px]
+                            font-bold
+                            text-black
+                        "
+                    >
+                        Module Permission Mapping
+                    </DialogTitle>
 
-                        <button
-                            onClick={() => onOpenChange(false)}
-                            className="rounded-md p-2 hover:bg-gray-100 transition"
-                        >
-                            <X className="h-5 w-5 text-[#11295b]"/>
-                        </button>
+                    <button
+                        onClick={() => onOpenChange(false)}
+                        className="
+                            rounded-sm
+                            border
+                            border-[#cfcfcf]
+                            p-1
+                            hover:bg-gray-100
+                        "
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
 
-                    </DialogHeader>
+                </DialogHeader>
 
-                    {/* BODY */}
-                    <div className="max-h-[70vh] overflow-y-auto bg-[#fafafa] px-5 py-5">
+                {/* BODY */}
+                <div
+                    className="
+                        max-h-[75vh]
+                        overflow-y-auto
+                        bg-[#efefef]
+                        p-3
+                    "
+                >
 
-                        {/* TABLE HEADER */}
+                    {/* TOP ROLE SECTION */}
+                    <div className="mb-4 flex items-center gap-0">
+
                         <div
-                            className="grid grid-cols-4 overflow-hidden rounded-t-xl border border-[#dbe3ef] bg-[#dfeafb] text-sm font-semibold text-[#1f3768]">
-
-                            <div className="border-r border-[#dbe3ef] px-6 py-4 text-left">
-                                Module
-                            </div>
-
-                            <div className="border-r border-[#dbe3ef] px-6 py-4 text-center">
-                                View
-                            </div>
-
-                            <div className="border-r border-[#dbe3ef] px-6 py-4 text-center">
-                                Edit
-                            </div>
-
-                            <div className="px-6 py-4 text-center">
-                                Download
-                            </div>
-
+                            className="
+                                min-w-[100px]
+                                border
+                                border-[#7a7a7a]
+                                bg-[#cde8c9]
+                                px-2
+                                py-1
+                                text-[12px]
+                            "
+                        >
+                            Role
                         </div>
 
-                        {/* MODULES */}
-                        <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#dbe3ef] bg-white">
+                        <select
+                            className="
+                                h-[30px]
+                                w-[320px]
+                                border
+                                border-l-0
+                                border-[#7a7a7a]
+                                bg-white
+                                px-2
+                                text-[12px]
+                                outline-none
+                            "
+                        >
+                            <option>
+                                Select Role as Listed
+                            </option>
+                        </select>
 
-                            {sidebarConfig
-                                .filter(
-                                    (module) =>
-                                        module.title?.toLowerCase() !== "settings" &&
-                                        module.title?.toLowerCase() !== "master"
-                                )
-                                .map((module) => (
+                    </div>
 
-                                    <div key={module.title}>
+                    {/* TABLE HEADER */}
+                    <div
+                        className="
+                            grid
+                            grid-cols-[1fr_70px_90px]
+                            border
+                            border-[#cfcfcf]
+                            bg-[#c8e3ef]
+                            text-[12px]
+                            font-bold
+                        "
+                    >
 
-                                        {/* MODULE TITLE */}
-                                        <div className="flex items-center gap-2 border-b bg-[#eef3fb] px-5 py-3">
+                        <div
+                            className="
+                                border-r
+                                border-[#cfcfcf]
+                                px-2
+                                py-1
+                                text-center
+                            "
+                        >
+                            Module/Sub Module
+                        </div>
 
-                                            {module.title?.toLowerCase() === "settings" ? (
-                                                <Settings className="h-4 w-4 text-[#243b6b]"/>
-                                            ) : (
-                                                <Database className="h-4 w-4 text-[#243b6b]"/>
-                                            )}
+                        <div
+                            className="
+                                border-r
+                                border-[#cfcfcf]
+                                px-2
+                                py-1
+                                text-center
+                            "
+                        >
+                            View
+                        </div>
 
-                                            <h2 className="text-[15px] font-semibold text-[#243b6b] capitalize">
-                                                {module.title}
-                                            </h2>
+                        <div
+                            className="
+                                px-2
+                                py-1
+                                text-center
+                            "
+                        >
+                            Add/Edit
+                        </div>
 
-                                        </div>
+                    </div>
 
-                                        {/* CHILDREN */}
-                                        {module.children?.map((child) => (
+                    {/* TABLE BODY */}
+                    <div
+                        className="
+                            border
+                            border-t-0
+                            border-[#cfcfcf]
+                            bg-white
+                        "
+                    >
 
-                                            <div key={child.title}>
+                        {sidebarConfig.map((module, moduleIndex) => (
 
-                                                {/* CHILD WITH SUB MENU */}
-                                                {child.children ? (
+                            <div key={module.title}>
 
-                                                    child.children.map((sub) => (
+                                {/* MAIN MODULE */}
+                                <div
+                                    className="
+                                        border-b
+                                        border-[#cfcfcf]
+                                        bg-[#c8e3ef]
+                                        px-2
+                                        py-1
+                                        text-[12px]
+                                        font-bold
+                                    "
+                                >
+                                    {moduleIndex + 1}. {module.title}
+                                </div>
+
+                                {/* CHILDREN */}
+                                {module.children?.map((child, childIndex) => (
+
+                                    <div key={child.title}>
+
+                                        {/* SECTION HEADER */}
+                                        {child.children ? (
+
+                                            <>
+                                                <div
+                                                    className="
+                                                        border-b
+                                                        border-[#cfcfcf]
+                                                        bg-[#d7ebcd]
+                                                        px-2
+                                                        py-1
+                                                        text-[12px]
+                                                        font-semibold
+                                                    "
+                                                >
+                                                    {moduleIndex + 1}.
+                                                    {childIndex + 1}{" "}
+                                                    {child.title}
+                                                </div>
+
+                                                {/* SUB CHILDREN */}
+                                                {child.children.map(
+                                                    (sub, subIndex) => (
 
                                                         <div
                                                             key={sub.path}
-                                                            className="grid grid-cols-4 border-b border-[#e5e7eb] text-sm hover:bg-[#f8fbff] transition"
+                                                            className="
+                                                                grid
+                                                                grid-cols-[1fr_70px_90px]
+                                                                border-b
+                                                                border-[#cfcfcf]
+                                                                text-[12px]
+                                                            "
                                                         >
 
                                                             {/* NAME */}
                                                             <div
-                                                                className="border-r border-[#e5e7eb] px-12 py-4 font-medium text-[#2f3b52]">
+                                                                className="
+                                                                    border-r
+                                                                    border-[#cfcfcf]
+                                                                    px-2
+                                                                    py-1
+                                                                "
+                                                            >
+                                                                {moduleIndex + 1}.
+                                                                {childIndex + 1}.
+                                                                {subIndex + 1}{" "}
                                                                 {sub.title}
                                                             </div>
 
                                                             {/* VIEW */}
                                                             <div
-                                                                className="flex items-center justify-center border-r border-[#e5e7eb]">
+                                                                className="
+                                                                    flex
+                                                                    items-center
+                                                                    justify-center
+                                                                    border-r
+                                                                    border-[#cfcfcf]
+                                                                "
+                                                            >
 
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        permissions?.[sub.path]
-                                                                            ?.view || false
+                                                                        permissions?.[
+                                                                            sub.path
+                                                                            ]?.view || false
                                                                     }
                                                                     onChange={(e) =>
                                                                         handleCheckbox(
@@ -158,20 +307,30 @@ export default function MapUserModal({
                                                                             e.target.checked
                                                                         )
                                                                     }
-                                                                    className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
+                                                                    className="
+                                                                        h-3.5
+                                                                        w-3.5
+                                                                        cursor-pointer
+                                                                    "
                                                                 />
 
                                                             </div>
 
                                                             {/* EDIT */}
                                                             <div
-                                                                className="flex items-center justify-center border-r border-[#e5e7eb]">
+                                                                className="
+                                                                    flex
+                                                                    items-center
+                                                                    justify-center
+                                                                "
+                                                            >
 
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        permissions?.[sub.path]
-                                                                            ?.edit || false
+                                                                        permissions?.[
+                                                                            sub.path
+                                                                            ]?.edit || false
                                                                     }
                                                                     onChange={(e) =>
                                                                         handleCheckbox(
@@ -180,133 +339,153 @@ export default function MapUserModal({
                                                                             e.target.checked
                                                                         )
                                                                     }
-                                                                    className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
-                                                                />
-
-                                                            </div>
-
-                                                            {/* DOWNLOAD */}
-                                                            <div className="flex items-center justify-center">
-
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        permissions?.[sub.path]
-                                                                            ?.download || false
-                                                                    }
-                                                                    onChange={(e) =>
-                                                                        handleCheckbox(
-                                                                            sub.path,
-                                                                            "download",
-                                                                            e.target.checked
-                                                                        )
-                                                                    }
-                                                                    className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
+                                                                    className="
+                                                                        h-3.5
+                                                                        w-3.5
+                                                                        cursor-pointer
+                                                                    "
                                                                 />
 
                                                             </div>
 
                                                         </div>
-                                                    ))
-
-                                                ) : (
-
-                                                    <div
-                                                        className="grid grid-cols-4 border-b border-[#e5e7eb] text-sm hover:bg-[#f8fbff] transition last:border-b-0">
-
-                                                        {/* NAME */}
-                                                        <div
-                                                            className="border-r border-[#e5e7eb] px-12 py-4 font-medium text-[#2f3b52]">
-                                                            {child.title}
-                                                        </div>
-
-                                                        {/* VIEW */}
-                                                        <div
-                                                            className="flex items-center justify-center border-r border-[#e5e7eb]">
-
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={
-                                                                    permissions?.[child.path]
-                                                                        ?.view || false
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleCheckbox(
-                                                                        child.path,
-                                                                        "view",
-                                                                        e.target.checked
-                                                                    )
-                                                                }
-                                                                className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
-                                                            />
-
-                                                        </div>
-
-                                                        {/* EDIT */}
-                                                        <div
-                                                            className="flex items-center justify-center border-r border-[#e5e7eb]">
-
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={
-                                                                    permissions?.[child.path]
-                                                                        ?.edit || false
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleCheckbox(
-                                                                        child.path,
-                                                                        "edit",
-                                                                        e.target.checked
-                                                                    )
-                                                                }
-                                                                className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
-                                                            />
-
-                                                        </div>
-
-                                                        {/* DOWNLOAD */}
-                                                        <div className="flex items-center justify-center">
-
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={
-                                                                    permissions?.[child.path]
-                                                                        ?.download || false
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleCheckbox(
-                                                                        child.path,
-                                                                        "download",
-                                                                        e.target.checked
-                                                                    )
-                                                                }
-                                                                className="h-[18px] w-[18px] cursor-pointer rounded border-gray-400 accent-green-600"
-                                                            />
-
-                                                        </div>
-
-                                                    </div>
+                                                    )
                                                 )}
 
+                                            </>
+
+                                        ) : (
+
+                                            <div
+                                                className="
+                                                    grid
+                                                    grid-cols-[1fr_70px_90px]
+                                                    border-b
+                                                    border-[#cfcfcf]
+                                                    text-[12px]
+                                                "
+                                            >
+
+                                                {/* NAME */}
+                                                <div
+                                                    className="
+                                                        border-r
+                                                        border-[#cfcfcf]
+                                                        px-2
+                                                        py-1
+                                                    "
+                                                >
+                                                    {moduleIndex + 1}.
+                                                    {childIndex + 1}{" "}
+                                                    {child.title}
+                                                </div>
+
+                                                {/* VIEW */}
+                                                <div
+                                                    className="
+                                                        flex
+                                                        items-center
+                                                        justify-center
+                                                        border-r
+                                                        border-[#cfcfcf]
+                                                    "
+                                                >
+
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={
+                                                            permissions?.[
+                                                                child.path
+                                                                ]?.view || false
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleCheckbox(
+                                                                child.path,
+                                                                "view",
+                                                                e.target.checked
+                                                            )
+                                                        }
+                                                        className="
+                                                            h-3.5
+                                                            w-3.5
+                                                            cursor-pointer
+                                                        "
+                                                    />
+
+                                                </div>
+
+                                                {/* EDIT */}
+                                                <div
+                                                    className="
+                                                        flex
+                                                        items-center
+                                                        justify-center
+                                                    "
+                                                >
+
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={
+                                                            permissions?.[
+                                                                child.path
+                                                                ]?.edit || false
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleCheckbox(
+                                                                child.path,
+                                                                "edit",
+                                                                e.target.checked
+                                                            )
+                                                        }
+                                                        className="
+                                                            h-3.5
+                                                            w-3.5
+                                                            cursor-pointer
+                                                        "
+                                                    />
+
+                                                </div>
+
                                             </div>
-                                        ))}
+                                        )}
 
                                     </div>
                                 ))}
 
-                        </div>
+                            </div>
+                        ))}
 
                     </div>
+
                 </div>
 
-
                 {/* FOOTER */}
-                <div className="flex justify-end gap-4 border-t bg-white px-7 py-5">
+                <div
+                    className="
+                        flex
+                        justify-end
+                        gap-2
+                        border-t
+                        border-[#cfcfcf]
+                        bg-white
+                        px-3
+                        py-2
+                    "
+                >
 
                     {/* CANCEL */}
                     <button
                         onClick={() => onOpenChange(false)}
-                        className="min-w-[130px] rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#1f2937] transition hover:bg-gray-100"
+                        className="
+                            min-w-[100px]
+                            border
+                            border-[#7a7a7a]
+                            bg-white
+                            px-3
+                            py-1
+                            text-[12px]
+                            hover:bg-gray-100
+                        "
                     >
                         Cancel
                     </button>
@@ -315,7 +494,18 @@ export default function MapUserModal({
                     <button
                         onClick={onSave}
                         disabled={loading}
-                        className="min-w-[130px] rounded-xl bg-[#295dcc] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1f4fb5] disabled:opacity-50"
+                        className="
+                            min-w-[100px]
+                            border
+                            border-[#1d4ed8]
+                            bg-[#2f64d6]
+                            px-3
+                            py-1
+                            text-[12px]
+                            text-white
+                            hover:bg-[#1d4ed8]
+                            disabled:opacity-50
+                        "
                     >
                         {loading ? "Saving..." : "Save"}
                     </button>
