@@ -257,29 +257,29 @@ export default function ProjectRolePage() {
               </select>
 
               {/* ACTION BUTTONS */}
-              <div className="flex gap-2 mt-1 md:mt-0">
+              {isEditing && (
+                  <div className="flex gap-2 mt-1 md:mt-0">
 
-                {/* MAP BUTTON */}
-                <button
-                    type="button"
-                    onClick={() => handleMapUser(item)}
-                    className="border rounded-sm p-1 hover:bg-blue-100 transition"
-                >
-                  <Link2 size={16} />
-                </button>
+                    {/* MAP BUTTON */}
+                    <button
+                        type="button"
+                        onClick={() => handleMapUser(item)}
+                        className="border rounded-sm p-1 hover:bg-blue-100 transition"
+                    >
+                      <Link2 size={16} />
+                    </button>
 
-                {/* DELETE BUTTON */}
-                <button
-                    type="button"
-                    onClick={() =>
-                        handleDeleteDesignation(item)
-                    }
-                    className="border rounded-sm p-1 hover:bg-red-100 transition"
-                >
-                  <Trash2 size={16} />
-                </button>
+                    {/* DELETE BUTTON */}
+                    <button
+                        type="button"
+                        onClick={() => handleDeleteDesignation(item)}
+                        className="border rounded-sm p-1 hover:bg-red-100 transition"
+                    >
+                      <Trash2 size={16} />
+                    </button>
 
-              </div>
+                  </div>
+              )}
 
             </div>
 
