@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { sidebarConfig } from "@/config/sidebar.config";
+
 import { X } from "lucide-react";
 
 export default function MapUserModal({
@@ -112,43 +113,6 @@ export default function MapUserModal({
                     "
                 >
 
-                    {/* TOP ROLE SECTION */}
-                    <div className="mb-4 flex items-center gap-0">
-
-                        <div
-                            className="
-                                min-w-[100px]
-                                border
-                                border-[#7a7a7a]
-                                bg-[#cde8c9]
-                                px-2
-                                py-1
-                                text-[12px]
-                            "
-                        >
-                            Role
-                        </div>
-
-                        <select
-                            className="
-                                h-[30px]
-                                w-[320px]
-                                border
-                                border-l-0
-                                border-[#7a7a7a]
-                                bg-white
-                                px-2
-                                text-[12px]
-                                outline-none
-                            "
-                        >
-                            <option>
-                                Select Role as Listed
-                            </option>
-                        </select>
-
-                    </div>
-
                     {/* TABLE HEADER */}
                     <div
                         className="
@@ -232,10 +196,11 @@ export default function MapUserModal({
 
                                     <div key={child.title}>
 
-                                        {/* SECTION HEADER */}
+                                        {/* SUB MODULE */}
                                         {child.children ? (
 
                                             <>
+                                                {/* SECTION */}
                                                 <div
                                                     className="
                                                         border-b

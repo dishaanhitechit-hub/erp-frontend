@@ -18,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import MapUserModal from "@/components/common/MapUserModal";
 
+import {sidebarConfig} from "@/config/sidebar.config";
+
 export default function ProjectRolePage() {
   const [projectCode, setProjectCode] = useState("");
   const [projectData, setProjectData] = useState(null);
@@ -29,6 +31,7 @@ export default function ProjectRolePage() {
 
   const [siteTeam, setSiteTeam] = useState([]);
   const [hoTeam, setHoTeam] = useState([]);
+  const [tempPermissions, setTempPermissions] = useState({});
 
   const [openModal, setOpenModal] = useState(false);
   const [newDesignation, setNewDesignation] = useState({
@@ -37,6 +40,9 @@ export default function ProjectRolePage() {
   });
   const router = useRouter();
   const [openMapModal, setOpenMapModal] = useState(false);
+
+  const [permissions, setPermissions] = useState({});
+  const [selectedRole, setSelectedRole] = useState(null);
 
 
   const inputClass =
@@ -93,6 +99,10 @@ export default function ProjectRolePage() {
           designationName: item.designationName,
           userId: item.userId || "",
           teamId: item.teamId,
+
+          // permissions
+          permissions: item.permissions || {},
+          userPermissions: item.userPermissions || {},
         });
       });
 
@@ -115,10 +125,131 @@ export default function ProjectRolePage() {
     teamSetter(updated);
   };
 
+  // Parse Permission
+  const parsePermissions = (backendPermissions) => {
+
+    const parsed = {};
+
+    // ALL MODULE PATHS FROM SIDEBAR
+    const allPaths = [];
+
+    sidebarConfig.forEach((module) => {
+
+      module.children?.forEach((child) => {
+
+        if (child.path) {
+          allPaths.push(child.path);
+        }
+
+        child.children?.forEach((sub) => {
+
+          if (sub.path) {
+            allPaths.push(sub.path);
+          }
+
+        });
+
+      });
+
+    });
+
+    Object.entries(backendPermissions || {}).forEach(
+        ([key, value]) => {
+
+          if (!value) return;
+
+          // company_details.VIEW
+          const [moduleKey, action] = key.split(".");
+
+          // convert company_details -> company-details
+          const frontendKey =
+              moduleKey.replaceAll("_", "-");
+
+          // FIND MATCHING SIDEBAR PATH
+          const matchedPath = allPaths.find((path) =>
+              path.includes(frontendKey)
+          );
+
+          if (!matchedPath) return;
+
+          if (!parsed[matchedPath]) {
+
+            parsed[matchedPath] = {
+              view: false,
+              edit: false,
+            };
+
+          }
+
+          if (action === "VIEW") {
+            parsed[matchedPath].view = true;
+          }
+
+          if (action === "EDIT") {
+            parsed[matchedPath].edit = true;
+          }
+
+        }
+    );
+
+    return parsed;
+  };
+
+  // Formatting Permission
+  const formatPermissions = (permissions) => {
+
+    const formatted = {};
+
+    Object.entries(permissions).forEach(
+
+        ([path, value]) => {
+
+          const moduleName = path
+              .split("/")
+              .filter(Boolean)
+              .pop()
+              .replaceAll("-", "_");
+
+          if (value.view) {
+
+            formatted[
+                `${moduleName}.VIEW`
+                ] = true;
+
+          }
+
+          if (value.edit) {
+
+            formatted[
+                `${moduleName}.EDIT`
+                ] = true;
+
+          }
+
+        }
+    );
+
+    return formatted;
+  };
+
   // HANDLE MAP USER
   const handleMapUser = (item) => {
 
-    console.log("Map User:", item);
+    setSelectedRole(item);
+
+    // PRIORITY:
+    // 1. tempPermissions
+    // 2. existing backend permissions
+
+    const currentPermissions =
+
+        tempPermissions[item.id]
+        || item.permissions
+        || {};
+
+    setPermissions(
+        parsePermissions(currentPermissions)
+    );
 
     setOpenMapModal(true);
 
@@ -135,6 +266,48 @@ export default function ProjectRolePage() {
 
   };
 
+  // handle Permissions
+  const handlePermissionSave = async () => {
+
+    const formattedPermissions =
+        formatPermissions(permissions);
+
+    // SAVE TEMPORARY IN FRONTEND
+    setTempPermissions((prev) => ({
+
+      ...prev,
+
+      [selectedRole.id]: formattedPermissions,
+
+    }));
+
+    // UPDATE UI DATA ALSO
+    setSiteTeam((prev) =>
+        prev.map((item) =>
+            item.id === selectedRole.id
+                ? {
+                  ...item,
+                  permissions: formattedPermissions,
+                }
+                : item
+        )
+    );
+
+    setHoTeam((prev) =>
+        prev.map((item) =>
+            item.id === selectedRole.id
+                ? {
+                  ...item,
+                  permissions: formattedPermissions,
+                }
+                : item
+        )
+    );
+
+    setOpenMapModal(false);
+
+  };
+
   //  SAVE
   const handleSave = async () => {
     let toastId;
@@ -143,19 +316,49 @@ export default function ProjectRolePage() {
       toastId = toast.loading("Saving...");
       setLoading(true);
       const payload = {
+
         projectCode,
+
         roleUserMap: [
+
           ...siteTeam.map((r) => ({
+
             designationId: r.designationId,
-            userId: Number(r.userId) || null,
+
+            userId:
+                Number(r.userId) || null,
+
             teamId: r.teamId,
+
+            permissions:
+                tempPermissions[r.id]
+                || r.permissions
+                || {},
+
+            userPermissions: {},
+
           })),
+
           ...hoTeam.map((r) => ({
+
             designationId: r.designationId,
-            userId: Number(r.userId) || null,
+
+            userId:
+                Number(r.userId) || null,
+
             teamId: r.teamId,
+
+            permissions:
+                tempPermissions[r.id]
+                || r.permissions
+                || {},
+
+            userPermissions: {},
+
           })),
+
         ],
+
       };
 
       await apiRequest({
@@ -416,6 +619,10 @@ export default function ProjectRolePage() {
           <MapUserModal
               open={openMapModal}
               onOpenChange={setOpenMapModal}
+              permissions={permissions}
+              setPermissions={setPermissions}
+              loading={loading}
+              onSave={handlePermissionSave}
           />
 
         </div>
