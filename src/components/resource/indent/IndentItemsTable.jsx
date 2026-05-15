@@ -55,88 +55,93 @@ export default function IndentItemsTable({
     setValue(`items.${rowIndex}.unit`, item?.unit || "");
   };
 
+  const formatNumber = (num) => {
+    if (!num) return 0;
+
+    const value = Number(num);
+
+    if (value > 999999999) {
+      return value.toExponential(2);
+    }
+
+    return value;
+  };
+
   return (
     <div className="flex-1 min-w-0">
-      <div className="border border-[#b5b5b5] overflow-visible">
+      <div className="border border-[#b5b5b5] overflow-hidden">
         {/* HEADER */}
         <div className="bg-[#e8f0df] px-2 py-1 border-b border-[#b5b5b5] font-bold text-[18px]">
           BASIC
         </div>
 
-        {/* TABLE */}
-        <div className="w-full">
-          {/* TABLE HEADER */}
-          <table className="w-full border-collapse text-sm table-fixed">
-            <thead>
-              <tr className="bg-[#d9d9d9]">
-                <th className="border border-[#b5b5b5] w-[50px] text-center">
-                  Sl no
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[110px] text-left px-2">
-                  Item Code
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[200px] text-left px-2">
-                  Item Name
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[220px] text-left px-2">
-                  Note
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[100px] text-center">
-                  Unit
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[100px] text-center">
-                  Qty
-                </th>
-
-                <th className="border border-[#b5b5b5] w-[100px] text-center">
-                  Ammenmend Qty
-                </th>
-
-                <th className="border border-[#b5b5b5] text-center">
-                  Location
-                </th>
-
-                {isEditing && (
-                  <th className="border border-[#b5b5b5] w-[60px] text-center">
-                    Action
-                  </th>
-                )}
-              </tr>
-            </thead>
-          </table>
-
-          {/* SCROLLABLE ROWS */}
+        {/* TABLE WRAPPER */}
+        <div className="w-full overflow-x-auto">
           <div
-  className={`
-    relative
-    overflow-y-auto
-    ${fields.length > 7 ? "max-h-[224px]" : "overflow-visible"}
-  `}
-  style={{
-    overflowX: "visible",
-  }}
->
-            <table className="w-full border-collapse text-sm table-fixed">
+            className={`
+              overflow-auto
+              custom-thin-scrollbar
+              ${fields.length > 7 ? "max-h-[320px]" : ""}
+            `}
+          >
+            <table className="min-w-[1010px] w-full border-collapse text-sm table-fixed">
+              {/* TABLE HEADER */}
+              <thead className="sticky top-0 z-20 bg-[#d9d9d9]">
+                <tr>
+                  <th className="border border-[#b5b5b5] w-[40px] text-center">
+                    Sl no
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[100px] text-left px-2">
+                    Item Code
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[180px] text-left px-2">
+                    Item Name
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[180px] text-left px-2">
+                    Note
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                    Unit
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                    Qty
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                    Ammenmend Qty
+                  </th>
+
+                  <th className="border border-[#b5b5b5] w-[180px] text-center">
+                    Location
+                  </th>
+
+                  {isEditing && (
+                    <th className="border border-[#b5b5b5] w-[40px] text-center">
+                      Action
+                    </th>
+                  )}
+                </tr>
+              </thead>
+
+              {/* TABLE BODY */}
               <tbody>
                 {fields.map((field, index) => {
-                  const selectedItemCode = watch(
-                    `items.${index}.itemCode`,
-                  );
+                  const selectedItemCode = watch(`items.${index}.itemCode`);
 
                   return (
                     <tr key={field.id}>
                       {/* SL NO */}
-                      <td className="border border-[#b5b5b5] w-[50px] text-center bg-[#f7f7f7]">
+                      <td className="border border-[#b5b5b5] text-center bg-[#f7f7f7]">
                         {index + 1}
                       </td>
 
                       {/* ITEM CODE */}
-                      <td className="border border-[#b5b5b5] w-[110px] p-0">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           {...register(`items.${index}.itemCode`)}
                           disabled
@@ -150,7 +155,7 @@ export default function IndentItemsTable({
                       </td>
 
                       {/* ITEM SELECT */}
-                      <td className="border border-[#b5b5b5] w-[200px] p-0">
+                      <td className="border border-[#b5b5b5] p-0">
                         <SearchableSelect
                           options={itemsOptions}
                           value={selectedItemCode}
@@ -161,20 +166,15 @@ export default function IndentItemsTable({
                           placeholder="Select Item"
                           labelKey="itemName"
                           valueKey="itemCode"
-                          searchKeys={[
-                            "itemName",
-                            "itemCode",
-                          ]}
-                          className="rounded-none "
+                          searchKeys={["itemName", "itemCode"]}
+                          className="rounded-none"
                         />
                       </td>
 
                       {/* NOTE */}
                       <td
-                        className="border border-[#b5b5b5] w-[220px] p-0 cursor-pointer"
-                        onClick={() =>
-                          toggleCell(`note-${index}`)
-                        }
+                        className="border border-[#b5b5b5] p-0 cursor-pointer"
+                        onClick={() => toggleCell(`note-${index}`)}
                       >
                         <div
                           className={`
@@ -204,7 +204,7 @@ export default function IndentItemsTable({
                       </td>
 
                       {/* UNIT */}
-                      <td className="border border-[#b5b5b5] w-[100px] p-0">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           {...register(`items.${index}.unit`)}
                           disabled
@@ -219,26 +219,31 @@ export default function IndentItemsTable({
                       </td>
 
                       {/* QTY */}
-                      <td className="border border-[#b5b5b5] w-[100px] p-0">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           type="number"
-                          {...register(`items.${index}.qty`)}
+                          min={0}
+                          {...register(`items.${index}.qty`, {
+                            min: 0,
+                            onChange: (e) => {
+                              if (Number(e.target.value) < 0) {
+                                e.target.value = 0;
+                              }
+                            },
+                          })}
                           disabled={!isEditing || isSubmitting}
                           className={`
-                            ${getInputClass(
-                              errors?.items?.[index]?.qty,
-                              !isEditing || isSubmitting,
-                            )}
-                            border-0
-                            rounded-none
-                            h-[32px]
-                            text-center
-                          `}
+    ${getInputClass(errors?.items?.[index]?.qty, !isEditing || isSubmitting)}
+    border-0
+    rounded-none
+    h-[32px]
+    text-center
+  `}
                         />
                       </td>
 
                       {/* AMMENMEND QTY */}
-                      <td className="border border-[#b5b5b5] w-[100px] p-0">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           type="number"
                           disabled
@@ -255,9 +260,7 @@ export default function IndentItemsTable({
                       {/* LOCATION */}
                       <td
                         className="border border-[#b5b5b5] p-0 cursor-pointer"
-                        onClick={() =>
-                          toggleCell(`location-${index}`)
-                        }
+                        onClick={() => toggleCell(`location-${index}`)}
                       >
                         <div
                           className={`
@@ -293,7 +296,7 @@ export default function IndentItemsTable({
 
                       {/* DELETE */}
                       {isEditing && (
-                        <td className="border border-[#b5b5b5] w-[60px] text-center">
+                        <td className="border border-[#b5b5b5] text-center">
                           <button
                             type="button"
                             disabled={fields.length === 1}
@@ -308,41 +311,55 @@ export default function IndentItemsTable({
                   );
                 })}
               </tbody>
+
+              {/* TABLE FOOTER */}
+              <tfoot className="sticky bottom-0 z-20 bg-[#d9d9d9]">
+                <tr className="font-bold">
+                  <td className="border border-[#b5b5b5]"></td>
+
+                  <td className="border border-[#b5b5b5]"></td>
+
+                  <td className="border border-[#b5b5b5]"></td>
+
+                  <td className="border border-[#b5b5b5] text-center">TOTAL</td>
+
+                  <td className="border border-[#b5b5b5]"></td>
+
+                  <td
+                    className="
+    border border-[#b5b5b5]
+    text-center
+    whitespace-nowrap
+    overflow-hidden
+    text-ellipsis
+    px-2
+  "
+                    title={totalQty}
+                  >
+                    {formatNumber(totalQty)}
+                  </td>
+
+                  <td
+                    className="
+                      border border-[#b5b5b5]
+                      text-center
+                      whitespace-nowrap
+                      overflow-hidden
+                      text-ellipsis
+                      px-2
+                    "
+                    title={formatNumber(totalAmmenmendQty)}
+                  >
+                    {totalAmmenmendQty}
+                  </td>
+
+                  <td className="border border-[#b5b5b5]"></td>
+
+                  {isEditing && <td className="border border-[#b5b5b5]"></td>}
+                </tr>
+              </tfoot>
             </table>
           </div>
-
-          {/* TOTAL ROW */}
-          <table className="w-full border-collapse text-sm table-fixed">
-            <tbody>
-              <tr className="bg-[#d9d9d9] font-bold">
-                <td className="border border-[#b5b5b5] w-[50px]"></td>
-
-                <td className="border border-[#b5b5b5] w-[110px]"></td>
-
-                <td className="border border-[#b5b5b5] w-[200px]"></td>
-
-                <td className="border border-[#b5b5b5] w-[220px] text-center">
-                  TOTAL
-                </td>
-
-                <td className="border border-[#b5b5b5] w-[100px]"></td>
-
-                <td className="border border-[#b5b5b5] w-[100px] text-center">
-                  {totalQty}
-                </td>
-
-                <td className="border border-[#b5b5b5] w-[100px] text-center">
-                  {totalAmmenmendQty}
-                </td>
-
-                <td className="border border-[#b5b5b5]"></td>
-
-                {isEditing && (
-                  <td className="border border-[#b5b5b5] w-[60px]"></td>
-                )}
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
@@ -372,4 +389,3 @@ export default function IndentItemsTable({
     </div>
   );
 }
-

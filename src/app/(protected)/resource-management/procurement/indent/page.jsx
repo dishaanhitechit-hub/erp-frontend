@@ -19,9 +19,7 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-
-  //  INITIAL LOAD 
+  //  INITIAL LOAD
   useEffect(() => {
     const fetchIndents = async () => {
       try {
@@ -63,18 +61,49 @@ export default function Page() {
   }, []);
 
   // SEARCH HANDLER
-  const handleSearch = ({ search }) => {
+  const handleSearch = ({ search, from, to }) => {
+    let filtered = [...data];
 
-    if (!search) {
-      setFilteredData(data);
-      return;
+    // TEXT SEARCH
+    if (search) {
+      filtered = filtered.filter((item) =>
+        Object.values(item).some((val) =>
+          String(val).toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
     }
 
-    const filtered = data.filter((item) =>
-      Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
-    );
+    // DATE FILTER
+    if (from || to) {
+      filtered = filtered.filter((item) => {
+        if (!item.date) return false;
+
+        const itemDate = new Date(item.date);
+        itemDate.setHours(0, 0, 0, 0);
+
+        // FROM DATE
+        if (from) {
+          const fromDate = new Date(from);
+          fromDate.setHours(0, 0, 0, 0);
+
+          if (itemDate < fromDate) {
+            return false;
+          }
+        }
+
+        // TO DATE
+        if (to) {
+          const toDate = new Date(to);
+          toDate.setHours(0, 0, 0, 0);
+
+          if (itemDate > toDate) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
 
     setFilteredData(filtered);
   };
@@ -90,10 +119,8 @@ export default function Page() {
     { header: "Order Status", accessor: "orderStatus" },
   ];
   const actions = getPageActions({
-
     onHome: () => router.push("/dashboard"),
     onBack: () => router.back(),
-
   });
 
   if (loading) {
@@ -106,34 +133,31 @@ export default function Page() {
 
   return (
     <>
-      <HeaderWrapper
-            header={<PageHeader actions={actions} />}
-          >
-      <div className="p-3 ">
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <div className="p-3 ">
+          {/*  SEARCH SECTION */}
+          <SearchSection
+            onSearch={handleSearch}
+            showDateRange={true}
+            actions={[
+              {
+                label: "+ New Indent",
+                onClick: () =>
+                  router.push("/resource-management/procurement/indent/new"),
+              },
+            ]}
+          />
 
-        {/*  SEARCH SECTION */}
-        <SearchSection
-          onSearch={handleSearch}
-          actions={[
-            {
-              label: "+ New Indent",
-              onClick: () => router.push("/resource-management/procurement/indent/new"),
-            },
-
-          ]}
-        />
-
-        {/*  TABLE */}
-        <DataTable
-          columns={columns}
-          data={filteredData}
-          onRowClick={(row) => {
-            router.push(`/resource-management/procurement/indent/${row.id}`);
-          }}
-        />
-      </div>
+          {/*  TABLE */}
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            onRowClick={(row) => {
+              router.push(`/resource-management/procurement/indent/${row.id}`);
+            }}
+          />
+        </div>
       </HeaderWrapper>
     </>
-
   );
 }

@@ -375,7 +375,7 @@ export default function IndentForm({ mode = "create", indentId }) {
     <div className="p-3 space-y-3">
       <div className="md:flex gap-3 items-start">
         {/* LEFT PANEL */}
-        <div className="w-[400px] bg-[#f7f7f7] p-3 pl-0 pt-0 border-r border-sky-300">
+        <div className="w-[400px] bg-[#f7f7f7] p-3 pl-0 pt-0 ">
           {/* CATEGORY */}
           <div className="md:flex md:items-center">
             <div className={labelClass}>Category</div>
@@ -604,6 +604,8 @@ export default function IndentForm({ mode = "create", indentId }) {
             )}
           </div>
         </div>
+
+        <div className="w-[1px] h-[30vw] bg-sky-300" />
 
         {/* RIGHT TABLE */}
         <IndentItemsTable
