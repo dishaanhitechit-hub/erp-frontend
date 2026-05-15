@@ -197,37 +197,24 @@ export default function ProjectRolePage() {
 
   // Formatting Permission
   const formatPermissions = (permissions) => {
-
     const formatted = {};
 
-    Object.entries(permissions).forEach(
+    Object.entries(permissions).forEach(([path, value]) => {
 
-        ([path, value]) => {
+      const moduleName = path
+          .split("/")
+          .filter(Boolean)
+          .pop()
+          .replaceAll("-", "_");
 
-          const moduleName = path
-              .split("/")
-              .filter(Boolean)
-              .pop()
-              .replaceAll("-", "_");
+      // ALWAYS SEND BOTH
 
-          if (value.view) {
+      formatted[`${moduleName}.VIEW`] =
+          value.view || false;
 
-            formatted[
-                `${moduleName}.VIEW`
-                ] = true;
-
-          }
-
-          if (value.edit) {
-
-            formatted[
-                `${moduleName}.EDIT`
-                ] = true;
-
-          }
-
-        }
-    );
+      formatted[`${moduleName}.EDIT`] =
+          value.edit || false;
+    });
 
     return formatted;
   };
