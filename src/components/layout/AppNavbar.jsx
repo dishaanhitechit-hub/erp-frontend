@@ -107,7 +107,7 @@ export default function AppNavbar() {
 
       setProjectList(res.data || []);
     } catch (err) {
-      toast.error("Failed to fetch projects");
+      toast.error(err.message || "Failed to fetch projects");
     } finally {
       setLoadingProjects(false);
     }

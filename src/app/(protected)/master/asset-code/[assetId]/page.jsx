@@ -9,6 +9,7 @@ import AssetForm from "@/components/master/asset/AssetForm";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 
 export default function Page() {
   const { assetId } = useParams();

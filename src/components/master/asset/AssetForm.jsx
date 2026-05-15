@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import SearchableSelect from "@/components/common/SearchableSelect";
+import { getInputClass } from "@/lib/formStyles";
 
 const assetSchema = z.object({
   itemCategoryId: z.string().min(1),
@@ -31,7 +32,8 @@ export default function AssetForm({
   const [isEditing, setIsEditing] = useState(mode === "create");
   const [ccList, setCcList] = useState([]);
   const [loadingCc, setLoadingCc] = useState(false);
-
+  const [unitList, setUnitList] = useState([]);
+  const [loadingUnits, setLoadingUnits] = useState(false);
 
   const {
     register,
@@ -75,10 +77,9 @@ export default function AssetForm({
         }
       } catch {
         setCcList([]);
-      }finally {
+      } finally {
         setLoadingCc(false);
       }
-      
     };
 
     fetchCC();
@@ -86,6 +87,27 @@ export default function AssetForm({
     // reset cc when category changes
     setValue("ccCodeId", "");
   }, [selectedCategory]);
+  // FETCH UNIT LIST
+  useEffect(() => {
+    const fetchUnitList = async () => {
+      try {
+        setLoadingUnits(true);
+
+        const res = await apiRequest({
+          url: API_ENDPOINTS.MASTER.GET_ALL_UNIT,
+        });
+
+        setUnitList(res.data || []);
+      } catch (err) {
+        console.log(err);
+        setUnitList([]);
+      } finally {
+        setLoadingUnits(false);
+      }
+    };
+
+    fetchUnitList();
+  }, []);
 
   //  SET EDIT DATA
   useEffect(() => {
@@ -172,7 +194,7 @@ export default function AssetForm({
         <Input
           {...register("assetCode")}
           disabled
-          className={`w-[200px] ${inputClass}`}
+          className={`${getInputClass(false, true)} w-[200px]`}
           placeholder="[Auto]"
         />
       </div>
@@ -183,7 +205,7 @@ export default function AssetForm({
           <select
             {...register("itemCategoryId")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${inputClass} ${errors.itemCategoryId && "border-red-500"}`}
+            className={`flex-1 ${getInputClass(errors.itemCategoryId, !isEditing || isSubmitting)}`}
           >
             <option value="">Select</option>
             {categories.map((c) => (
@@ -203,9 +225,7 @@ export default function AssetForm({
               options={ccList}
               value={watch("ccCodeId")}
               onChange={(value) => setValue("ccCodeId", String(value))}
-              placeholder={
-                  loadingCc ? "Loading..." : "Select CC"
-                }
+              placeholder={loadingCc ? "Loading..." : "Select CC"}
               disabled={!isEditing || isSubmitting || loadingCc}
               labelKey="ccName"
               valueKey="ccId"
@@ -221,7 +241,7 @@ export default function AssetForm({
           <Input
             {...register("assetName")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${errors.assetName && "border-red-500"} ${inputClass}`}
+            className={`flex-1 ${getInputClass(errors.assetName, !isEditing || isSubmitting)}`}
           />
         </div>
 
@@ -231,10 +251,8 @@ export default function AssetForm({
           <textarea
             {...register("assetDescription")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 border border-[#8f8f8f] text-sm rounded-sm px-2 py-1 min-h-[80px] resize-none
-                disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed ${
-              errors.assetDescription && "border-red-500"
-            }`}
+            className={`flex-1 ${getInputClass(errors.assetDescription, !isEditing || isSubmitting)}  px-2 py-1 min-h-[80px] resize-none
+                 disabled:cursor-not-allowed `}
           />
         </div>
       </div>
@@ -242,13 +260,43 @@ export default function AssetForm({
       {/* BOTTOM */}
       <div className="grid md:grid-cols-2 gap-x-10 mt-7">
         <div className="space-y-1">
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <div className={label}>Unit</div>
             <Input
               {...register("unit")}
               disabled={!isEditing || isSubmitting}
               className={`flex-1 ${errors.unit && "border-red-500"} ${inputClass}`}
             />
+          </div> */}
+          <div className="flex gap-2 items-start">
+            <div className={label + " h-[30px]"}>Unit</div>
+
+            <div className="flex-1">
+              <SearchableSelect
+                options={unitList}
+                value={watch("unit")}
+                onChange={(value) => setValue("unit", String(value))}
+                placeholder={loadingUnits ? "Loading..." : "Select Unit"}
+                searchPlaceholder="Search by short/unit/parent/category name"
+                disabled={!isEditing || isSubmitting || loadingUnits}
+                labelKey="shortName"
+                valueKey="unitId"
+                dropdownPosition="up"
+                searchKeys={[
+                  "shortName",
+                  "unitName",
+                  "parentUnitName",
+                  "categoryName",
+                ]}
+                className={`
+                    ${
+                      errors.unit &&
+                      "border-red-500 bg-red-50 focus-visible:ring-red-500"
+                    }
+                    
+                  `}
+              />
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -256,7 +304,7 @@ export default function AssetForm({
             <Input
               {...register("hsnSac")}
               disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${errors.hsnSac && "border-red-500"} ${inputClass}`}
+              className={`flex-1 ${getInputClass(errors.hsnSac, !isEditing || isSubmitting)}`}
             />
           </div>
 
@@ -265,7 +313,7 @@ export default function AssetForm({
             <Input
               {...register("gstPercentage")}
               disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${errors.gstPercentage && "border-red-500"} ${inputClass}`}
+              className={`flex-1 ${getInputClass(errors.gstPercentage, !isEditing || isSubmitting)}`}
             />
           </div>
         </div>

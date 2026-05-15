@@ -15,6 +15,7 @@ import { API_ENDPOINTS } from "@/config/api.config";
 
 import { toast } from "sonner";
 import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
+import { getInputClass } from "@/lib/formStyles";
 
 const schema = z.object({
   unitName: z.string().min(1),
@@ -26,18 +27,11 @@ const schema = z.object({
   parentUnitMultiplyFactor: z.string().optional(),
 });
 
-export default function UnitForm({
-  mode = "create",
-  unitId,
-  initialData,
-}) {
-  const [isEditing, setIsEditing] = useState(
-    mode === "create"
-  );
+export default function UnitForm({ mode = "create", unitId, initialData }) {
+  const [isEditing, setIsEditing] = useState(mode === "create");
 
   const [parentUnits, setParentUnits] = useState([]);
-  const [loadingParentUnits, setLoadingParentUnits] =
-    useState(false);
+  const [loadingParentUnits, setLoadingParentUnits] = useState(false);
 
   const {
     register,
@@ -66,17 +60,11 @@ export default function UnitForm({
   // FETCH PARENT UNITS
   useEffect(() => {
     const fetchUnits = async () => {
-      if (
-        selectedUnitType !== "Child" ||
-        !selectedCategory
-      ) {
+      if (selectedUnitType !== "Child" || !selectedCategory) {
         setParentUnits([]);
 
         setValue("parentUnitId", "");
-        setValue(
-          "parentUnitMultiplyFactor",
-          ""
-        );
+        setValue("parentUnitMultiplyFactor", "");
 
         return;
       }
@@ -89,7 +77,6 @@ export default function UnitForm({
         });
 
         setParentUnits(res.data || []);
-
       } catch {
         setParentUnits([]);
       } finally {
@@ -112,11 +99,9 @@ export default function UnitForm({
           ? String(initialData.parentUnitId)
           : "",
 
-        parentUnitMultiplyFactor:
-          initialData.parentUnitMultiplyFactor || "",
+        parentUnitMultiplyFactor: initialData.parentUnitMultiplyFactor || "",
 
-        categoryId:
-          initialData.categoryId || "",
+        categoryId: initialData.categoryId || "",
       });
     }
   }, [initialData]);
@@ -134,11 +119,9 @@ export default function UnitForm({
         ? String(initialData.parentUnitId)
         : "",
 
-      parentUnitMultiplyFactor:
-        initialData.parentUnitMultiplyFactor || "",
+      parentUnitMultiplyFactor: initialData.parentUnitMultiplyFactor || "",
 
-      categoryId:
-        initialData.categoryId || "",
+      categoryId: initialData.categoryId || "",
     });
 
     setIsEditing(false);
@@ -158,15 +141,10 @@ export default function UnitForm({
         shortName: v.shortName,
         unitType: v.unitType,
 
-        parentUnitId:
-          v.unitType === "Child"
-            ? Number(v.parentUnitId)
-            : null,
+        parentUnitId: v.unitType === "Child" ? Number(v.parentUnitId) : null,
 
         parentUnitMultiplyFactor:
-          v.unitType === "Child"
-            ? v.parentUnitMultiplyFactor
-            : null,
+          v.unitType === "Child" ? v.parentUnitMultiplyFactor : null,
 
         categoryId: v.categoryId,
       };
@@ -183,7 +161,6 @@ export default function UnitForm({
         });
 
         setIsEditing(false);
-
       } else {
         await apiRequest({
           url: `${API_ENDPOINTS.MASTER.UPDATE_UNIT_BY_ID}/${unitId}`,
@@ -197,14 +174,10 @@ export default function UnitForm({
 
         setIsEditing(false);
       }
-
     } catch (err) {
-      toast.error(
-        err.message || "Failed",
-        {
-          id: toastId,
-        }
-      );
+      toast.error(err.message || "Failed", {
+        id: toastId,
+      });
     }
   };
 
@@ -216,211 +189,122 @@ export default function UnitForm({
 
   return (
     <div className="p-4 flex flex-col gap-7">
-
       {/* TOP */}
       <div className="space-y-1">
-
         {/* UNIT NAME */}
         <div className="flex gap-2">
-          <div className={label}>
-            Unit Name
-          </div>
+          <div className={label}>Unit Name</div>
 
           <Input
             {...register("unitName")}
-            disabled={
-              !isEditing || isSubmitting
-            }
-            className={`flex-1 ${inputClass} ${
-              errors.unitName &&
-              "border-red-500"
-            }`}
+            disabled={!isEditing || isSubmitting}
+            className={`flex-1 ${getInputClass(errors.unitName,!isEditing || isSubmitting)}`}
           />
         </div>
 
         {/* SHORT NAME */}
         <div className="flex gap-2">
-          <div className={label}>
-            Short Name
-          </div>
+          <div className={label}>Short Name</div>
 
           <Input
             {...register("shortName")}
-            disabled={
-              !isEditing || isSubmitting
-            }
-            className={`flex-1 ${inputClass} ${
-              errors.shortName &&
-              "border-red-500"
-            }`}
+            disabled={!isEditing || isSubmitting}
+            className={`flex-1 ${getInputClass(errors.shortName,!isEditing || isSubmitting)}`}
           />
         </div>
 
         {/* UNIT TYPE */}
         <div className="flex gap-2">
-          <div className={label}>
-            Type of Unit
-          </div>
+          <div className={label}>Type of Unit</div>
 
           <select
             {...register("unitType")}
-            disabled={
-              !isEditing || isSubmitting
-            }
-            className={`flex-1 ${inputClass} ${
-              errors.unitType &&
-              "border-red-500"
-            }`}
+            disabled={!isEditing || isSubmitting}
+            className={`flex-1 ${getInputClass(errors.unitType,!isEditing || isSubmitting)}`}
           >
-            <option value="">
-              Select
-            </option>
+            <option value="">Select</option>
 
-            <option value="Parent">
-              Parent
-            </option>
+            <option value="Parent">Parent</option>
 
-            <option value="Child">
-              Child
-            </option>
+            <option value="Child">Child</option>
           </select>
         </div>
-
       </div>
 
       {/* BOTTOM */}
       <div className="space-y-1">
-
-        {/* PARENT UNIT */}
+        {/* CATEGORY */}
         <div className="flex gap-2 items-start">
-
-          <div className={label}>
-            Parent Unit
-          </div>
+          <div className={label}>Unit Category</div>
 
           <div className="flex-1">
-
             <SearchableSelect
-              options={parentUnits}
-              value={watch("parentUnitId")}
-              onChange={(value) =>
-                setValue(
-                  "parentUnitId",
-                  String(value)
-                )
-              }
+              options={CATEGORY_OPTIONS.unitCategory}
+              value={watch("categoryId")}
+              onChange={(value) => setValue("categoryId", String(value))}
               placeholder="Select"
-              disabled={
-                !isEditing ||
-                isSubmitting ||
-                selectedUnitType !==
-                  "Child" ||
-                loadingParentUnits
-              }
-              labelKey="unitName"
-              valueKey="unitId"
-              searchKeys={[
-                "unitName",
-                "shortName",
-              ]}
+              disabled={!isEditing || isSubmitting}
+              labelKey="label"
+              valueKey="value"
+              searchKeys={["label", "value"]}
             />
-
           </div>
-
         </div>
 
         {/* FACTOR */}
         <div className="flex gap-2">
-          <div className={label}>
-            Parent Unit Multiply Factor
-          </div>
+          <div className={label}>Parent Unit Multiply Factor</div>
 
           <Input
-            {...register(
-              "parentUnitMultiplyFactor"
-            )}
+            {...register("parentUnitMultiplyFactor")}
             disabled={
-              !isEditing ||
-              isSubmitting ||
-              selectedUnitType !==
-                "Child"
+              !isEditing || isSubmitting || selectedUnitType !== "Child"
             }
-            className={`flex-1 ${inputClass} ${
-              errors.parentUnitMultiplyFactor &&
-              "border-red-500"
-            }`}
+            className={`flex-1 ${getInputClass(errors.shortName,!isEditing || isSubmitting || selectedUnitType !== "Child")}`}
           />
         </div>
 
-        {/* CATEGORY */}
+        {/* PARENT UNIT */}
         <div className="flex gap-2 items-start">
-
-          <div className={label}>
-            Unit Category
-          </div>
+          <div className={label}>Parent Unit</div>
 
           <div className="flex-1">
-
             <SearchableSelect
-              options={
-                CATEGORY_OPTIONS.unitCategory
-              }
-              value={watch("categoryId")}
-              onChange={(value) =>
-                setValue(
-                  "categoryId",
-                  String(value)
-                )
-              }
+              options={parentUnits}
+              value={watch("parentUnitId")}
+              onChange={(value) => setValue("parentUnitId", String(value))}
               placeholder="Select"
               disabled={
-                !isEditing || isSubmitting
+                !isEditing ||
+                isSubmitting ||
+                selectedUnitType !== "Child" ||
+                loadingParentUnits
               }
-              labelKey="label"
-              valueKey="value"
-              searchKeys={[
-                "label",
-                "value",
-              ]}
+              labelKey="unitName"
+              valueKey="unitId"
+              searchKeys={["unitName", "shortName"]}
             />
-
           </div>
-
         </div>
-
       </div>
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-10">
-
         <SaveButton
-          onClick={() =>
-            handleSubmit(onSubmit)()
-          }
+          onClick={() => handleSubmit(onSubmit)()}
           loading={isSubmitting}
-          disabled={
-            !isEditing || isSubmitting
-          }
+          disabled={!isEditing || isSubmitting}
         />
 
         {mode === "edit" && (
           <EditButton
-            onClick={
-              isEditing
-                ? handleCancel
-                : () =>
-                    setIsEditing(true)
-            }
+            onClick={isEditing ? handleCancel : () => setIsEditing(true)}
             disabled={isSubmitting}
           >
-            {isEditing
-              ? "Cancel"
-              : "Edit"}
+            {isEditing ? "Cancel" : "Edit"}
           </EditButton>
         )}
-
       </div>
-
     </div>
   );
 }

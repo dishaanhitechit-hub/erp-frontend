@@ -13,26 +13,28 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ROLE } from "@/config/role.config";
 import { getInputClass, labelClass } from "@/lib/formStyles";
+import { useRouter } from "next/navigation";
 
 // ---------------- SCHEMA ----------------
 const MAX_SIZE = 5 * 1024 * 1024;
 
-const schema = z.object({
-  username: z.string().min(1, "Required"),
-  role: z.string().min(1, "Please Select Role"),
-  employeeCode: z.string().min(1, "Required"),
-  email: z.string().email("Invalid"),
-  mobile: z.string().min(10, "Invalid"),
-  whatsapp: z.string().min(10, "Invalid"),
-  password: z.string().min(5, "Required"),
-  status: z.string().min(1, "Required"),
-});
-
 export default function UserForm({ mode = "create", data }) {
+  const schema = z.object({
+    username: z.string().min(1, "Required"),
+    role: z.string().min(1, "Please Select Role"),
+    employeeCode: z.string().min(1, "Required"),
+    email: z.string().email("Invalid"),
+    mobile: z.string().min(10, "Invalid"),
+    whatsapp: z.string().min(10, "Invalid"),
+    password:
+      mode === "create" ? z.string().min(1, "Required") : z.string().optional(),
+    status: z.string().min(1, "Required"),
+  });
   const [isEditing, setIsEditing] = useState(mode === "create");
   const [signatureName, setSignatureName] = useState("");
   const [signatureError, setSignatureError] = useState("");
   const [previewSignature, setPreviewSignature] = useState("");
+  const router = useRouter();
 
   const signatureRef = useRef(null);
 
@@ -59,7 +61,7 @@ export default function UserForm({ mode = "create", data }) {
     getValues,
   } = form;
 
-  // ---------------- LOAD EDIT DATA ----------------
+  //  LOAD EDIT DATA
   useEffect(() => {
     const apiCall = () => {
       if (data) {
@@ -81,7 +83,7 @@ export default function UserForm({ mode = "create", data }) {
     apiCall();
   }, []);
 
-  // ---------------- FILE HANDLER ----------------
+  //  FILE HANDLER
 
   const handleFileChange = (file) => {
     if (!file) {
@@ -106,7 +108,7 @@ export default function UserForm({ mode = "create", data }) {
     setPreviewSignature(URL.createObjectURL(file));
   };
 
-  // ---------------- SUBMIT ----------------
+  //  SUBMIT
   const onSubmit = async () => {
     let toastId;
 
@@ -147,6 +149,11 @@ export default function UserForm({ mode = "create", data }) {
 
       setIsEditing(false);
       setPreviewSignature(res.data[0].signatureUrl || "");
+      if (mode == "create" || mode == "edit") {
+        setTimeout(() => {
+          router.push("/settings/user-id-password/");
+        }, 500);
+      }
     } catch (err) {
       toast.error(err.message || "Failed", { id: toastId });
     }

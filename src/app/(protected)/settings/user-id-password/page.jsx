@@ -55,7 +55,7 @@ export default function Page() {
     fetchUsers();
   }, []);
 
-  // ✅ SEARCH HANDLER
+  // SEARCH HANDLER
   const handleSearch = ({ search }) => {
     //  TODO: Replace with API search call
 

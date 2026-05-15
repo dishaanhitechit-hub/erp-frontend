@@ -51,7 +51,13 @@ export const API_ENDPOINTS = {
     // resource/indent
     RESOURCE:{
         INDENT:{
-            GET_ALL_INDENT:"/resource/indent"
+            GET_ALL_INDENT:"/resource/indent/list",
+            CREATE_INDENT_SUBMIT:"/resource/indent/create",//status=submited in payload
+            CREATE_INDENT_DRAFT:"/resource/indent/create",//status=draft in payload
+            GET_INDENT_BY_ID:"/resource/indent/",//id
+            UPDATE_INDENT_BY_ID_SUBMIT:"/resource/indent/update/",//id ,put  status=submited in payload
+            UPDATE_INDENT_BY_ID_DRAFT:"/resource/indent/update/",//id ,put , status=draft in payload
+            GET_ITEMS_BY_CATEGORY:"/resource/indent/items-by-category/"//category id 
         }
     }
     
