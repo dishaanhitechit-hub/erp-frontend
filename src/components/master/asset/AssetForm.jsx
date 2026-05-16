@@ -66,12 +66,14 @@ export default function AssetForm({
     const fetchCC = async () => {
       try {
         setLoadingCc(true);
+
         const res = await apiRequest({
           url: `${API_ENDPOINTS.MASTER.GET_ALL_CC_CODE}?categoryId=${selectedCategory}`,
         });
 
         setCcList(res.data || []);
-        // reset cc only in create mode
+
+        // clear only in create mode
         if (mode === "create") {
           setValue("ccCodeId", "");
         }
@@ -83,9 +85,6 @@ export default function AssetForm({
     };
 
     fetchCC();
-
-    // reset cc when category changes
-    setValue("ccCodeId", "");
   }, [selectedCategory]);
   // FETCH UNIT LIST
   useEffect(() => {
@@ -111,14 +110,20 @@ export default function AssetForm({
 
   //  SET EDIT DATA
   useEffect(() => {
-    if (mode === "edit" && initialData) {
+    if (
+      mode === "edit" &&
+      initialData &&
+      categories.length &&
+      unitList.length
+    ) {
       reset({
         ...initialData,
         itemCategoryId: String(initialData.itemCategoryId),
-        ccCodeId: String(initialData.ccCodeId),
+        ccCodeId: String(initialData.ccCodeId || ""),
+        unit: String(initialData.unit || ""),
       });
     }
-  }, [initialData]);
+  }, [initialData, categories, unitList]);
 
   //  CANCEL
   const handleCancel = () => {
