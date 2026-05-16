@@ -12,26 +12,29 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ROLE } from "@/config/role.config";
+import { getInputClass, labelClass } from "@/lib/formStyles";
+import { useRouter } from "next/navigation";
 
 // ---------------- SCHEMA ----------------
 const MAX_SIZE = 5 * 1024 * 1024;
 
-const schema = z.object({
-  username: z.string().min(1, "Required"),
-  role: z.string().min(1, "Please Select Role"),
-  employeeCode: z.string().min(1, "Required"),
-  email: z.string().email("Invalid"),
-  mobile: z.string().min(10, "Invalid"),
-  whatsapp: z.string().min(10, "Invalid"),
-  password: z.string().optional(),
-  status: z.string().min(1, "Required"),
-});
-
 export default function UserForm({ mode = "create", data }) {
+  const schema = z.object({
+    username: z.string().min(1, "Required"),
+    role: z.string().min(1, "Please Select Role"),
+    employeeCode: z.string().min(1, "Required"),
+    email: z.string().email("Invalid"),
+    mobile: z.string().min(10, "Invalid"),
+    whatsapp: z.string().min(10, "Invalid"),
+    password:
+      mode === "create" ? z.string().min(1, "Required") : z.string().optional(),
+    status: z.string().min(1, "Required"),
+  });
   const [isEditing, setIsEditing] = useState(mode === "create");
   const [signatureName, setSignatureName] = useState("");
   const [signatureError, setSignatureError] = useState("");
   const [previewSignature, setPreviewSignature] = useState("");
+  const router = useRouter();
 
   const signatureRef = useRef(null);
 
@@ -58,7 +61,7 @@ export default function UserForm({ mode = "create", data }) {
     getValues,
   } = form;
 
-  // ---------------- LOAD EDIT DATA ----------------
+  //  LOAD EDIT DATA
   useEffect(() => {
     const apiCall = () => {
       if (data) {
@@ -70,18 +73,17 @@ export default function UserForm({ mode = "create", data }) {
           mobile: data.mobile || "",
           whatsapp: data.whatsapp || "",
           password: "", // never prefill password
-          status: String(data.status ? "true":"false"), // boolean → string
+          status: String(data.status ? "true" : "false"), // boolean → string
         });
 
         // signature preview (use URL)
         setPreviewSignature(data.signatureUrl || "");
       }
-    }
+    };
     apiCall();
-
   }, []);
 
-  // ---------------- FILE HANDLER ----------------
+  //  FILE HANDLER
 
   const handleFileChange = (file) => {
     if (!file) {
@@ -106,7 +108,7 @@ export default function UserForm({ mode = "create", data }) {
     setPreviewSignature(URL.createObjectURL(file));
   };
 
-  // ---------------- SUBMIT ----------------
+  //  SUBMIT
   const onSubmit = async () => {
     let toastId;
 
@@ -129,14 +131,12 @@ export default function UserForm({ mode = "create", data }) {
         //skip empty password in edit mode
         if (k === "password" && mode === "edit" && !v) return;
         formData.append(k, v);
-      }
-
-      );
+      });
 
       const file = signatureRef.current?.files?.[0];
       if (file) formData.append("signature", file);
 
-      let res= await apiRequest({
+      let res = await apiRequest({
         url:
           mode === "create"
             ? API_ENDPOINTS.SETTINGS.CREATE_USER
@@ -149,7 +149,11 @@ export default function UserForm({ mode = "create", data }) {
 
       setIsEditing(false);
       setPreviewSignature(res.data[0].signatureUrl || "");
-
+      if (mode == "create" || mode == "edit") {
+        setTimeout(() => {
+          router.push("/settings/user-id-password/");
+        }, 500);
+      }
     } catch (err) {
       toast.error(err.message || "Failed", { id: toastId });
     }
@@ -159,39 +163,32 @@ export default function UserForm({ mode = "create", data }) {
   const handleEdit = () => {
     if (isEditing && mode === "edit") {
       reset({
-          username: data.username || "",
-          role: data.role || "",
-          employeeCode: data.employeeCode || "",
-          email: data.email || "",
-          mobile: data.mobile || "",
-          whatsapp: data.whatsapp || "",
-          password: "", // never prefill password
-          status: String(data.status ? "true":"false"), // boolean → string
-        });
+        username: data.username || "",
+        role: data.role || "",
+        employeeCode: data.employeeCode || "",
+        email: data.email || "",
+        mobile: data.mobile || "",
+        whatsapp: data.whatsapp || "",
+        password: "", // never prefill password
+        status: String(data.status ? "true" : "false"), // boolean → string
+      });
 
-        // signature preview (use URL)
+      // signature preview (use URL)
       setPreviewSignature(data.signatureUrl || "");
       setSignatureName("");
       setSignatureError("");
       if (signatureRef.current) {
-      signatureRef.current.value = "";
-    }
+        signatureRef.current.value = "";
+      }
     }
     setIsEditing((prev) => !prev);
   };
 
-  // ---------------- STYLES ----------------
-  const inputClass =
-    "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm";
-
-  const labelClass =
-    "w-[220px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
-
+  // STYLE
   const errorText = "text-red-500 text-[10px] h-[14px] mt-[2px]";
 
   return (
     <div className="p-4 ">
-
       {/* USERNAME + ROLE */}
       <div className="md:flex md:items-center">
         <div className={labelClass}>User Name</div>
@@ -199,13 +196,14 @@ export default function UserForm({ mode = "create", data }) {
         <Input
           {...register("username")}
           disabled={!isEditing || isSubmitting}
-          className={`${inputClass} w-[250px] -ml-px`}
+          className={`${getInputClass(errors.username, !isEditing || isSubmitting)} w-[250px] -ml-px`}
         />
 
         <select
           {...register("role")}
           disabled={!isEditing || isSubmitting}
-          className="
+          className={`
+                ${getInputClass(errors.role, !isEditing || isSubmitting)}
                 ml-4
                 h-7.5
                 px-2
@@ -216,9 +214,10 @@ export default function UserForm({ mode = "create", data }) {
                 outline-none
                 focus:ring-1 focus:ring-blue-400
                 cursor-pointer
-                disabled:bg-gray-100 disabled:cursor-not-allowed
-                "
+                0 disabled:cursor-not-allowed
+          `}
         >
+          <option value="">Select Type</option>
           <option value={ROLE.USER}>General User</option>
           <option value={ROLE.SUPER_ADMIN}>Super Admin</option>
           <option value={ROLE.ADMIN}>Admin</option>
@@ -237,19 +236,22 @@ export default function UserForm({ mode = "create", data }) {
         const finalLabel =
           key === "password"
             ? mode === "edit"
-              ? "Password (leave blank to keep unchanged)"
+              ? "Password"
               : "Password"
             : label;
 
         return (
-          <div key={key} className={`${(key =="password") || (key=="email") ? "mt-3":""}`}>
+          <div
+            key={key}
+            className={`${key == "password" || key == "email" ? "mt-3" : ""}`}
+          >
             <div className="md:flex md:items-center">
               <div className={labelClass}>{finalLabel}</div>
 
               <Input
                 {...register(key)}
                 disabled={!isEditing || isSubmitting}
-                className={`${inputClass} w-[250px] -ml-px`}
+                className={`${getInputClass(errors[key], !isEditing || isSubmitting)} w-[250px] -ml-px`}
               />
             </div>
 
@@ -265,9 +267,9 @@ export default function UserForm({ mode = "create", data }) {
           <select
             {...register("status")}
             disabled={!isEditing || isSubmitting}
-            className={`${inputClass} w-62.5 -ml-px focus:ring-1 focus:ring-blue-400
+            className={`${getInputClass(errors.status, !isEditing || isSubmitting)} w-62.5 -ml-px focus:ring-1 focus:ring-blue-400
                 cursor-pointer
-                disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                 disabled:cursor-not-allowed`}
           >
             <option value="true">Active</option>
             <option value="false">Suspended</option>
@@ -280,7 +282,6 @@ export default function UserForm({ mode = "create", data }) {
       {/* SIGNATURE */}
       <div className="pt-2 mt-3">
         <div className="flex items-center gap-2">
-
           <div className="px-3 py-1 min-w-37.5 text-center bg-[#8e7cc3] text-white text-md rounded-sm">
             Signature
           </div>
@@ -302,9 +303,7 @@ export default function UserForm({ mode = "create", data }) {
             type="file"
             hidden
             accept="image/png, image/jpeg, image/jpg"
-            onChange={(e) =>
-              handleFileChange(e.target.files?.[0])
-            }
+            onChange={(e) => handleFileChange(e.target.files?.[0])}
           />
         </div>
 
@@ -313,11 +312,7 @@ export default function UserForm({ mode = "create", data }) {
         {/* PREVIEW */}
         {previewSignature && (
           <div className="mt-4">
-            <img
-              src={previewSignature}
-              alt="signature"
-              className="h-[120px]"
-            />
+            <img src={previewSignature} alt="signature" className="h-[120px]" />
           </div>
         )}
       </div>

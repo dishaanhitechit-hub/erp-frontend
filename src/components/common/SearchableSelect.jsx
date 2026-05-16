@@ -8,25 +8,25 @@ export default function SearchableSelect({
   value,
   onChange,
   placeholder = "Select",
+  searchPlaceholder="Search...",
   disabled = false,
   className = "",
   searchKeys = [],
   labelKey = "label",
   valueKey = "value",
   emptyText = "No Data Found",
+  dropdownPosition = "down",
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [dropdownStyle, setDropdownStyle] = useState({});
 
   const wrapperRef = useRef(null);
 
   // CLOSE OUTSIDE
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target)
-      ) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setOpen(false);
       }
     };
@@ -34,18 +34,13 @@ export default function SearchableSelect({
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   // SELECTED OPTION
   const selectedOption = useMemo(() => {
-    return options.find(
-      (item) => String(item[valueKey]) === String(value)
-    );
+    return options.find((item) => String(item[valueKey]) === String(value));
   }, [options, value, valueKey]);
 
   // FILTERED OPTIONS
@@ -70,15 +65,36 @@ export default function SearchableSelect({
   };
 
   return (
+    // <div
+    //   ref={wrapperRef}
+    //   className={`relative w-full ${className}`}
+    // >
     <div
       ref={wrapperRef}
-      className={`relative w-full ${className}`}
+      className={`relative w-full overflow-visible ${className}`}
     >
       {/* SELECT BUTTON */}
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+
+          const DROPDOWN_HEIGHT = 260;
+
+          setDropdownStyle({
+            position: "fixed",
+            top:
+              dropdownPosition === "up"
+                ? rect.top - DROPDOWN_HEIGHT - 4
+                : rect.bottom + 4,
+            left: rect.left,
+            width: rect.width,
+            zIndex: 999999,
+          });
+
+          setOpen((prev) => !prev);
+        }}
         className={`
           w-full
           h-[30px]
@@ -92,15 +108,14 @@ export default function SearchableSelect({
           flex
           items-center
           justify-between
-          disabled:bg-gray-100
+          disabled:border-[#7fa37f]  
+          disabled:bg-[#edf8ed] 
           disabled:text-gray-500
           disabled:cursor-not-allowed
         `}
       >
         <span className="truncate">
-          {selectedOption
-            ? selectedOption[labelKey]
-            : placeholder}
+          {selectedOption ? selectedOption[labelKey] : placeholder}
         </span>
 
         <ChevronDown size={16} />
@@ -108,20 +123,30 @@ export default function SearchableSelect({
 
       {/* DROPDOWN */}
       {open && !disabled && (
+        // <div
+        //   className="
+        //     absolute
+        //     top-full
+        //     left-0
+        //     z-99999
+        //     mt-1
+        //     w-full
+        //     border
+        //     border-[#8f8f8f]
+        //     rounded-sm
+        //     bg-white
+        //     shadow-md
+        //   "
+        // >
         <div
           className="
-            absolute
-            top-full
-            left-0
-            z-50
-            mt-1
-            w-full
-            border
-            border-[#8f8f8f]
-            rounded-sm
-            bg-white
-            shadow-md
-          "
+                border
+                border-[#8f8f8f]
+                rounded-sm
+                bg-white
+                shadow-xl
+              "
+          style={dropdownStyle}
         >
           {/* SEARCH */}
           <div className="p-2 border-b border-gray-200">
@@ -129,7 +154,7 @@ export default function SearchableSelect({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
+              placeholder={searchPlaceholder}
               className="
                 w-full
                 h-[30px]
@@ -147,8 +172,7 @@ export default function SearchableSelect({
           <div className="max-h-[220px] overflow-y-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((item) => {
-                const isSelected =
-                  String(item[valueKey]) === String(value);
+                const isSelected = String(item[valueKey]) === String(value);
 
                 return (
                   <button
@@ -164,11 +188,7 @@ export default function SearchableSelect({
                       hover:bg-[#d6e6f2]
                       border-b
                       border-gray-100
-                      ${
-                        isSelected
-                          ? "bg-[#d6e6f2]"
-                          : "bg-white"
-                      }
+                      ${isSelected ? "bg-[#d6e6f2]" : "bg-white"}
                     `}
                   >
                     {item[labelKey]}
@@ -186,7 +206,6 @@ export default function SearchableSelect({
     </div>
   );
 }
-
 
 // example usage
 

@@ -14,48 +14,54 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function SaveButton({
+export default function SaveDraftButton({
   onClick,
-  children = "Save",
-  className = "",
   loading = false,
-  disabled = true,
+  disabled = false,
+  children = "Save as Draft",
+  className = "",
   requireConfirmation = false,
-  confirmationTitle = "Are you sure?",
-  confirmationMessage = "This action will continue the process.",
+  confirmationTitle = "Save Draft?",
+  confirmationMessage = "This draft will be saved.",
 }) {
-  const isDisabled = loading || disabled;
+  const isDisabled = disabled || loading;
 
   const buttonUI = (
     <button
+      type="button"
       disabled={isDisabled}
       className={`
-        h-8.5
-        min-w-30
+        min-w-[120px]
+        h-[34px]
         px-4
-        rounded-md
+        rounded-sm
         border
-        border-[#d97a2b]
-        bg-[#f4b183]
-        text-black
+        border-[#b38f2a]
+        bg-[#f4d47c]
+        hover:brightness-95
+        disabled:opacity-70
+        disabled:cursor-not-allowed
         text-md
         font-medium
-        hover:bg-[#eea36e]
-        transition
-        flex items-center justify-center gap-2
-        ${
-          isDisabled
-            ? "opacity-70 cursor-not-allowed"
-            : "cursor-pointer"
-        }
+        text-[#3d3200]
+        inline-flex
+        items-center
+        justify-center
+        gap-2
+        transition-all
+        duration-150
+        cursor-pointer
         ${className}
       `}
     >
-      {loading && (
-        <Loader2 className="h-4 w-4 animate-spin" />
+      {loading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Saving...
+        </>
+      ) : (
+        children
       )}
-
-      {loading ? "Saving..." : children}
     </button>
   );
 
@@ -63,35 +69,41 @@ export default function SaveButton({
   if (!requireConfirmation) {
     return (
       <button
+        type="button"
         onClick={onClick}
         disabled={isDisabled}
         className={`
-          h-8.5
-          min-w-30
+          min-w-[120px]
+          h-[34px]
           px-4
-          rounded-md
+          rounded-sm
           border
-          border-[#d97a2b]
-          bg-[#f4b183]
-          text-black
+          border-[#b38f2a]
+          bg-[#f4d47c]
+          hover:brightness-95
+          disabled:opacity-70
+          disabled:cursor-not-allowed
           text-md
           font-medium
-          hover:bg-[#eea36e]
-          transition
-          flex items-center justify-center gap-2
-          ${
-            isDisabled
-              ? "opacity-70 cursor-not-allowed"
-              : "cursor-pointer"
-          }
+          text-[#3d3200]
+          inline-flex
+          items-center
+          justify-center
+          gap-2
+          transition-all
+          duration-150
+          cursor-pointer
           ${className}
         `}
       >
-        {loading && (
-          <Loader2 className="h-4 w-4 animate-spin" />
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Saving...
+          </>
+        ) : (
+          children
         )}
-
-        {loading ? "Saving..." : children}
       </button>
     );
   }

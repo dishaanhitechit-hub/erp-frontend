@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
@@ -12,6 +12,11 @@ import IndentForm from "@/components/resource/indent/IndentForm";
 
 export default function Page() {
   const router = useRouter();
+
+  const { indentId } = useParams();
+
+  // CHANGE THIS LATER IF NEEDED
+  const mode = "edit";
 
   const actions = getPageActions({
     onHome: () =>
@@ -32,7 +37,10 @@ export default function Page() {
         <PageHeader actions={actions} />
       }
     >
-      <IndentForm mode="create" />
+      <IndentForm
+        mode={mode}
+        indentId={indentId}
+      />
     </HeaderWrapper>
   );
 }

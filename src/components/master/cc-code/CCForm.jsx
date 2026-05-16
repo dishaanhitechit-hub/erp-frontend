@@ -12,8 +12,10 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
+import { getInputClass } from "@/lib/formStyles";
 
 const schema = z.object({
+  ccCode:z.string().min(1, "Required"),
   ccName: z.string().min(1, "Required"),
   groupId: z.string().min(1, "Required"),
   categoryId: z.string().min(1, "Required"),
@@ -183,7 +185,7 @@ export default function CCForm({ mode = "create", ccId ,data}) {
       {/* CC CODE */}
       <div className="flex gap-2">
         <div className="w-[220px] bg-[#d6e6f2] px-3 py-1 border rounded-md">CC Code</div>
-        <Input {...register("ccCode")} disabled={!isEditing || isSubmitting}  className={`w-[200px] ${errors.ccName && "border-red-500"}`} />
+        <Input {...register("ccCode")} disabled={!isEditing || isSubmitting}  className={`${getInputClass(errors.ccCode,!isEditing || isSubmitting)} w-[200px]`} />
       </div>
 
       {/* CC NAME */}
@@ -193,7 +195,7 @@ export default function CCForm({ mode = "create", ccId ,data}) {
           <Input
             {...register("ccName")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${errors.ccName && "border-red-500"}`}
+            className={`flex-1 ${getInputClass(errors.ccName,!isEditing || isSubmitting)}`}
           />
         </div>
       </div>
@@ -206,9 +208,7 @@ export default function CCForm({ mode = "create", ccId ,data}) {
           <select
             {...register("groupId")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${inputClass} ${
-              errors.groupId && "border-red-500"
-            } disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed rounded-md`}
+            className={`flex-1 ${getInputClass(errors.groupId,!isEditing || isSubmitting)}  disabled:cursor-not-allowed rounded-md`}
           >
             <option value="">Select</option>
             {groups.map((g) => (
@@ -228,9 +228,7 @@ export default function CCForm({ mode = "create", ccId ,data}) {
           <select
             {...register("categoryId")}
             disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${inputClass} ${
-              errors.categoryId && "border-red-500"
-            } disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed rounded-md`}
+            className={`flex-1 ${getInputClass(errors.categoryId,!isEditing || isSubmitting)} disabled:cursor-not-allowed rounded-md`}
           >
             <option value="">Select</option>
             {categories.map((c) => (

@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import SearchableSelect from "@/components/common/SearchableSelect";
+import { getInputClass } from "@/lib/formStyles";
 
 const schema = z.object({
   itemCategoryId: z.string().min(1, "Required"),
@@ -34,6 +35,8 @@ export default function ItemForm({
   // const [filteredCcList, setFilteredCcList] = useState([]);
   // const [ccSearch, setCcSearch] = useState("");
   const [loadingCc, setLoadingCc] = useState(false);
+  const [unitList, setUnitList] = useState([]);
+  const [loadingUnits, setLoadingUnits] = useState(false);
 
   const {
     register,
@@ -96,6 +99,28 @@ export default function ItemForm({
 
     fetchCcList();
   }, [selectedCategory]);
+
+  // FETCH UNIT LIST
+  useEffect(() => {
+    const fetchUnitList = async () => {
+      try {
+        setLoadingUnits(true);
+
+        const res = await apiRequest({
+          url: API_ENDPOINTS.MASTER.GET_ALL_UNIT,
+        });
+
+        setUnitList(res.data || []);
+      } catch (err) {
+        console.log(err);
+        setUnitList([]);
+      } finally {
+        setLoadingUnits(false);
+      }
+    };
+
+    fetchUnitList();
+  }, []);
 
   // SEARCH FILTER
   // useEffect(() => {
@@ -196,7 +221,7 @@ export default function ItemForm({
         <Input
           {...register("itemCode")}
           disabled
-          className="w-[200px] border border-[#8f8f8f]"
+          className={`${getInputClass(false, true)} w-[200px]`}
           placeholder="[Auto]"
         />
       </div>
@@ -210,8 +235,7 @@ export default function ItemForm({
             <select
               {...register("itemCategoryId")}
               disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${inputClass} ${errors.itemCategoryId && "border-red-500"
-                } disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed`}
+              className={`flex-1 ${getInputClass(errors.itemCategoryId, !isEditing || isSubmitting)} disabled:cursor-not-allowed`}
             >
               <option value="">Select</option>
 
@@ -227,31 +251,21 @@ export default function ItemForm({
         {/* CC */}
         <div className="flex flex-col">
           <div className="flex gap-2 items-start">
-
             <div className={label + " h-[30px]"}>CC Name</div>
 
             <div className="flex-1">
-
               <SearchableSelect
                 options={ccList}
                 value={watch("ccCodeId")}
-                onChange={(value) =>
-                  setValue("ccCodeId", String(value))
-                }
-                placeholder={
-                  loadingCc ? "Loading..." : "Select CC"
-                }
-                disabled={
-                  !isEditing || isSubmitting || loadingCc
-                }
+                onChange={(value) => setValue("ccCodeId", String(value))}
+                placeholder={loadingCc ? "Loading..." : "Select CC"}
+                disabled={!isEditing || isSubmitting || loadingCc}
                 labelKey="ccName"
                 valueKey="ccId"
                 searchKeys={["ccName", "ccCode"]}
-                className={`${errors.ccCodeId && "border-red-500"}`}
+                className={`${errors.ccCodeId && "border-red-500 bg-red-50 focus-visible:ring-red-500"} ${!isEditing || isSubmitting || (loadingCc && "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed] disabled:text-gray-500")}`}
               />
-
             </div>
-
           </div>
         </div>
       </div>
@@ -265,7 +279,7 @@ export default function ItemForm({
             <Input
               {...register("itemName")}
               disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${inputClass} ${errors.itemName && "border-red-500"}`}
+              className={`flex-1 ${getInputClass(errors.itemName, !isEditing || isSubmitting)}`}
             />
           </div>
         </div>
@@ -279,15 +293,13 @@ export default function ItemForm({
               {...register("itemDescription")}
               disabled={!isEditing || isSubmitting}
               className={`
+                ${getInputClass(errors.itemDescription, !isEditing || isSubmitting)}
                 flex-1
-                border border-[#8f8f8f]
-                text-sm
-                rounded-sm
                 px-2 py-1
                 min-h-[80px]
                 resize-none
-                disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
-                ${errors.itemDescription && "border-red-500"}
+                disabled:cursor-not-allowed
+                
               `}
               placeholder="Text"
             />
@@ -300,14 +312,33 @@ export default function ItemForm({
         <div className="space-y-1">
           {/* UNIT */}
           <div className="flex flex-col">
-            <div className="flex gap-2">
-              <div className={label}>Unit</div>
+            <div className="flex gap-2 items-start">
+              <div className={label + " h-[30px]"}>Unit</div>
 
-              <Input
-                {...register("unit")}
-                disabled={!isEditing || isSubmitting}
-                className={`flex-1 ${inputClass} ${errors.unit && "border-red-500"}`}
-              />
+              <div className="flex-1">
+                <SearchableSelect
+                  options={unitList}
+                  value={watch("unit")}
+                  onChange={(value) => setValue("unit", String(value))}
+                  placeholder={loadingUnits ? "Loading..." : "Select Unit"}
+                  searchPlaceholder="Search by short/unit/parent/category name"
+                  disabled={!isEditing || isSubmitting || loadingUnits}
+                  labelKey="shortName"
+                  valueKey="unitId"
+                  dropdownPosition="up"
+                  searchKeys={[
+                    "shortName",
+                    "unitName",
+                    "parentUnitName",
+                    "categoryName",
+                  ]}
+                  className={`
+          ${
+            errors.unit && "border-red-500 bg-red-50 focus-visible:ring-red-500"
+          }
+        `}
+                />
+              </div>
             </div>
           </div>
 
@@ -319,7 +350,7 @@ export default function ItemForm({
               <Input
                 {...register("hsnSac")}
                 disabled={!isEditing || isSubmitting}
-                className={`flex-1 ${inputClass} ${errors.hsnSac && "border-red-500"}`}
+                className={`flex-1 ${getInputClass(errors.hsnSac, !isEditing || isSubmitting)}`}
               />
             </div>
           </div>
@@ -332,7 +363,7 @@ export default function ItemForm({
               <Input
                 {...register("gstPercentage")}
                 disabled={!isEditing || isSubmitting}
-                className={`flex-1 ${inputClass} ${errors.gstPercentage && "border-red-500"}`}
+                className={`flex-1 ${getInputClass(errors.gstPercentage, !isEditing || isSubmitting)}`}
               />
             </div>
           </div>
