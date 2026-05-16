@@ -46,7 +46,7 @@ export default function AssetForm({
   } = useForm({
     resolver: zodResolver(assetSchema),
     defaultValues: {
-      assetCode: "",
+      assetDisplayCode: "",
       itemCategoryId: "",
       ccCodeId: "",
       assetName: "",
@@ -165,7 +165,7 @@ export default function AssetForm({
         });
 
         const d = res.data[0];
-        setValue("assetCode", d.assetCode);
+        setValue("assetDisplayCode", d.assetDisplayCode);
         setIsEditing(false);
 
         toast.success("Created", { id: toastId });
@@ -177,7 +177,7 @@ export default function AssetForm({
         });
 
         const d = res.data[0];
-        setValue("assetCode", d.assetCode);
+        setValue("assetDisplayCode", d.assetDisplayCode);
         setIsEditing(false);
 
         toast.success("Updated", { id: toastId });
@@ -197,7 +197,7 @@ export default function AssetForm({
       <div className="flex gap-2">
         <div className={label}>Asset Code</div>
         <Input
-          {...register("assetCode")}
+          {...register("assetDisplayCode")}
           disabled
           className={`${getInputClass(false, true)} w-[200px]`}
           placeholder="[Auto]"
