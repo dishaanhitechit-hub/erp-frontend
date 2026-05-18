@@ -110,8 +110,8 @@ const approvalModules = [
         title: "Project Management",
         moduleCode: "project_management",
         children: [
-            { title: "Order & BOQ", moduleCode: "order_and_boq" },
-            { title: "Budget & Costing", moduleCode: "budget_and_costing" },
+            { title: "Order & BOQ", moduleCode: "order_boq" },
+            { title: "Budget & Costing", moduleCode: "budget_costing" },
             {
                 title: "Planning",
                 moduleCode: "planning",
@@ -126,7 +126,7 @@ const approvalModules = [
                 moduleCode: "sale_billing",
                 children: [
                     { title: "Certified Bill", moduleCode: "certified_bill" },
-                    { title: "Hold /Ammd Pending.", moduleCode: "hold_ammd_pending" },
+                    { title: "Hold /Amend Pending.", moduleCode: "hold_amend_pending" },
                     { title: "Work In Progress", moduleCode: "work_in_progress" },
                 ],
             },
