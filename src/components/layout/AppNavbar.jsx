@@ -239,7 +239,7 @@ export default function AppNavbar() {
                       value={projectInfo.projectId}
                       onChange={handleProjectSelect}
                       placeholder={
-                        loadingProjects ? "Loading..." : "Select Project"
+                        loadingProjects ? "Loading..." : "SingleSelect Project"
                       }
                       labelKey="projectName"
                       valueKey="id"

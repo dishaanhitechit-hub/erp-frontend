@@ -225,7 +225,7 @@ export default function AssetForm({
               options={ccList}
               value={watch("ccCodeId")}
               onChange={(value) => setValue("ccCodeId", String(value))}
-              placeholder={loadingCc ? "Loading..." : "Select CC"}
+              placeholder={loadingCc ? "Loading..." : "SingleSelect CC"}
               disabled={!isEditing || isSubmitting || loadingCc}
               labelKey="ccName"
               valueKey="ccId"
@@ -276,7 +276,7 @@ export default function AssetForm({
                 options={unitList}
                 value={watch("unit")}
                 onChange={(value) => setValue("unit", String(value))}
-                placeholder={loadingUnits ? "Loading..." : "Select Unit"}
+                placeholder={loadingUnits ? "Loading..." : "SingleSelect Unit"}
                 searchPlaceholder="Search by short/unit/parent/category name"
                 disabled={!isEditing || isSubmitting || loadingUnits}
                 labelKey="shortName"

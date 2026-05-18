@@ -222,7 +222,7 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
             disabled={!isEditing || isSubmitting}
             className={`flex-1 ${getInputClass(errors.unitType,!isEditing || isSubmitting)}`}
           >
-            <option value="">Select</option>
+            <option value="">SingleSelect</option>
 
             <option value="Parent">Parent</option>
 

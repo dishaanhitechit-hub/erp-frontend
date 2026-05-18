@@ -13,7 +13,18 @@ export const API_ENDPOINTS = {
         CREATE_PROJECT:"/setting/create-project",
         GET_PROJECT_BY_ID:"/setting/project",//get and put for update
         ADD_DESIGNATION:"/setting/designation",
-        UPDATE_PROJECT_ROLES:"/setting/project-role" //project code also used for get
+        UPDATE_PROJECT_ROLES:"/setting/project-role", //project code also used for get
+        APPROVAL_PATH: {
+
+            SAVE:
+                "/setting/approval-path",
+
+            GET_USERS_BY_PROJECT:
+                "/setting/users",
+
+            LIST: "/setting/approval-path/list",
+
+        }
     },
     MASTER :{
         CREATE_GROUP:"/master/group/create",

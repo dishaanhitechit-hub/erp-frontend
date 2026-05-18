@@ -21,7 +21,7 @@ const MAX_SIZE = 5 * 1024 * 1024;
 export default function UserForm({ mode = "create", data }) {
   const schema = z.object({
     username: z.string().min(1, "Required"),
-    role: z.string().min(1, "Please Select Role"),
+    role: z.string().min(1, "Please SingleSelect Role"),
     employeeCode: z.string().min(1, "Required"),
     email: z.string().email("Invalid"),
     mobile: z.string().min(10, "Invalid"),

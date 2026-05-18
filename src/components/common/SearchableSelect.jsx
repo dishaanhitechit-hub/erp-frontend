@@ -213,7 +213,7 @@ export default function SearchableSelect({
 //   options={vendorList}
 //   value={watch("vendorId")}
 //   onChange={(value) => setValue("vendorId", value)}
-//   placeholder="Select Vendor"
+//   placeholder="SingleSelect Vendor"
 //   labelKey="vendorName"
 //   valueKey="vendorId"
 //   searchKeys={["vendorName", "vendorCode", "mobile"]}
