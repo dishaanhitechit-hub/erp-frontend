@@ -40,9 +40,11 @@ const projectSchema = z.object({
   initialOrderValue: z
     .string()
     .min(1, "Required")
-    .regex(/^[0-9]+$/, "Only numbers"),
+    .regex(/^\d+(\.\d+)?$/, "Invalid number"),
 
-  revisedOrderValue: z.string().optional(),
+  revisedOrderValue: z
+    .union([z.literal(""), z.string().regex(/^\d+(\.\d+)?$/, "Invalid number")])
+    .optional(),
 
   scheduleDate: z.string().min(1, "Required"),
   scheduleCompletionDate: z.string().min(1, "Required"),
@@ -154,15 +156,8 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
   };
 
   //  STYLES
-  const inputClass =
-    "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm w-full";
-
   const labelClass =
     "px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm min-w-[180px]";
-
-  // const getInputClass = (fieldError) =>
-  //     `${inputClass} ${fieldError ? "border-red-500 focus:ring-red-400" : ""
-  //     }`;
 
   //  UI
   return (
@@ -487,10 +482,24 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
         <div className="grid md:grid-cols-2 gap-3">
           <div className="flex flex-col">
             <div className="flex ">
-              <div className={labelClass}>Initial Order Value</div>
+              <div className={labelClass}>Initial Order Value(Cr)</div>
 
               <Input
                 {...register("initialOrderValue")}
+                inputMode="decimal"
+                onInput={(e) => {
+                  let value = e.target.value;
+
+                  value = value.replace(/[^0-9.]/g, "");
+
+                  const parts = value.split(".");
+
+                  if (parts.length > 2) {
+                    value = parts[0] + "." + parts.slice(1).join("");
+                  }
+
+                  e.target.value = value;
+                }}
                 disabled={!isEditing || isSubmitting}
                 className={getInputClass(
                   errors.initialOrderValue,
@@ -506,10 +515,24 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
 
           <div className="flex flex-col">
             <div className="flex ">
-              <div className={labelClass}>Revised Order Value</div>
+              <div className={labelClass}>Revised Order Value(Cr)</div>
 
               <Input
                 {...register("revisedOrderValue")}
+                inputMode="decimal"
+                onInput={(e) => {
+                  let value = e.target.value;
+
+                  value = value.replace(/[^0-9.]/g, "");
+
+                  const parts = value.split(".");
+
+                  if (parts.length > 2) {
+                    value = parts[0] + "." + parts.slice(1).join("");
+                  }
+
+                  e.target.value = value;
+                }}
                 disabled={!isEditing || isSubmitting}
                 className={getInputClass(
                   errors.revisedOrderValue,
@@ -554,39 +577,39 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
           ))}
         </div>
       </div>
-    <div>
-      {/* ADDRESS BLOCK */}
-      {[
-        ["BADD", "Billing Address", "billingAddress"],
-        ["SHP1", "Shipping Address 1", "shippingAddress"],
-        ["SHP2", "Shipping Address 2", "shippingAddress2"],
-        ["SHP3", "Shipping Address 3", "shippingAddress3"],
-      ].map(([short, full, key]) => (
-        <div key={key} className="flex flex-col">
-          <div className="flex  items-center">
-            {/* SHORT LABEL */}
-            <div className={`${labelClass} min-w-[80px] text-center`}>
-              {short}
+      <div>
+        {/* ADDRESS BLOCK */}
+        {[
+          ["BADD", "Billing Address", "billingAddress"],
+          ["SHP1", "Shipping Address 1", "shippingAddress"],
+          ["SHP2", "Shipping Address 2", "shippingAddress2"],
+          ["SHP3", "Shipping Address 3", "shippingAddress3"],
+        ].map(([short, full, key]) => (
+          <div key={key} className="flex flex-col">
+            <div className="flex  items-center">
+              {/* SHORT LABEL */}
+              <div className={`${labelClass} min-w-[80px] text-center`}>
+                {short}
+              </div>
+
+              {/* FULL LABEL */}
+              <div className={`${labelClass} min-w-[180px]`}>{full}</div>
+
+              {/* INPUT */}
+              <Input
+                {...register(key)}
+                disabled={!isEditing || isSubmitting}
+                className={`flex-1 ${getInputClass(errors[key], !isEditing || isSubmitting)}`}
+                placeholder="Text"
+              />
             </div>
 
-            {/* FULL LABEL */}
-            <div className={`${labelClass} min-w-[180px]`}>{full}</div>
-
-            {/* INPUT */}
-            <Input
-              {...register(key)}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors[key], !isEditing || isSubmitting)}`}
-              placeholder="Text"
-            />
-          </div>
-
-          {/* ERROR */}
-          {/* <p className="text-red-500 text-[10px] h-[14px] mt-[2px]">
+            {/* ERROR */}
+            {/* <p className="text-red-500 text-[10px] h-[14px] mt-[2px]">
                         {errors[key]?.message}
                     </p> */}
-        </div>
-      ))}
+          </div>
+        ))}
       </div>
 
       {/* BUTTONS */}

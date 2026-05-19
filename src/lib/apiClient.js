@@ -53,7 +53,8 @@ export const apiRequest = async ({
       clearAuthCookies();
       window.location.href = "/login";
     }
-    throw new Error(result?.message || "API Error");
+    let msg = result?.message || result?.msg;
+    throw new Error(msg || "API Error");
   }
 
   return result;

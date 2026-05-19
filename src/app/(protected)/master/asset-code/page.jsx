@@ -33,7 +33,7 @@ export default function Page() {
         const formatted = assets.map((p, index) => ({
           assetId: p.assetId,
           sl: index + 1,
-          assetCode: p.assetCode,
+          assetDisplayCode: p.assetDisplayCode,
           assetName: p.assetName,
           assetCategoryName: p.assetCategoryName,
           unit: p.unit,
@@ -72,7 +72,7 @@ export default function Page() {
   //  TABLE COLUMNS
   const columns = [
     { header: "Sl. no", accessor: "sl" },
-    { header: "Asset Code", accessor: "assetCode" },
+    { header: "Asset Code", accessor: "assetDisplayCode" },
     { header: "Asset Name", accessor: "assetName" },
     { header: "Category", accessor: "assetCategoryName" },
     { header: "Unit", accessor: "unit" },

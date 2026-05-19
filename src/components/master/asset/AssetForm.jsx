@@ -46,7 +46,7 @@ export default function AssetForm({
   } = useForm({
     resolver: zodResolver(assetSchema),
     defaultValues: {
-      assetCode: "",
+      assetDisplayCode: "",
       itemCategoryId: "",
       ccCodeId: "",
       assetName: "",
@@ -66,12 +66,14 @@ export default function AssetForm({
     const fetchCC = async () => {
       try {
         setLoadingCc(true);
+
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.MASTER.GET_ALL_CC_CODE}?categoryId=${selectedCategory}`,
+          url: `${API_ENDPOINTS.MASTER.GET_ALL_CC_CODE}?categoryId=${selectedCategory}&key=asset`,
         });
 
         setCcList(res.data || []);
-        // reset cc only in create mode
+
+        // clear only in create mode
         if (mode === "create") {
           setValue("ccCodeId", "");
         }
@@ -83,9 +85,6 @@ export default function AssetForm({
     };
 
     fetchCC();
-
-    // reset cc when category changes
-    setValue("ccCodeId", "");
   }, [selectedCategory]);
   // FETCH UNIT LIST
   useEffect(() => {
@@ -111,14 +110,20 @@ export default function AssetForm({
 
   //  SET EDIT DATA
   useEffect(() => {
-    if (mode === "edit" && initialData) {
+    if (
+      mode === "edit" &&
+      initialData &&
+      categories.length &&
+      unitList.length
+    ) {
       reset({
         ...initialData,
         itemCategoryId: String(initialData.itemCategoryId),
-        ccCodeId: String(initialData.ccCodeId),
+        ccCodeId: String(initialData.ccCodeId || ""),
+        unit: String(initialData.unit || ""),
       });
     }
-  }, [initialData]);
+  }, [initialData, categories, unitList]);
 
   //  CANCEL
   const handleCancel = () => {
@@ -160,7 +165,7 @@ export default function AssetForm({
         });
 
         const d = res.data[0];
-        setValue("assetCode", d.assetCode);
+        setValue("assetDisplayCode", d.assetDisplayCode);
         setIsEditing(false);
 
         toast.success("Created", { id: toastId });
@@ -172,7 +177,7 @@ export default function AssetForm({
         });
 
         const d = res.data[0];
-        setValue("assetCode", d.assetCode);
+        setValue("assetDisplayCode", d.assetDisplayCode);
         setIsEditing(false);
 
         toast.success("Updated", { id: toastId });
@@ -192,7 +197,7 @@ export default function AssetForm({
       <div className="flex gap-2">
         <div className={label}>Asset Code</div>
         <Input
-          {...register("assetCode")}
+          {...register("assetDisplayCode")}
           disabled
           className={`${getInputClass(false, true)} w-[200px]`}
           placeholder="[Auto]"

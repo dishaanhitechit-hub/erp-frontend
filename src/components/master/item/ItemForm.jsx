@@ -76,7 +76,7 @@ export default function ItemForm({
         setLoadingCc(true);
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.MASTER.GET_ALL_CC_CODE}?categoryId=${selectedCategory}`,
+          url: `${API_ENDPOINTS.MASTER.GET_ALL_CC_CODE}?categoryId=${selectedCategory}&key=item`,
         });
 
         const data = res.data || [];
@@ -169,7 +169,7 @@ export default function ItemForm({
 
         const d = res.data[0];
 
-        setValue("itemCode", d.itemCode);
+        setValue("itemDisplayCode", d.itemDisplayCode);
 
         setIsEditing(false);
 
@@ -183,7 +183,7 @@ export default function ItemForm({
 
         const d = res.data[0];
 
-        setValue("itemCode", d.itemCode);
+        setValue("itemDisplayCode", d.itemDisplayCode);
 
         setIsEditing(false);
 
@@ -219,7 +219,7 @@ export default function ItemForm({
         <div className={label}>Item Code</div>
 
         <Input
-          {...register("itemCode")}
+          {...register("itemDisplayCode")}
           disabled
           className={`${getInputClass(false, true)} w-[200px]`}
           placeholder="[Auto]"

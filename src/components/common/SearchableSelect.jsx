@@ -8,14 +8,15 @@ export default function SearchableSelect({
   value,
   onChange,
   placeholder = "Select",
-  searchPlaceholder="Search...",
+  searchPlaceholder = "Search...",
   disabled = false,
   className = "",
   searchKeys = [],
-  labelKey = "label",
+  labelKey = "label", //["name","fullname"]
   valueKey = "value",
   emptyText = "No Data Found",
   dropdownPosition = "down",
+  labelSeparator = " : ",
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -115,7 +116,14 @@ export default function SearchableSelect({
         `}
       >
         <span className="truncate">
-          {selectedOption ? selectedOption[labelKey] : placeholder}
+          {selectedOption
+            ? Array.isArray(labelKey)
+              ? labelKey
+                  .map((key) => selectedOption[key])
+                  .filter(Boolean)
+                  .join(labelSeparator)
+              : selectedOption[labelKey]
+            : placeholder}
         </span>
 
         <ChevronDown size={16} />
@@ -191,7 +199,12 @@ export default function SearchableSelect({
                       ${isSelected ? "bg-[#d6e6f2]" : "bg-white"}
                     `}
                   >
-                    {item[labelKey]}
+                    {Array.isArray(labelKey)
+                      ? labelKey
+                          .map((key) => item[key])
+                          .filter(Boolean)
+                          .join(labelSeparator)
+                      : item[labelKey]}
                   </button>
                 );
               })

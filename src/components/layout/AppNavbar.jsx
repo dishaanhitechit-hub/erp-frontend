@@ -241,7 +241,7 @@ export default function AppNavbar() {
                       placeholder={
                         loadingProjects ? "Loading..." : "SingleSelect Project"
                       }
-                      labelKey="projectName"
+                      labelKey={["projectCode","projectName"]}
                       valueKey="id"
                       searchKeys={["projectName", "projectCode"]}
                     />

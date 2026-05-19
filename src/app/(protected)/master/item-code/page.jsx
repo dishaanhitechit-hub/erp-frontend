@@ -38,7 +38,7 @@ export default function Page() {
         const formatted = items.map((p, index) => ({
           itemId: p.itemId,
           sl: index + 1,
-          itemCode: p.itemCode,
+          itemDisplayCode: p.itemDisplayCode,
           itemName: p.itemName,
           itemCategoryName: p.itemCategoryName,
           hsnSac: p.hsnSac,
@@ -76,7 +76,7 @@ export default function Page() {
   //  TABLE COLUMNS
   const columns = [
     { header: "Sl. no", accessor: "sl" },
-    { header: "Item Code", accessor: "itemCode" },
+    { header: "Item Code", accessor: "itemDisplayCode" },
     { header: "Item Name", accessor: "itemName" },
     { header: "Category", accessor: "itemCategoryName" },
     { header: "HSN", accessor: "hsnSac" },
