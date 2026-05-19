@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,20 +23,21 @@ import IndentItemsTable from "@/components/resource/indent/IndentItemsTable";
 
 const indentSchema = z.object({
   categoryCode: z.string().min(1),
-  indentDate: z.string().min(1),
   priority: z.string().min(1),
   requiredWithin: z.string().min(1),
+  indentDate:z.string().min(1),
   indentPlacedBy: z.string().min(1),
   siteRegSerialNo: z.string().min(1),
   saleOrderNo: z.string().min(1),
-  // remarks: z.string().optional(),
+  remarks: z.string().optional(),
+
   items: z.array(
     z.object({
       itemCode: z.string().min(1),
       itemName: z.string().optional(),
       qty: z.coerce.number().min(1),
-      ammenmendQty: z.coerce.number().optional(),
-      location: z.string().min(1),
+      ammenmendQty: z.any().optional(),
+      location: z.string().min(2),
       note: z.string().optional(),
       unit: z.string().optional(),
     }),
@@ -56,13 +57,13 @@ const defaultItemRow = {
 const defaultValues = {
   indentNo: "",
   categoryCode: "",
-  indentDate: "",
   priority: "",
   requiredWithin: "",
+  indentDate:"",
   indentPlacedBy: "",
   siteRegSerialNo: "",
   saleOrderNo: "",
-  // remarks: "",
+  remarks: "",
   items: [defaultItemRow],
 };
 
@@ -82,6 +83,15 @@ export default function IndentForm({ mode = "create", indentId }) {
   const [attachedFile, setAttachedFile] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
+
+  const [initialFileData, setInitialFileData] = useState({
+    fileName: "",
+    fileUrl: "",
+  });
 
   const fileRef = useRef(null);
 
@@ -104,9 +114,7 @@ export default function IndentForm({ mode = "create", indentId }) {
     name: "items",
   });
 
-  const categoryCode = watch("categoryCode");
-
-  const disabled = isViewMode || !isEditing || isSubmitting;
+  const disabled = isViewMode || !isEditing || isSubmitting || isSubmitted;
 
   const projectInfo = getLocalStorage("projectInfo");
 
@@ -117,7 +125,7 @@ export default function IndentForm({ mode = "create", indentId }) {
 
     try {
       const res = await apiRequest({
-        url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_ITEMS_BY_CATEGORY}${category}`,
+        url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=${category}`,
         method: "GET",
       });
 
@@ -149,6 +157,7 @@ export default function IndentForm({ mode = "create", indentId }) {
     const fetchIndent = async () => {
       try {
         setIsLoading(true);
+
         const res = await apiRequest({
           url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_INDENT_BY_ID}${indentId}`,
           method: "GET",
@@ -158,36 +167,72 @@ export default function IndentForm({ mode = "create", indentId }) {
 
         const formattedData = {
           indentNo: data.indentNo || "",
+
           categoryCode: data.categoryCode || "",
-          indentDate: data.indentDate || "",
+
           priority: data.priority || "",
+
           requiredWithin: data.requiredWithin || "",
+
+          indentDate:data.indentDate || "",
+
           indentPlacedBy: data.indentPlacedBy || "",
+
           siteRegSerialNo: data.siteRegSerialNo || "",
+
           saleOrderNo: data.saleOrderNo || "",
-          // remarks: data.remarks || "",
+
+          remarks: data.remarks || "",
+
           items: data.items?.map((item) => ({
             itemCode: item.itemCode || "",
-            itemName: "",
+
+            itemName: item.itemName || "",
+
             qty: item.qty || "",
-            ammenmendQty: item.ammenmendQty || "0",
+
+            ammenmendQty: item.ammenmendQty || "",
+
             location: item.location || "",
+
             note: item.note || "",
-            unit: "",
+
+            unit: item.unit || "",
           })) || [defaultItemRow],
         };
 
         reset(formattedData);
 
         setInitialData(formattedData);
+        setFileUrl(data.indentFile || "");
 
-        setFileUrl(data.indentSlipFileUrl || "");
+        const extractedFileName = data.indentFile?.split("/")?.pop() || "";
+
+        setFileName("");
+
+        setInitialFileData({
+          fileName: extractedFileName,
+          fileUrl: data.indentFile || "",
+        });
+        // data.indentStatus === "Submitted" || data.indentStatus==="Approved"
+        if (data.indentStatus !== "Draft") {
+          setIsSubmitted(true);
+
+          setIsEditing(false);
+          let msg = data.indentStatus==="Approved" ? "Indent already Approved" : "Indent already submitted";
+          toast.info(msg || "Indent already submitted");
+        } else {
+          setIsEditing(false);
+
+          setAllowSubmit(true);
+        }
 
         if (data.categoryCode) {
           await fetchItemsByCategory(data.categoryCode, formattedData.items);
         }
       } catch (err) {
         toast.error(err.message || "Failed to load indent");
+        setIsSubmitted(true);
       } finally {
         setIsLoading(false);
       }
@@ -199,12 +244,21 @@ export default function IndentForm({ mode = "create", indentId }) {
   const handleCategoryChange = async (categoryCode) => {
     setValue("categoryCode", categoryCode);
 
-    setValue("items", [defaultItemRow]);
+    const currentItems = getValues("items");
+
+    const updatedItems = currentItems.map((item) => ({
+      ...item,
+      itemCode: "",
+      itemName: "",
+      unit: "",
+    }));
+
+    setValue("items", updatedItems);
 
     await fetchItemsByCategory(categoryCode);
   };
 
-  const buildPayload = (status) => {
+  const buildPayload = () => {
     const values = getValues();
 
     const formData = new FormData();
@@ -217,35 +271,33 @@ export default function IndentForm({ mode = "create", indentId }) {
 
     formData.append("requiredWithin", values.requiredWithin);
 
+    formData.append("indentDate",values.indentDate);
+
     formData.append("indentPlacedBy", values.indentPlacedBy);
 
     formData.append("siteRegSerialNo", values.siteRegSerialNo);
 
     formData.append("saleOrderNo", values.saleOrderNo);
 
-    // formData.append(
-    //   "remarks",
-    //   values.remarks || ""
-    // );
-
-    formData.append("indentDate", values.indentDate);
-
-    formData.append("status", status);
+    formData.append("remarks", values.remarks || "");
 
     formData.append(
       "items",
       JSON.stringify(
         values.items.map((item) => ({
           itemCode: item.itemCode,
+
           qty: Number(item.qty),
+
           location: item.location,
+
           note: item.note,
         })),
       ),
     );
 
     if (attachedFile) {
-      formData.append("indentSlipFile", attachedFile);
+      formData.append("indentFile", attachedFile);
     }
 
     return formData;
@@ -253,30 +305,51 @@ export default function IndentForm({ mode = "create", indentId }) {
 
   const handleSaveDraft = async () => {
     let toastId;
+    if (!projectCode) {
+      toast.error("Please select a project first");
+
+      return;
+    }
 
     try {
       toastId = toast.loading("Saving draft...");
 
-      const payload = buildPayload("draft");
+      const payload = buildPayload();
 
-      await apiRequest({
+      const res = await apiRequest({
         url:
           mode === "create"
-            ? API_ENDPOINTS.RESOURCE.INDENT.CREATE_INDENT_DRAFT
-            : `${API_ENDPOINTS.RESOURCE.INDENT.UPDATE_INDENT_BY_ID_DRAFT}${indentId}`,
+            ? API_ENDPOINTS.RESOURCE.INDENT.CREATE_INDENT
+            : `${API_ENDPOINTS.RESOURCE.INDENT.UPDATE_INDENT_BY_ID}${indentId}`,
 
         method: mode === "create" ? "POST" : "PUT",
 
         data: payload,
-
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
       });
+
+      if (res?.data?.indentNo) {
+        setValue("indentNo", res.data.indentNo);
+      }
+      if (res?.data?.indentFile) {
+        setFileUrl(res.data.indentFile);
+
+        setInitialFileData({
+          fileName: res.data.indentFile?.split("/")?.pop() || "",
+          fileUrl: res.data.indentFile,
+        });
+      }
+
+      setInitialData(getValues());
+
+      setIsEditing(false);
+
+      setAllowSubmit(true);
 
       toast.success("Draft saved successfully", {
         id: toastId,
       });
+
+      // router.push("/resource-management/procurement/indent")
     } catch (err) {
       toast.error(err.message || "Failed", {
         id: toastId,
@@ -286,51 +359,32 @@ export default function IndentForm({ mode = "create", indentId }) {
 
   const onSubmit = async () => {
     let toastId;
+    if (!projectCode) {
+      toast.error("Please select a project first");
+
+      return;
+    }
 
     try {
-      toastId = toast.loading(
-        mode === "create" ? "Creating indent..." : "Updating indent...",
-      );
-
-      const payload = buildPayload("submitted");
+      toastId = toast.loading("Submitting indent...");
 
       const res = await apiRequest({
-        url:
-          mode === "create"
-            ? API_ENDPOINTS.RESOURCE.INDENT.CREATE_INDENT_SUBMIT
-            : `${API_ENDPOINTS.RESOURCE.INDENT.UPDATE_INDENT_BY_ID_SUBMIT}${indentId}`,
+        url: `${API_ENDPOINTS.RESOURCE.INDENT.SUBMIT_INDENT_BY_ID}${indentId}`,
 
-        method: mode === "create" ? "POST" : "PUT",
-
-        data: payload,
-
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        method: "POST",
       });
 
-      if (res?.data?.indentNo) {
-        setValue("indentNo", res.data.indentNo);
-      }
+      toast.success("Indent submitted successfully", {
+        id: toastId,
+      });
 
-      const currentValues = getValues();
-
-      setInitialData(currentValues);
+      setIsSubmitted(true);
 
       setIsEditing(false);
 
-      setAttachedFile(null);
+      setAllowSubmit(false);
 
-      setFileName("");
-
-      toast.success(
-        mode === "create"
-          ? "Indent created successfully"
-          : "Indent updated successfully",
-        {
-          id: toastId,
-        },
-      );
+      // router.push("/resource-management/procurement/indent")
     } catch (err) {
       toast.error(err.message || "Failed", {
         id: toastId,
@@ -338,25 +392,36 @@ export default function IndentForm({ mode = "create", indentId }) {
     }
   };
 
-  const handleEdit = async () => {
+  const handleEdit = () => {
     if (isSubmitting) return;
 
+    // CANCEL
     if (isEditing) {
-      reset(initialData);
+      if (initialData) {
+        reset(initialData);
+      }
 
       setAttachedFile(null);
 
+      setFileUrl(initialFileData.fileUrl);
+
       setFileName("");
 
-      if (initialData?.categoryCode) {
-        await fetchItemsByCategory(
-          initialData.categoryCode,
-          initialData.items || [],
-        );
+      if (fileRef.current) {
+        fileRef.current.value = "";
       }
+
+      setIsEditing(false);
+
+      setAllowSubmit(true);
+
+      return;
     }
 
-    setIsEditing((prev) => !prev);
+    // EDIT
+    setIsEditing(true);
+
+    setAllowSubmit(false);
   };
 
   if (isLoading) {
@@ -367,14 +432,14 @@ export default function IndentForm({ mode = "create", indentId }) {
     );
   }
 
-  //style
   const labelClass =
     "w-[180px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-md rounded-sm";
 
   return (
-    <div className="p-3 space-y-3">
+    <div className="p-3 ">
       <div className="md:flex gap-3 items-start">
         {/* LEFT PANEL */}
+
         <div className="w-[400px] bg-[#f7f7f7] p-3 pl-0 pt-0 ">
           {/* CATEGORY */}
           <div className="md:flex md:items-center">
@@ -509,26 +574,21 @@ export default function IndentForm({ mode = "create", indentId }) {
           </div>
 
           {/* REMARKS */}
-          {/* <div className="md:flex md:items-start">
-        <div className={labelClass}>
-          Remarks
-        </div>
+          <div className="md:flex md:items-start">
+            <div className={labelClass}>Remarks</div>
 
-        <textarea
-          {...register("remarks")}
-          disabled={disabled}
-          className={`
-            ${getInputClass(
-              errors.remarks,
-              disabled
-            )}
+            <textarea
+              {...register("remarks")}
+              disabled={disabled}
+              className={`
+            ${getInputClass(errors.remarks, disabled)}
             flex-1
             -ml-px
             min-h-[70px]
             p-2
           `}
-        />
-      </div> */}
+            />
+          </div>
 
           {/* ATTACHMENT */}
           <div className="md:mt-20">
@@ -578,6 +638,7 @@ export default function IndentForm({ mode = "create", indentId }) {
 
                   setAttachedFile(file);
                   setFileName(file.name);
+                  setFileUrl("");
                 }}
               />
             </div>
@@ -607,7 +668,6 @@ export default function IndentForm({ mode = "create", indentId }) {
 
         <div className="w-[1px] h-[30vw] bg-sky-300" />
 
-        {/* RIGHT TABLE */}
         <IndentItemsTable
           fields={fields}
           register={register}
@@ -617,17 +677,17 @@ export default function IndentForm({ mode = "create", indentId }) {
           remove={remove}
           errors={errors}
           isEditing={isEditing}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || isSubmitted}
           itemsOptions={itemsOptions}
         />
       </div>
 
-      {/* BUTTONS */}
       {!isViewMode && (
-        <div className="flex justify-end gap-3 pt-4">
-          {isEditing && (
+        <div className="flex justify-end gap-3 pt-4 md:pt-0">
+          {((mode === "create" && isEditing) ||
+            (mode !== "create" && isEditing && !isSubmitted)) && (
             <SaveDraftButton
-              onClick={handleSaveDraft}
+              onClick={() => handleSubmit(handleSaveDraft)()}
               loading={isSubmitting}
               disabled={isSubmitting}
               requireConfirmation
@@ -637,7 +697,13 @@ export default function IndentForm({ mode = "create", indentId }) {
           <SaveButton
             onClick={() => handleSubmit(onSubmit)()}
             loading={isSubmitting}
-            disabled={!isEditing || isSubmitting}
+            disabled={
+              !allowSubmit ||
+              isEditing ||
+              isSubmitted ||
+              isSubmitting ||
+              mode === "create"
+            }
             requireConfirmation
             confirmationTitle="Submit Indent?"
             confirmationMessage="Once submitted, this indent will be processed."
@@ -645,8 +711,8 @@ export default function IndentForm({ mode = "create", indentId }) {
             Submit
           </SaveButton>
 
-          {mode !== "create" && (
-            <EditButton onClick={handleEdit}>
+          {mode !== "create" && !isSubmitted && (
+            <EditButton onClick={handleEdit} disabled={isSubmitting}>
               {isEditing ? "Cancel" : "Edit"}
             </EditButton>
           )}
