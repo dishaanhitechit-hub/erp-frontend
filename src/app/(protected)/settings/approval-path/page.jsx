@@ -29,6 +29,8 @@ import { API_ENDPOINTS } from "@/config/api.config";
 
 import {clearAuthCookies} from "@/lib/cookies";
 import {toast} from "sonner";
+import {router} from "next/client";
+import {useRouter} from "next/navigation";
 
 // Generate Safe Module Code
 
@@ -979,8 +981,10 @@ export default function ApprovalPathPage() {
         })),
     ];
 
+    const router = useRouter();
+
     const actions = getPageActions({
-        onHome: () => clearAuthCookies(),
+        onHome: () => router.push("/dashboard"),
         onBack: () => router.back(),
     });
 

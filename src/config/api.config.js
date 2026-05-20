@@ -57,6 +57,14 @@ export const API_ENDPOINTS = {
         CREATE_UNIT:"/master/unit/create",
         UPDATE_UNIT_BY_ID:"/master/unit/update",//unitId
         GET_UNIT_BY_ID:"/master/unit",//unitId
+
+        TERM: {
+            CREATE: "/master/term/create",
+            LIST: "/master/term/list",
+            GET_BY_ID: "/master/term",
+            UPDATE: "/master/term/update",
+            DELETE: "/master/term/delete",
+        },
     },
     // resource/indent
     RESOURCE:{

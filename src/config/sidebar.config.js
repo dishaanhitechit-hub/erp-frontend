@@ -42,6 +42,7 @@ export const sidebarConfig = [
       { title: "Unit", path: "/master/unit" },
       { title: "Cost Center Code", path: "/master/cc-code" },
       { title: "Category & Group", path: "/master/category-group" },
+      {title: "Terms & Condition", path: "/master/terms-condition" },
     ],
   },
 
