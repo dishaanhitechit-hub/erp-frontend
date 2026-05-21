@@ -16,15 +16,10 @@ export const API_ENDPOINTS = {
         ADD_DESIGNATION:"/setting/designation",
         UPDATE_PROJECT_ROLES:"/setting/project-role", //project code also used for get
         APPROVAL_PATH: {
-
-            SAVE:
-                "/setting/approval-path",
-
-            GET_USERS_BY_PROJECT:
-                "/setting/users",
-
+            SAVE: "/setting/approval-path",
+            GET_USERS_BY_PROJECT: "/setting/users",
             LIST: "/setting/approval-path/list",
-
+            EDIT_USERS: "/setting/edit-users",
         }
     },
     MASTER :{
