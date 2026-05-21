@@ -25,6 +25,7 @@ const assetSchema = z.object({
 
 export default function AssetForm({
   mode = "create",
+  disabled = false,
   assetId,
   initialData,
   categories = [],
@@ -58,6 +59,9 @@ export default function AssetForm({
   });
 
   const selectedCategory = watch("itemCategoryId");
+  const isViewMode = disabled;
+
+  const fieldDisabled = isViewMode || !isEditing || isSubmitting;
 
   //  FETCH CC LIST BASED ON CATEGORY
   useEffect(() => {
@@ -189,7 +193,6 @@ export default function AssetForm({
 
   const label =
     "w-[220px] h-[30px] flex items-center px-3 bg-[#d6e6f2] border border-black rounded-sm text-sm";
-  const inputClass = "border border-[#8f8f8f] h-[30px] text-sm rounded-sm px-2";
 
   return (
     <div className="p-4 flex flex-col gap-7">
@@ -209,8 +212,8 @@ export default function AssetForm({
           <div className={label}>Item Category</div>
           <select
             {...register("itemCategoryId")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.itemCategoryId, !isEditing || isSubmitting)}`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.itemCategoryId, fieldDisabled)}`}
           >
             <option value="">Select</option>
             {categories.map((c) => (
@@ -231,7 +234,7 @@ export default function AssetForm({
               value={watch("ccCodeId")}
               onChange={(value) => setValue("ccCodeId", String(value))}
               placeholder={loadingCc ? "Loading..." : "SingleSelect CC"}
-              disabled={!isEditing || isSubmitting || loadingCc}
+              disabled={fieldDisabled || loadingCc}
               labelKey="ccName"
               valueKey="ccId"
               searchKeys={["ccName", "ccCode"]}
@@ -245,8 +248,8 @@ export default function AssetForm({
           <div className={label}>Asset Name</div>
           <Input
             {...register("assetName")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.assetName, !isEditing || isSubmitting)}`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.assetName, fieldDisabled)}`}
           />
         </div>
 
@@ -255,8 +258,8 @@ export default function AssetForm({
           <div className={label}>Asset Description</div>
           <textarea
             {...register("assetDescription")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.assetDescription, !isEditing || isSubmitting)}  px-2 py-1 min-h-[80px] resize-none
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.assetDescription, fieldDisabled)}  px-2 py-1 min-h-[80px] resize-none
                  disabled:cursor-not-allowed `}
           />
         </div>
@@ -269,7 +272,7 @@ export default function AssetForm({
             <div className={label}>Unit</div>
             <Input
               {...register("unit")}
-              disabled={!isEditing || isSubmitting}
+              disabled={fieldDisabled}
               className={`flex-1 ${errors.unit && "border-red-500"} ${inputClass}`}
             />
           </div> */}
@@ -283,7 +286,7 @@ export default function AssetForm({
                 onChange={(value) => setValue("unit", String(value))}
                 placeholder={loadingUnits ? "Loading..." : "SingleSelect Unit"}
                 searchPlaceholder="Search by short/unit/parent/category name"
-                disabled={!isEditing || isSubmitting || loadingUnits}
+                disabled={fieldDisabled || loadingUnits}
                 labelKey="shortName"
                 valueKey="unitId"
                 dropdownPosition="up"
@@ -308,8 +311,8 @@ export default function AssetForm({
             <div className={label}>HSN/SAC</div>
             <Input
               {...register("hsnSac")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.hsnSac, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.hsnSac, fieldDisabled)}`}
             />
           </div>
 
@@ -317,8 +320,8 @@ export default function AssetForm({
             <div className={label}>GST %</div>
             <Input
               {...register("gstPercentage")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.gstPercentage, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.gstPercentage, fieldDisabled)}`}
             />
           </div>
         </div>
@@ -326,13 +329,15 @@ export default function AssetForm({
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-10">
-        <SaveButton
-          onClick={() => handleSubmit(onSubmit)()}
-          loading={isSubmitting}
-          disabled={!isEditing || isSubmitting}
-        />
+        {!isViewMode && (
+          <SaveButton
+            onClick={() => handleSubmit(onSubmit)()}
+            loading={isSubmitting}
+            disabled={!isEditing || isSubmitting}
+          />
+        )}
 
-        {mode === "edit" && (
+        {mode === "edit" && !isViewMode && (
           <EditButton
             onClick={isEditing ? handleCancel : () => setIsEditing(true)}
             disabled={isSubmitting}

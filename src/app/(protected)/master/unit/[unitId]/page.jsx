@@ -10,10 +10,12 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const { unitId } = useParams();
   const router = useRouter();
+  const canEdit = isMasterEditable();
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
@@ -41,7 +43,12 @@ export default function Page() {
   return (
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
-        <UnitForm mode="edit" unitId={unitId} initialData={data} />
+        <UnitForm
+          mode={canEdit ? "edit" : "view"}
+          disabled={!canEdit}
+          unitId={unitId}
+          initialData={data}
+        />
       </HeaderWrapper>
     </>
   );

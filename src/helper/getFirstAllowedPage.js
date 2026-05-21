@@ -20,6 +20,9 @@ export const getFirstAllowedPage = (
           ] ||
           permissions[
             `${item.permissionKey}.EDIT`
+          ] ||
+          permissions[
+            `${item.permissionKey}.APPROVER`
           ]; //have to add if only approve there
 
         if (canAccess) {

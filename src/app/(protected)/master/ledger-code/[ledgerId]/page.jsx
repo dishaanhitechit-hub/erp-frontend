@@ -11,6 +11,7 @@ import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const { ledgerId } = useParams();
@@ -18,6 +19,8 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const router = useRouter();
+  const canEdit =
+      isMasterEditable();
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
     onBack: () => router.back(),
@@ -64,7 +67,13 @@ export default function Page() {
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
         <LedgerForm
-          mode="edit"
+          mode={
+            canEdit
+              ? "edit"
+              : "view"
+          }
+
+          disabled={!canEdit}
           ledgerId={ledgerId}
           initialData={data}
           categories={categories}

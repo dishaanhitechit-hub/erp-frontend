@@ -12,7 +12,10 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { getInputClass } from "@/lib/formStyles";
-import { getStateCodeByName, INDIAN_STATES } from "@/config/indianStates.config";
+import {
+  getStateCodeByName,
+  INDIAN_STATES,
+} from "@/config/indianStates.config";
 
 const schema = z.object({
   categoryId: z.string().min(1, "Required"),
@@ -35,6 +38,7 @@ const schema = z.object({
 
 export default function LedgerForm({
   mode = "create",
+  disabled = false,
   ledgerId,
   initialData,
   categories = [],
@@ -61,6 +65,9 @@ export default function LedgerForm({
   } = useForm({
     resolver: zodResolver(schema),
   });
+  const isViewMode = disabled;
+
+  const fieldDisabled = isViewMode || !isEditing || isSubmitting;
 
   // ================= FILE =================
   const handleFileChange = (key, file) => {
@@ -301,8 +308,8 @@ export default function LedgerForm({
             <div className={label}>Ledger Name</div>
             <Input
               {...register("ledgerName")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.ledgerName, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.ledgerName, fieldDisabled)}`}
             />
           </div>
           {/* <p className={error}>{errors.ledgerName?.message}</p> */}
@@ -314,8 +321,8 @@ export default function LedgerForm({
             <div className={label}>Registered Address</div>
             <Input
               {...register("registeredAddress")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.registeredAddress, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.registeredAddress, fieldDisabled)}`}
             />
           </div>
           {/* <p className={error}>{errors.registeredAddress?.message}</p> */}
@@ -327,8 +334,8 @@ export default function LedgerForm({
             <div className={label}>Corporate Address</div>
             <Input
               {...register("corporateAddress")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.corporateAddress, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.corporateAddress, fieldDisabled)}`}
             />
           </div>
           {/* <p className={error}>{errors.corporateAddress?.message}</p> */}
@@ -342,8 +349,8 @@ export default function LedgerForm({
 
           <select
             {...register("categoryId")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.categoryId, !isEditing || isSubmitting)} disabled:cursor-not-allowed rounded-md`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.categoryId, fieldDisabled)} disabled:cursor-not-allowed rounded-md`}
           >
             <option value="">Select</option>
 
@@ -369,8 +376,8 @@ export default function LedgerForm({
                 <div className={label}>PAN</div>
                 <Input
                   {...register("pan")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.pan, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.pan, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.pan?.message}</p> */}
@@ -382,8 +389,8 @@ export default function LedgerForm({
                 <div className={label}>GSTN</div>
                 <Input
                   {...register("gstin")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.gstin, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.gstin, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.gstin?.message}</p> */}
@@ -397,8 +404,8 @@ export default function LedgerForm({
                 <div className={label}>Primary Contact Person</div>
                 <Input
                   {...register("primaryContactPerson")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.primaryContactPerson, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.primaryContactPerson, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.primaryContactPerson?.message}</p> */}
@@ -410,8 +417,8 @@ export default function LedgerForm({
                 <div className={label}>Primary Contact Number</div>
                 <Input
                   {...register("primaryContactNumber")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.primaryContactPerson, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.primaryContactPerson, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.primaryContactNumber?.message}</p> */}
@@ -424,8 +431,8 @@ export default function LedgerForm({
                 <div className={label}>Bank A/c Number</div>
                 <Input
                   {...register("bankAccountNumber")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.bankAccountNumber, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.bankAccountNumber, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.bankAccountNumber?.message}</p> */}
@@ -437,8 +444,8 @@ export default function LedgerForm({
                 <div className={label}>Bank Name</div>
                 <Input
                   {...register("bankName")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.bankName, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.bankName, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.bankName?.message}</p> */}
@@ -450,8 +457,8 @@ export default function LedgerForm({
                 <div className={label}>Branch Name</div>
                 <Input
                   {...register("branchName")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.branchName, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.branchName, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.branchName?.message}</p> */}
@@ -463,8 +470,8 @@ export default function LedgerForm({
                 <div className={label}>IFSC Code</div>
                 <Input
                   {...register("ifscCode")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.ifscCode, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.ifscCode, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.ifscCode?.message}</p> */}
@@ -494,21 +501,21 @@ export default function LedgerForm({
                 <div className={label}>State Name</div>
                 <select
                   {...register("stateName")}
-                  disabled={!isEditing || isSubmitting}
+                  disabled={fieldDisabled}
                   onChange={(e) => {
                     const selectedState = e.target.value;
                     setValue("stateName", selectedState);
                     setValue("stateCode", getStateCodeByName(selectedState));
                   }}
-                  className={`flex-1 ${getInputClass(errors.stateName, !isEditing || isSubmitting)}`}
+                  className={`flex-1 ${getInputClass(errors.stateName, fieldDisabled)}`}
                 >
                   <option value="">Select State</option>
-                  
-                                  {INDIAN_STATES.map((item) => (
-                                    <option key={item.code} value={item.state}>
-                                      {item.state}
-                                    </option>
-                                  ))}
+
+                  {INDIAN_STATES.map((item) => (
+                    <option key={item.code} value={item.state}>
+                      {item.state}
+                    </option>
+                  ))}
                 </select>
               </div>
               {/* <p className={error}>{errors.stateName?.message}</p> */}
@@ -522,8 +529,8 @@ export default function LedgerForm({
                 <div className={label}>Designation</div>
                 <Input
                   {...register("designation")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.designation, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.designation, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.designation?.message}</p> */}
@@ -535,8 +542,8 @@ export default function LedgerForm({
                 <div className={label}>WhatsApp Number</div>
                 <Input
                   {...register("whatsappNumber")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`flex-1 ${getInputClass(errors.whatsappNumber, !isEditing || isSubmitting)}`}
+                  disabled={fieldDisabled}
+                  className={`flex-1 ${getInputClass(errors.whatsappNumber, fieldDisabled)}`}
                 />
               </div>
               {/* <p className={error}>{errors.whatsappNumber?.message}</p> */}
@@ -555,13 +562,15 @@ export default function LedgerForm({
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-10">
-        <SaveButton
-          onClick={() => handleSubmit(onSubmit)()}
-          loading={isSubmitting}
-          disabled={!isEditing || isSubmitting}
-        />
+        {!isViewMode && (
+          <SaveButton
+            onClick={() => handleSubmit(onSubmit)()}
+            loading={isSubmitting}
+            disabled={!isEditing || isSubmitting}
+          />
+        )}
 
-        {mode === "edit" && (
+        {mode === "edit" && !isViewMode && (
           <EditButton
             onClick={isEditing ? handleCancel : () => setIsEditing(true)}
           >

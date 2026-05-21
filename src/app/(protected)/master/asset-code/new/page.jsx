@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import PageHeader from "@/components/layout/PageHeader";
 import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
+import PageNotAvailable from "@/components/common/PageNotAvailable";
 
 export default function Page() {
   const [categories, setCategories] = useState(
@@ -17,6 +19,7 @@ export default function Page() {
   );
   // const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const canEdit = isMasterEditable();
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
@@ -37,6 +40,10 @@ export default function Page() {
   // }, []);
 
   // if (loading) return <Loader2 className="animate-spin m-auto mt-10" />;
+  // BLOCK NON-ADMIN USERS
+  if (!canEdit) {
+    return <PageNotAvailable />;
+  }
 
   return (
     <>

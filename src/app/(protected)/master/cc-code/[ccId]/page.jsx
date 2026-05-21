@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const { ccId } = useParams();
@@ -17,6 +18,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const router = useRouter();
+  const canEdit = isMasterEditable();
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
@@ -63,7 +65,12 @@ export default function Page() {
   return (
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
-        <CCForm mode="edit" ccId={ccId} data={data} />
+        <CCForm
+          mode={canEdit ? "edit" : "view"}
+          disabled={!canEdit}
+          ccId={ccId}
+          data={data}
+        />
       </HeaderWrapper>
     </>
   );
