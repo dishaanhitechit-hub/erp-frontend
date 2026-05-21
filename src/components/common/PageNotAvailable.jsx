@@ -6,7 +6,7 @@ export default function PageNotAvailable() {
   const router = useRouter();
 
   return (
-    <div className="flex h-screen items-center justify-center flex-col gap-4">
+    <div className="flex h-[35vw] max:h-screen items-center justify-center flex-col gap-4">
       <h1 className="text-2xl font-semibold">Page Not Available</h1>
       <p className="text-sm text-gray-500">
         You don’t have access to this page.
