@@ -5,69 +5,130 @@ export const getPageActions = ({
   onPrint,
   onDownload,
   onApprove,
-  onBack ,
-  onTimeLine
+  onBack,
+  onTimeLine,
 }) => {
-  
-  const btnClass = "cursor-pointer hover:scale-105 transition";
+  const baseBtnClass =
+    "transition flex items-center justify-center w-[32px] h-[32px]";
 
-  const actions = [];
+  const enabledClass = "cursor-pointer hover:scale-105";
+  const disabledClass =
+    "opacity-40 grayscale cursor-not-allowed pointer-events-none";
 
-  if (onTimeLine) {
-    actions.push(
-      <button key="timeline" className={btnClass} onClick={onTimeLine}>
-        <Image src="/assets/icons/timeline.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+  const iconWrapperClass =
+    "w-[32px] h-[32px] flex items-center justify-center";
 
-  if (onApprove) {
-    actions.push(
-      <button key="approve" className={btnClass} onClick={onApprove}>
-        <Image src="/assets/icons/approval-action.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+  const getButtonClass = (isEnabled) =>
+    `${baseBtnClass} ${isEnabled ? enabledClass : disabledClass}`;
 
-  if (onHome) {
-    actions.push(
-      <button key="home" className={btnClass} onClick={onHome}>
-        <Image src="/assets/icons/home1.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+  const divider = (key) => (
+    <div
+      key={key}
+      className="w-0.5 h-7 bg-[#8F8F8F] mx-0.5 shrink-0"
+    />
+  );
 
-  if (onBack) {
-    actions.push(
-      <button key="back" className={btnClass} onClick={onBack}>
-        <Image src="/assets/icons/left-arrow1.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+  const actions = [
+    <button
+      key="timeline"
+      className={`${getButtonClass(
+        !!onTimeLine
+      )} ${iconWrapperClass}`}
+      onClick={onTimeLine}
+      disabled={!onTimeLine}
+    >
+      <Image
+        src="/assets/icons/timeline.png"
+        alt="timeline"
+        width={28}
+        height={28}
+      />
+    </button>,
 
-  if (onDownload) {
-    actions.push(
-      <button key="download" className={btnClass} onClick={onDownload}>
-        <Image src="/assets/icons/file-download.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+    <button
+      key="approve"
+      className={`${getButtonClass(
+        !!onApprove
+      )} ${iconWrapperClass}`}
+      onClick={onApprove}
+      disabled={!onApprove}
+    >
+      <Image
+        src="/assets/icons/approval-action.png"
+        alt="approve"
+        width={28}
+        height={28}
+      />
+    </button>,
 
-  if (onPrint) {
-    actions.push(
-      <button key="print" className={btnClass} onClick={onPrint}>
-        <Image src="/assets/icons/printer.png" alt="" width={32} height={32} />
-      </button>
-    );
-  }
+    divider("divider-1"),
+
+    <button
+      key="home"
+      className={`${getButtonClass(
+        !!onHome
+      )} ${iconWrapperClass}`}
+      onClick={onHome}
+      disabled={!onHome}
+    >
+      <Image
+        src="/assets/icons/home1.png"
+        alt="home"
+        width={28}
+        height={28}
+      />
+    </button>,
+
+    <button
+      key="back"
+      className={`${getButtonClass(
+        !!onBack
+      )} ${iconWrapperClass}`}
+      onClick={onBack}
+      disabled={!onBack}
+    >
+      <Image
+        src="/assets/icons/left-arrow1.png"
+        alt="back"
+        width={28}
+        height={28}
+      />
+    </button>,
+
+    divider("divider-2"),
+
+    <button
+      key="download"
+      className={`${getButtonClass(
+        !!onDownload
+      )} ${iconWrapperClass}`}
+      onClick={onDownload}
+      disabled={!onDownload}
+    >
+      <Image
+        src="/assets/icons/file-download.png"
+        alt="download"
+        width={28}
+        height={28}
+      />
+    </button>,
+
+    <button
+      key="print"
+      className={`${getButtonClass(
+        !!onPrint
+      )} ${iconWrapperClass}`}
+      onClick={onPrint}
+      disabled={!onPrint}
+    >
+      <Image
+        src="/assets/icons/printer.png"
+        alt="print"
+        width={28}
+        height={28}
+      />
+    </button>,
+  ];
 
   return actions;
 };
-
-
-// const actions = getPageActions({
-//     onHome: () => clearAuthCookies(),
-//     onPrint: () => window.print(),
-//   });
-
-{/* <PageHeader actions={actions} /> */}
