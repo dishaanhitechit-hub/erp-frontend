@@ -52,12 +52,19 @@ export default function MapUserModal({
                         ...current,
 
                         edit: true,
-
                         view: true,
 
                     },
 
                 };
+            }
+            // If VIEW unchecked while EDIT already checked
+            if (
+                permissionType === "view" &&
+                !checked &&
+                current.edit
+            ) {
+                return prev;
             }
 
             // NORMAL FLOW
@@ -301,6 +308,11 @@ export default function MapUserModal({
                                                                         permissions?.[
                                                                             sub.path
                                                                             ]?.view || false
+                                                                    }
+                                                                    disabled={
+                                                                        permissions?.[
+                                                                            sub.path
+                                                                            ]?.edit || false
                                                                     }
                                                                     onChange={(e) =>
                                                                         handleCheckbox(
