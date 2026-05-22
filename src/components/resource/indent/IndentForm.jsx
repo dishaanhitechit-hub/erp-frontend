@@ -219,14 +219,14 @@ export default function IndentForm({
           fileUrl: data.indentFile || "",
         });
         // data.indentStatus === "Submitted" || data.indentStatus==="Approved"
-        if (data.indentStatus !== "Draft" && mode === "edit") {
+        if ((data.indentStatus !== "Reback" || data.indentStatus!=="Draft") && mode === "edit") {
           setIsSubmitted(true);
 
           setIsEditing(false);
-          let msg =
-            data.indentStatus === "Approved"
-              ? "Indent already Approved"
-              : "Indent already submitted";
+          let msg;
+          if(data.indentStatus==="Rejected") msg ="Indent already Rejected."
+          else if(data.indentStatus==="Approved") msg ="Indent already Approved."
+          else msg ="Indent already submitted";
           toast.info(msg || "Indent already submitted");
         } else {
           setIsEditing(false);
