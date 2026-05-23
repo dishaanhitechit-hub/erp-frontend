@@ -226,7 +226,7 @@ export default function IndentForm({
           let msg;
           if(data.indentStatus==="Rejected") msg ="Indent already Rejected."
           else if(data.indentStatus==="Approved") msg ="Indent already Approved."
-          else msg ="Indent already submitted";
+          else msg ="Indent already Submitted";
           toast.info(msg || "Indent already submitted");
         } else {
           setIsEditing(false);
