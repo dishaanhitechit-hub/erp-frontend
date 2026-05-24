@@ -32,7 +32,7 @@ export default function Page() {
   }
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
     onTimeLine: () => setOpenTimeline(true),
     onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,

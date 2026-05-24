@@ -1,29 +1,26 @@
-export const getFirstAllowedPage = (
-  sidebarConfig,
-  permissions
-) => {
+import { ROLE } from "@/config/role.config";
 
-  const findFirstPath = (
-    items
-  ) => {
+import { getCookie } from "@/lib/cookies";
+export const getFirstAllowedPage = (sidebarConfig, permissions) => {
+  const role = getCookie("role");
 
+  // SUPER ADMIN
+  if (role === ROLE.SUPER_ADMIN) {
+    return "/settings/company-details";
+  }
+
+  // ADMIN
+  if (role === ROLE.ADMIN) {
+    return "/master/ledger-code";
+  }
+
+  const findFirstPath = (items) => {
     for (const item of items) {
-
-      if (
-        item.permissionKey &&
-        item.path
-      ) {
-
+      if (item.permissionKey && item.path) {
         const canAccess =
-          permissions[
-            `${item.permissionKey}.VIEW`
-          ] ||
-          permissions[
-            `${item.permissionKey}.EDIT`
-          ] ||
-          permissions[
-            `${item.permissionKey}.APPROVER`
-          ]; //have to add if only approve there
+          permissions[`${item.permissionKey}.VIEW`] ||
+          permissions[`${item.permissionKey}.EDIT`] ||
+          permissions[`${item.permissionKey}.APPROVER`]; //have to add if only approve there
 
         if (canAccess) {
           return item.path;
@@ -31,11 +28,7 @@ export const getFirstAllowedPage = (
       }
 
       if (item.children) {
-
-        const nested =
-          findFirstPath(
-            item.children
-          );
+        const nested = findFirstPath(item.children);
 
         if (nested) {
           return nested;
@@ -46,7 +39,5 @@ export const getFirstAllowedPage = (
     return null;
   };
 
-  return findFirstPath(
-    sidebarConfig
-  );
+  return findFirstPath(sidebarConfig);
 };

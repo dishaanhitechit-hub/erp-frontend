@@ -1,7 +1,9 @@
+import { goToHomePage } from "@/helper/goToHomePage";
 import Image from "next/image";
 
 export const getPageActions = ({
-  onHome,
+  router,
+  // onHome,
   onPrint,
   onDownload,
   onApprove,
@@ -66,10 +68,11 @@ export const getPageActions = ({
     <button
       key="home"
       className={`${getButtonClass(
-        !!onHome
+        true
       )} ${iconWrapperClass}`}
-      onClick={onHome}
-      disabled={!onHome}
+      onClick={() =>
+        goToHomePage(router)
+      }
     >
       <Image
         src="/assets/icons/home1.png"

@@ -19,7 +19,7 @@ export default function Page() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -33,8 +33,8 @@ export default function Page() {
 
         // map API → table format
         const formatted = users.map((item, index) => ({
-          id:item.id,
-          sl:  index + 1,
+          id: item.id,
+          sl: index + 1,
           username: item.userName,
           category: roleMap[item.role] || item.role, // or map if needed
           email: item.email,
@@ -66,19 +66,17 @@ export default function Page() {
 
     const filtered = data.filter((item) =>
       Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
+        String(val).toLowerCase().includes(search.toLowerCase()),
+      ),
     );
 
     setFilteredData(filtered);
   };
 
   const actions = getPageActions({
-      
-      onHome: () => router.push("/dashboard"),
-      onBack: () => router.back(),
-      
-    });
+    router,
+    onBack: () => router.back(),
+  });
 
   //  TABLE COLUMNS
   const columns = [
@@ -88,10 +86,10 @@ export default function Page() {
     { header: "Email", accessor: "email" },
     { header: "Mobile", accessor: "mobile" },
     { header: "WhatsApp", accessor: "whatsapp" },
-    { header: "Status", accessor: "status" ,width:"85px"},
+    { header: "Status", accessor: "status", width: "85px" },
   ];
 
-  // LOADER 
+  // LOADER
   if (loading) {
     return (
       <div className="flex justify-center items-center h-75">
@@ -102,33 +100,29 @@ export default function Page() {
 
   return (
     <>
-        <HeaderWrapper
-      header={<PageHeader actions={actions} />}
-    >
-              <div className="p-3">
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <div className="p-3">
+          {/*  SEARCH SECTION */}
+          <SearchSection
+            onSearch={handleSearch}
+            actions={[
+              {
+                label: "+ Add User",
+                onClick: () => router.push("/settings/user-id-password/new"),
+              },
+            ]}
+          />
 
-      {/*  SEARCH SECTION */}
-      <SearchSection
-        onSearch={handleSearch}
-        actions={[
-          {
-            label: "+ Add User",
-            onClick: () => router.push("/settings/user-id-password/new"),
-          },
-        ]}
-      />
-
-      {/*  TABLE */}
-      <DataTable
-        columns={columns}
-        data={filteredData}
-        onRowClick={(row) => {
-          router.push(`/settings/user-id-password/${row.id}`);
-        }}
-      />
-    </div>
-    </HeaderWrapper>
+          {/*  TABLE */}
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            onRowClick={(row) => {
+              router.push(`/settings/user-id-password/${row.id}`);
+            }}
+          />
+        </div>
+      </HeaderWrapper>
     </>
-    
   );
 }

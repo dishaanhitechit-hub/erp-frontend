@@ -19,9 +19,7 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-
-  //  INITIAL LOAD 
+  //  INITIAL LOAD
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -64,7 +62,6 @@ export default function Page() {
 
   // SEARCH HANDLER
   const handleSearch = ({ search }) => {
-
     if (!search) {
       setFilteredData(data);
       return;
@@ -72,8 +69,8 @@ export default function Page() {
 
     const filtered = data.filter((item) =>
       Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
+        String(val).toLowerCase().includes(search.toLowerCase()),
+      ),
     );
 
     setFilteredData(filtered);
@@ -90,10 +87,8 @@ export default function Page() {
     { header: "Status", accessor: "status" },
   ];
   const actions = getPageActions({
-
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
-
   });
 
   if (loading) {
@@ -106,34 +101,29 @@ export default function Page() {
 
   return (
     <>
-      <HeaderWrapper
-            header={<PageHeader actions={actions} />}
-          >
-      <div className="p-3 ">
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <div className="p-3 ">
+          {/*  SEARCH SECTION */}
+          <SearchSection
+            onSearch={handleSearch}
+            actions={[
+              {
+                label: "+ Add Project Code",
+                onClick: () => router.push("/settings/project-code/new"),
+              },
+            ]}
+          />
 
-        {/*  SEARCH SECTION */}
-        <SearchSection
-          onSearch={handleSearch}
-          actions={[
-            {
-              label: "+ Add Project Code",
-              onClick: () => router.push("/settings/project-code/new"),
-            },
-
-          ]}
-        />
-
-        {/*  TABLE */}
-        <DataTable
-          columns={columns}
-          data={filteredData}
-          onRowClick={(row) => {
-            router.push(`/settings/project-code/${row.id}`);
-          }}
-        />
-      </div>
+          {/*  TABLE */}
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            onRowClick={(row) => {
+              router.push(`/settings/project-code/${row.id}`);
+            }}
+          />
+        </div>
       </HeaderWrapper>
     </>
-
   );
 }

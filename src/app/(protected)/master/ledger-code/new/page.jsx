@@ -19,9 +19,9 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const canEdit = isMasterEditable();
-  
+
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 
@@ -51,16 +51,14 @@ export default function Page() {
   //   );
   // }
   // BLOCK NON-ADMIN USERS
-    if (!canEdit) {
-      return <PageNotAvailable />;
-    }
+  if (!canEdit) {
+    return <PageNotAvailable />;
+  }
 
   return (
     <>
-        <HeaderWrapper
-      header={<PageHeader actions={actions} />}
-    >
-      <LedgerForm mode="create" categories={categories} />
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <LedgerForm mode="create" categories={categories} />
       </HeaderWrapper>
     </>
   );

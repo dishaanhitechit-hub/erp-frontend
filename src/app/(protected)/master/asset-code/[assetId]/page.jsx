@@ -16,17 +16,16 @@ export default function Page() {
   const { assetId } = useParams();
 
   const [data, setData] = useState(null);
-  const [categories, setCategories] = useState(CATEGORY_OPTIONS.assetCategory || []);
+  const [categories, setCategories] = useState(
+    CATEGORY_OPTIONS.assetCategory || [],
+  );
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const canEdit =
-    isMasterEditable();
+  const canEdit = isMasterEditable();
 
   const actions = getPageActions({
-
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
-
   });
 
   useEffect(() => {
@@ -35,7 +34,9 @@ export default function Page() {
       //   apiRequest({ url: `${API_ENDPOINTS.MASTER.GET_ASSET_BY_ID}/${assetId}` }),
       //   apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_CATEGORY }),
       // ]);
-      const assetRes = await apiRequest({ url: `${API_ENDPOINTS.MASTER.GET_ASSET_BY_ID}/${assetId}` });
+      const assetRes = await apiRequest({
+        url: `${API_ENDPOINTS.MASTER.GET_ASSET_BY_ID}/${assetId}`,
+      });
 
       setData(assetRes.data[0]);
       setLoading(false);
@@ -46,26 +47,17 @@ export default function Page() {
 
   if (loading) return <Loader2 className="animate-spin m-auto mt-10" />;
 
-
   return (
     <>
-      <HeaderWrapper
-            header={<PageHeader actions={actions} />}
-          >
-      <AssetForm
-        mode={
-            canEdit
-              ? "edit"
-              : "view"
-          }
-
-        disabled={!canEdit}
-        assetId={assetId}
-        initialData={data}
-        categories={categories}
-      />
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <AssetForm
+          mode={canEdit ? "edit" : "view"}
+          disabled={!canEdit}
+          assetId={assetId}
+          initialData={data}
+          categories={categories}
+        />
       </HeaderWrapper>
     </>
-
   );
 }

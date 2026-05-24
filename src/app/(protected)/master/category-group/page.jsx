@@ -11,7 +11,7 @@ export default function Page() {
   const router = useRouter();
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
   return (

@@ -18,13 +18,11 @@ const Page = () => {
   const [projectData, setProjectData] = useState(null);
   const router = useRouter();
   const actions = getPageActions({
-          
-          onHome: () => router.push("/dashboard"),
-          onBack: () => router.back(),
-          
-        });
+    router,
+    onBack: () => router.back(),
+  });
 
-  //  FETCH USER 
+  //  FETCH USER
   useEffect(() => {
     if (!projectId) return;
 
@@ -35,7 +33,7 @@ const Page = () => {
           method: "GET",
         });
 
-        const apiData  = res.data[0];
+        const apiData = res.data[0];
         const { id, ...formData } = apiData;
 
         setProjectData(formData);
@@ -49,7 +47,7 @@ const Page = () => {
     fetchProjectDetails();
   }, [projectId]);
 
-  //  LOADER 
+  //  LOADER
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[300px]">
@@ -58,13 +56,11 @@ const Page = () => {
     );
   }
 
-  //  FORM 
+  //  FORM
   return (
     <>
-      <HeaderWrapper
-            header={<PageHeader actions={actions} />}
-          >
-      <ProjectForm mode="edit" data={projectData} projectId={projectId}/>
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <ProjectForm mode="edit" data={projectData} projectId={projectId} />
       </HeaderWrapper>
     </>
   );

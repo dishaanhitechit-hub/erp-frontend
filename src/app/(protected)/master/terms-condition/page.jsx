@@ -238,7 +238,7 @@ export default function TermsConditionPage() {
   `;
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
 
     onBack: () => router.back(),
 
@@ -406,49 +406,49 @@ export default function TermsConditionPage() {
                   </td>
 
                   <td
-                      className="border border-gray-300 px-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                    className="border border-gray-300 px-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
 
-                        if (term) {
-                          setExpandedDescriptionId(
-                              expandedDescriptionId === term.termId
-                                  ? null
-                                  : term.termId
-                          );
-                        }
-                      }}
+                      if (term) {
+                        setExpandedDescriptionId(
+                          expandedDescriptionId === term.termId
+                            ? null
+                            : term.termId,
+                        );
+                      }
+                    }}
                   >
                     {term ? (
-                        <div
-                            className={`
+                      <div
+                        className={`
         cursor-pointer
         ${
-                                expandedDescriptionId === term.termId
-                                    ? "whitespace-normal break-words"
-                                    : "truncate"
-                            }
+          expandedDescriptionId === term.termId
+            ? "whitespace-normal break-words"
+            : "truncate"
+        }
       `}
-                            title="Click to view full description"
-                        >
-                          {term.term_description || ""}
-                        </div>
+                        title="Click to view full description"
+                      >
+                        {term.term_description || ""}
+                      </div>
                     ) : (
-                        ""
+                      ""
                     )}
                   </td>
                   {!isViewMode && (
-                      <td className="border border-gray-300 text-center">
-                        {term && (
-                            <button
-                                type="button"
-                                disabled={!editMode || loading}
-                                onClick={(e) => handleDelete(e, term.termId)}
-                                className={`
+                    <td className="border border-gray-300 text-center">
+                      {term && (
+                        <button
+                          type="button"
+                          disabled={!editMode || loading}
+                          onClick={(e) => handleDelete(e, term.termId)}
+                          className={`
                           inline-flex items-center justify-center gap-1 rounded-sm px-2 py-[2px] text-xs font-semibold
                           ${
-                                    editMode
-                                        ? "bg-red-500 text-white hover:bg-red-600"
+                            editMode
+                              ? "bg-red-500 text-white hover:bg-red-600"
                               : "bg-gray-200 text-gray-400 cursor-not-allowed"
                           }
                         `}
@@ -496,7 +496,7 @@ export default function TermsConditionPage() {
             }
           `}
             >
-              {editMode ? "Cancel" : "Edit"} 
+              {editMode ? "Cancel" : "Edit"}
             </Button>
           </div>
         )}

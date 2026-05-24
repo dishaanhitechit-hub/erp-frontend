@@ -60,6 +60,7 @@ export default function PageHeader({ actions = [] }) {
 
 // example use
 // const actions = getPageActions({
+//     router
 //     onHome: () => clearAuthCookies(),
 //     onPrint: () => window.print(),
 //   });

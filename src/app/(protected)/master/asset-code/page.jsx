@@ -83,7 +83,7 @@ export default function Page() {
   ];
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 

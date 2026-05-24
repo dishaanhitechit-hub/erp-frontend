@@ -125,7 +125,7 @@ export default function Page() {
     { header: "Order Status", accessor: "orderStatus" },
   ];
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 

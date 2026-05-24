@@ -19,10 +19,9 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const router = useRouter();
-  const canEdit =
-      isMasterEditable();
+  const canEdit = isMasterEditable();
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 
@@ -67,12 +66,7 @@ export default function Page() {
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
         <LedgerForm
-          mode={
-            canEdit
-              ? "edit"
-              : "view"
-          }
-
+          mode={canEdit ? "edit" : "view"}
           disabled={!canEdit}
           ledgerId={ledgerId}
           initialData={data}

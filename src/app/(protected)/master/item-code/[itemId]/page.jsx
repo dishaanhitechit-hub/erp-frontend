@@ -22,7 +22,7 @@ export default function Page() {
   const canEdit = isMasterEditable();
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 

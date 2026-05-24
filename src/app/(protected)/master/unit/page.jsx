@@ -20,10 +20,9 @@ export default function Page() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const canEdit = isMasterEditable();
-  
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
 
@@ -104,12 +103,15 @@ export default function Page() {
           <SearchSection
             onSearch={handleSearch}
             actions={
-              canEdit ?[
-              {
-                label: "+ New Unit",
-                onClick: () => router.push("/master/unit/new"),
-              },
-            ]:[]}
+              canEdit
+                ? [
+                    {
+                      label: "+ New Unit",
+                      onClick: () => router.push("/master/unit/new"),
+                    },
+                  ]
+                : []
+            }
           />
 
           {/*  TABLE */}

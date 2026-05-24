@@ -11,22 +11,19 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const canEdit = isMasterEditable();
-  
 
   const actions = getPageActions({
-    onHome: () => router.push("/dashboard"),
+    router,
     onBack: () => router.back(),
   });
   // BLOCK NON-ADMIN USERS
-    if (!canEdit) {
-      return <PageNotAvailable />;
-    }
+  if (!canEdit) {
+    return <PageNotAvailable />;
+  }
   return (
     <>
-      <HeaderWrapper
-            header={<PageHeader actions={actions} />}
-          >
-      <UnitForm mode="create" />
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <UnitForm mode="create" />
       </HeaderWrapper>
     </>
   );

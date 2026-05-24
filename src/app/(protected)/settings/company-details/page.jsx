@@ -281,7 +281,7 @@ export default function CompanyDetailsPage() {
 
   const errorText = "text-red-500 text-[10px] h-[14px] mt-[2px]";
   const actions = getPageActions({
-    onHome: () => clearAuthCookies(),
+    router,
     onBack: () => router.back(),
   });
 

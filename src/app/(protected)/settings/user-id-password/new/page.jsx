@@ -1,27 +1,22 @@
-"use client"
-import { getPageActions } from '@/components/common/PageActionButtons'
-import HeaderWrapper from '@/components/layout/HeaderWrapper'
-import PageHeader from '@/components/layout/PageHeader'
-import UserForm from '@/components/user-id-password/UserForm'
-import { useRouter } from 'next/navigation'
-import React from 'react'
+"use client";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import PageHeader from "@/components/layout/PageHeader";
+import UserForm from "@/components/user-id-password/UserForm";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function Page() {
   const router = useRouter();
   const actions = getPageActions({
-        
-        onHome: () => router.push("/dashboard"),
-        onBack: () => router.back(),
-        
-      });
+    router,
+    onBack: () => router.back(),
+  });
   return (
     <>
-      <HeaderWrapper
-      header={<PageHeader actions={actions} />}
-    >
-      <UserForm />
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
+        <UserForm />
       </HeaderWrapper>
     </>
-  )
+  );
 }
-
