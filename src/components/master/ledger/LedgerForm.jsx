@@ -69,7 +69,7 @@ export default function LedgerForm({
 
   const fieldDisabled = isViewMode || !isEditing || isSubmitting;
 
-  // ================= FILE =================
+  //  FILE 
   const handleFileChange = (key, file) => {
     if (!file) {
       setFileNames((p) => ({ ...p, [key]: "" }));
@@ -220,7 +220,6 @@ export default function LedgerForm({
 
   const label =
     "w-[220px] px-3 py-1 bg-[#d6e6f2] border border-black rounded-md";
-  const inputClass = "border h-[30px] px-2 text-sm";
 
   const renderFile = (key, ref, labelText) => (
     <div className="flex items-center gap-2">
@@ -261,7 +260,7 @@ export default function LedgerForm({
   const handleCancel = () => {
     if (!initialData) return;
 
-    // ✅ reset form values
+    //  reset form values
     reset({
       ...initialData,
       categoryId: String(initialData.categoryId),
@@ -573,6 +572,7 @@ export default function LedgerForm({
         {mode === "edit" && !isViewMode && (
           <EditButton
             onClick={isEditing ? handleCancel : () => setIsEditing(true)}
+            disabled={isSubmitting}
           >
             {isEditing ? "Cancel" : "Edit"}
           </EditButton>

@@ -233,7 +233,7 @@ export default function AssetForm({
               options={ccList}
               value={watch("ccCodeId")}
               onChange={(value) => setValue("ccCodeId", String(value))}
-              placeholder={loadingCc ? "Loading..." : "SingleSelect CC"}
+              placeholder={loadingCc ? "Loading..." : "Select CC"}
               disabled={fieldDisabled || loadingCc}
               labelKey="ccName"
               valueKey="ccId"

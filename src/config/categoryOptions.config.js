@@ -103,5 +103,27 @@ export const CATEGORY_OPTIONS = {
       label: "Composite",
       value: "COM_001",
     },
-  ]
+  ],
+  termsCategory :[
+  {
+    label: "Rent",
+    value: "Rent",
+  },
+  {
+    label: "Order",
+    value: "Order",
+  },
+  {
+    label: "Enquiry",
+    value: "Enquiry",
+  },
+  {
+    label: "Despatch",
+    value: "Despatch",
+  },
+  {
+    label: "Delivery",
+    value: "Delivery",
+  },
+],
 };

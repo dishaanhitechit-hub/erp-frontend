@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { isMasterEditable } from "@/helper/getMasterAccess";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 
 export default function TermsConditionPage() {
   const [terms, setTerms] = useState([]);
@@ -31,6 +32,7 @@ export default function TermsConditionPage() {
   const [formEnabled, setFormEnabled] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("");
 
   const router = useRouter();
   const canEdit = isMasterEditable();
@@ -74,6 +76,7 @@ export default function TermsConditionPage() {
     setSubHeader("");
     setTermDescription("");
     setSelectedTermId(null);
+    setCategory("");
     setErrors({
       header: false,
       termDescription: false,
@@ -103,6 +106,7 @@ export default function TermsConditionPage() {
     setHeader(term.header || "");
     setSubHeader(term.sub_header || "");
     setTermDescription(term.term_description || "");
+    setCategory(term.category || "");
     setFormEnabled(true);
   };
 
@@ -130,6 +134,11 @@ export default function TermsConditionPage() {
       return;
     }
 
+    if (!category) {
+      toast.error("Module is required");
+      return;
+    }
+
     const termApi = API_ENDPOINTS?.MASTER?.TERM;
 
     if (!termApi?.CREATE || !termApi?.UPDATE || !termApi?.LIST) {
@@ -145,6 +154,7 @@ export default function TermsConditionPage() {
           url: `${termApi.UPDATE}/${selectedTermId}`,
           method: "PUT",
           data: {
+            category,
             header: header.trim(),
             sub_header: subHeader.trim(),
             term_description: termDescription.trim(),
@@ -157,6 +167,7 @@ export default function TermsConditionPage() {
           url: termApi.CREATE,
           method: "POST",
           data: {
+            category,
             header: header.trim(),
             sub_header: subHeader.trim(),
             termDescription: termDescription.trim(),
@@ -296,6 +307,30 @@ export default function TermsConditionPage() {
             />
           </div>
 
+          <div className="grid grid-cols-[270px_305px]">
+            <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
+              Module <span className="ml-1 text-red-600">*</span>
+            </label>
+
+            <select
+              disabled={isViewMode || !formEnabled}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`
+      h-8 rounded-r-sm border border-gray-500 bg-white px-2 text-sm
+      disabled:bg-gray-100 disabled:cursor-not-allowed
+    `}
+            >
+              <option value="">Select Module</option>
+
+              {CATEGORY_OPTIONS.termsCategory.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid grid-cols-[270px_1fr]">
             <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
               Terms Description <span className="ml-1 text-red-600">*</span>
@@ -323,6 +358,9 @@ export default function TermsConditionPage() {
                 </th>
                 <th className="w-[230px] border border-gray-300 py-1 font-bold">
                   Sub Header
+                </th>
+                <th className="w-[180px] border border-gray-300 py-1 font-bold">
+                  Module
                 </th>
                 <th className="border border-gray-300 py-1 font-bold">
                   Description
@@ -359,6 +397,10 @@ export default function TermsConditionPage() {
 
                   <td className="truncate border border-gray-300 px-2">
                     {term?.sub_header || ""}
+                  </td>
+
+                  <td className="truncate border border-gray-300 px-2">
+                    {term?.category || ""}
                   </td>
 
                   <td className="truncate border border-gray-300 px-2">
@@ -423,7 +465,7 @@ export default function TermsConditionPage() {
             }
           `}
             >
-              Edit
+              {editMode ? "Cancel" : "Edit"} 
             </Button>
           </div>
         )}

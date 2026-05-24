@@ -64,6 +64,7 @@ export default function ItemForm({
         ...initialData,
         itemCategoryId: String(initialData.itemCategoryId),
         ccCodeId: String(initialData.ccCodeId),
+        unit:String(initialData.unit),
       });
     }
   }, [initialData, categories]);
@@ -149,6 +150,7 @@ export default function ItemForm({
   // SUBMIT
   const onSubmit = async () => {
     let toastId;
+    console.log("working")
 
     try {
       toastId = toast.loading("Saving...");
@@ -263,7 +265,7 @@ export default function ItemForm({
                 options={ccList}
                 value={watch("ccCodeId")}
                 onChange={(value) => setValue("ccCodeId", String(value))}
-                placeholder={loadingCc ? "Loading..." : "SingleSelect CC"}
+                placeholder={loadingCc ? "Loading..." : "Select CC"}
                 disabled={fieldDisabled || loadingCc}
                 labelKey="ccName"
                 valueKey="ccId"
