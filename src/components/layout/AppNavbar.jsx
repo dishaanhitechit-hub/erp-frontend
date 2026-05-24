@@ -16,7 +16,7 @@ import SearchableSelect from "@/components/common/SearchableSelect";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { User, LogOut } from "lucide-react";
-import { roleMap } from "@/config/role.config";
+import { ROLE, roleMap } from "@/config/role.config";
 
 export default function AppNavbar() {
   const pathname = usePathname();
@@ -174,7 +174,10 @@ export default function AppNavbar() {
           <div className="mt-4 flex items-center flex-wrap gap-4">
             {/* LEFT ICONS */}
             <div className="flex items-center gap-2 h-[32px]">
-              <button className="cursor-pointer">
+              <button
+                className="cursor-pointer"
+                onClick={() => router.push("/dashboard")}
+              >
                 <Image
                   src="/assets/icons/computer-monitor.png"
                   alt=""
@@ -182,7 +185,10 @@ export default function AppNavbar() {
                   height={32}
                 />
               </button>
-              <button className="cursor-pointer">
+              <button
+                className="cursor-pointer"
+                onClick={() => router.push("/master/ledger-code")}
+              >
                 <Image
                   src="/assets/icons/database.png"
                   alt=""
@@ -190,7 +196,14 @@ export default function AppNavbar() {
                   height={32}
                 />
               </button>
-              <button className="cursor-pointer">
+              <button
+                className="cursor-pointer"
+                onClick={() => {
+                  if (role?.toLowerCase() === ROLE.SUPER_ADMIN) {
+                    router.push("/settings/company-details");
+                  }
+                }}
+              >
                 <Image
                   src="/assets/icons/settings.png"
                   alt=""
@@ -241,7 +254,7 @@ export default function AppNavbar() {
                       placeholder={
                         loadingProjects ? "Loading..." : "SingleSelect Project"
                       }
-                      labelKey={["projectCode","projectName"]}
+                      labelKey={["projectCode", "projectName"]}
                       valueKey="id"
                       searchKeys={["projectName", "projectCode"]}
                     />

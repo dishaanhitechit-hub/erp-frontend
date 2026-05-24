@@ -27,7 +27,7 @@ const schema = z.object({
   parentUnitMultiplyFactor: z.string().optional(),
 });
 
-export default function UnitForm({ mode = "create", unitId, initialData }) {
+export default function UnitForm({ mode = "create",disabled=false, unitId, initialData }) {
   const [isEditing, setIsEditing] = useState(mode === "create");
 
   const [parentUnits, setParentUnits] = useState([]);
@@ -56,6 +56,9 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
   const selectedUnitType = watch("unitType");
   const selectedCategory = watch("categoryId");
+  const isViewMode = disabled;
+
+  const fieldDisabled = isViewMode || !isEditing || isSubmitting;
 
   // FETCH PARENT UNITS
   useEffect(() => {
@@ -89,7 +92,7 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
   // EDIT MODE DATA
   useEffect(() => {
-    if (mode === "edit" && initialData) {
+    if ((mode === "edit" || mode==="view") && initialData) {
       reset({
         unitName: initialData.unitName || "",
         shortName: initialData.shortName || "",
@@ -197,8 +200,8 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
           <Input
             {...register("unitName")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.unitName,!isEditing || isSubmitting)}`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.unitName,fieldDisabled)}`}
           />
         </div>
 
@@ -208,8 +211,8 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
           <Input
             {...register("shortName")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.shortName,!isEditing || isSubmitting)}`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.shortName,fieldDisabled)}`}
           />
         </div>
 
@@ -219,8 +222,8 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
           <select
             {...register("unitType")}
-            disabled={!isEditing || isSubmitting}
-            className={`flex-1 ${getInputClass(errors.unitType,!isEditing || isSubmitting)}`}
+            disabled={fieldDisabled}
+            className={`flex-1 ${getInputClass(errors.unitType,fieldDisabled)}`}
           >
             <option value="">SingleSelect</option>
 
@@ -243,7 +246,7 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
               value={watch("categoryId")}
               onChange={(value) => setValue("categoryId", String(value))}
               placeholder="Select"
-              disabled={!isEditing || isSubmitting}
+              disabled={fieldDisabled}
               labelKey="label"
               valueKey="value"
               searchKeys={["label", "value"]}
@@ -258,9 +261,9 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
           <Input
             {...register("parentUnitMultiplyFactor")}
             disabled={
-              !isEditing || isSubmitting || selectedUnitType !== "Child"
+              fieldDisabled || selectedUnitType !== "Child"
             }
-            className={`flex-1 ${getInputClass(errors.shortName,!isEditing || isSubmitting || selectedUnitType !== "Child")}`}
+            className={`flex-1 ${getInputClass(errors.shortName,fieldDisabled || selectedUnitType !== "Child")}`}
           />
         </div>
 
@@ -290,13 +293,15 @@ export default function UnitForm({ mode = "create", unitId, initialData }) {
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-10">
+        {!isViewMode &&(
         <SaveButton
           onClick={() => handleSubmit(onSubmit)()}
           loading={isSubmitting}
           disabled={!isEditing || isSubmitting}
         />
+        )}
 
-        {mode === "edit" && (
+        {mode === "edit" && !isViewMode && (
           <EditButton
             onClick={isEditing ? handleCancel : () => setIsEditing(true)}
             disabled={isSubmitting}

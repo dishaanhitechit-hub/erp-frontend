@@ -10,6 +10,7 @@ import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const { itemId } = useParams();
@@ -18,6 +19,7 @@ export default function Page() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const canEdit = isMasterEditable();
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
@@ -50,7 +52,8 @@ export default function Page() {
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
         <ItemForm
-          mode="edit"
+          mode={canEdit ? "edit" : "view"}
+          disabled={!canEdit}
           itemId={itemId}
           initialData={data}
           categories={categories}

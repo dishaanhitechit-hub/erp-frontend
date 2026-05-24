@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function Page() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const canEdit = isMasterEditable();
+  
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
@@ -100,12 +103,13 @@ export default function Page() {
           {/*  SEARCH SECTION */}
           <SearchSection
             onSearch={handleSearch}
-            actions={[
+            actions={
+              canEdit ?[
               {
                 label: "+ New Unit",
                 onClick: () => router.push("/master/unit/new"),
               },
-            ]}
+            ]:[]}
           />
 
           {/*  TABLE */}

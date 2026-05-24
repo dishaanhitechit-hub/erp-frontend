@@ -11,11 +11,15 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import { useRouter } from "next/navigation";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { isMasterEditable } from "@/helper/getMasterAccess";
+import PageNotAvailable from "@/components/common/PageNotAvailable";
 
 export default function Page() {
   const [categories, setCategories] = useState(CATEGORY_OPTIONS.ledgerCategory);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const canEdit = isMasterEditable();
+  
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
     onBack: () => router.back(),
@@ -46,6 +50,10 @@ export default function Page() {
   //     </div>
   //   );
   // }
+  // BLOCK NON-ADMIN USERS
+    if (!canEdit) {
+      return <PageNotAvailable />;
+    }
 
   return (
     <>

@@ -1,18 +1,26 @@
 "use client";
 
 import { getPageActions } from "@/components/common/PageActionButtons";
+import PageNotAvailable from "@/components/common/PageNotAvailable";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import PageHeader from "@/components/layout/PageHeader";
 import UnitForm from "@/components/master/unit/UnitForm";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
+  const canEdit = isMasterEditable();
+  
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
     onBack: () => router.back(),
   });
+  // BLOCK NON-ADMIN USERS
+    if (!canEdit) {
+      return <PageNotAvailable />;
+    }
   return (
     <>
       <HeaderWrapper

@@ -10,6 +10,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
+import { isMasterEditable } from "@/helper/getMasterAccess";
 
 export default function Page() {
   const { assetId } = useParams();
@@ -18,6 +19,8 @@ export default function Page() {
   const [categories, setCategories] = useState(CATEGORY_OPTIONS.assetCategory || []);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const canEdit =
+    isMasterEditable();
 
   const actions = getPageActions({
 
@@ -43,13 +46,20 @@ export default function Page() {
 
   if (loading) return <Loader2 className="animate-spin m-auto mt-10" />;
 
+
   return (
     <>
       <HeaderWrapper
             header={<PageHeader actions={actions} />}
           >
       <AssetForm
-        mode="edit"
+        mode={
+            canEdit
+              ? "edit"
+              : "view"
+          }
+
+        disabled={!canEdit}
         assetId={assetId}
         initialData={data}
         categories={categories}

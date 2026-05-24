@@ -25,6 +25,7 @@ const schema = z.object({
 
 export default function ItemForm({
   mode = "create",
+  disabled = false,
   itemId,
   initialData,
   categories = [],
@@ -52,13 +53,18 @@ export default function ItemForm({
 
   const selectedCategory = watch("itemCategoryId");
 
+  const isViewMode = disabled;
+
+  const fieldDisabled = isViewMode || !isEditing || isSubmitting;
+
   // EDIT MODE DATA SYNC
   useEffect(() => {
-    if (mode === "edit" && initialData && categories.length) {
+    if ((mode === "edit" || mode==="view") && initialData && categories.length) {
       reset({
         ...initialData,
         itemCategoryId: String(initialData.itemCategoryId),
         ccCodeId: String(initialData.ccCodeId),
+        unit:String(initialData.unit),
       });
     }
   }, [initialData, categories]);
@@ -144,6 +150,7 @@ export default function ItemForm({
   // SUBMIT
   const onSubmit = async () => {
     let toastId;
+    console.log("working")
 
     try {
       toastId = toast.loading("Saving...");
@@ -234,8 +241,8 @@ export default function ItemForm({
 
             <select
               {...register("itemCategoryId")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.itemCategoryId, !isEditing || isSubmitting)} disabled:cursor-not-allowed`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.itemCategoryId, fieldDisabled)} disabled:cursor-not-allowed`}
             >
               <option value="">Select</option>
 
@@ -258,12 +265,12 @@ export default function ItemForm({
                 options={ccList}
                 value={watch("ccCodeId")}
                 onChange={(value) => setValue("ccCodeId", String(value))}
-                placeholder={loadingCc ? "Loading..." : "SingleSelect CC"}
-                disabled={!isEditing || isSubmitting || loadingCc}
+                placeholder={loadingCc ? "Loading..." : "Select CC"}
+                disabled={fieldDisabled || loadingCc}
                 labelKey="ccName"
                 valueKey="ccId"
                 searchKeys={["ccName", "ccCode"]}
-                className={`${errors.ccCodeId && "border-red-500 bg-red-50 focus-visible:ring-red-500"} ${!isEditing || isSubmitting || (loadingCc && "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed] disabled:text-gray-500")}`}
+                className={`${errors.ccCodeId && "border-red-500 bg-red-50 focus-visible:ring-red-500"} ${fieldDisabled || (loadingCc && "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed] disabled:text-gray-500")}`}
               />
             </div>
           </div>
@@ -278,8 +285,8 @@ export default function ItemForm({
 
             <Input
               {...register("itemName")}
-              disabled={!isEditing || isSubmitting}
-              className={`flex-1 ${getInputClass(errors.itemName, !isEditing || isSubmitting)}`}
+              disabled={fieldDisabled}
+              className={`flex-1 ${getInputClass(errors.itemName, fieldDisabled)}`}
             />
           </div>
         </div>
@@ -291,9 +298,9 @@ export default function ItemForm({
 
             <textarea
               {...register("itemDescription")}
-              disabled={!isEditing || isSubmitting}
+              disabled={fieldDisabled}
               className={`
-                ${getInputClass(errors.itemDescription, !isEditing || isSubmitting)}
+                ${getInputClass(errors.itemDescription, fieldDisabled)}
                 flex-1
                 px-2 py-1
                 min-h-[80px]
@@ -320,9 +327,11 @@ export default function ItemForm({
                   options={unitList}
                   value={watch("unit")}
                   onChange={(value) => setValue("unit", String(value))}
-                  placeholder={loadingUnits ? "Loading..." : "SingleSelect Unit"}
+                  placeholder={
+                    loadingUnits ? "Loading..." : "SingleSelect Unit"
+                  }
                   searchPlaceholder="Search by short/unit/parent/category name"
-                  disabled={!isEditing || isSubmitting || loadingUnits}
+                  disabled={fieldDisabled || loadingUnits}
                   labelKey="shortName"
                   valueKey="unitId"
                   dropdownPosition="up"
@@ -349,8 +358,8 @@ export default function ItemForm({
 
               <Input
                 {...register("hsnSac")}
-                disabled={!isEditing || isSubmitting}
-                className={`flex-1 ${getInputClass(errors.hsnSac, !isEditing || isSubmitting)}`}
+                disabled={fieldDisabled}
+                className={`flex-1 ${getInputClass(errors.hsnSac, fieldDisabled)}`}
               />
             </div>
           </div>
@@ -362,8 +371,8 @@ export default function ItemForm({
 
               <Input
                 {...register("gstPercentage")}
-                disabled={!isEditing || isSubmitting}
-                className={`flex-1 ${getInputClass(errors.gstPercentage, !isEditing || isSubmitting)}`}
+                disabled={fieldDisabled}
+                className={`flex-1 ${getInputClass(errors.gstPercentage, fieldDisabled)}`}
               />
             </div>
           </div>
@@ -372,13 +381,15 @@ export default function ItemForm({
 
       {/* BUTTONS */}
       <div className="flex justify-end gap-3 mt-4">
-        <SaveButton
-          onClick={() => handleSubmit(onSubmit)()}
-          loading={isSubmitting}
-          disabled={!isEditing || isSubmitting}
-        />
+        {!isViewMode && (
+          <SaveButton
+            onClick={() => handleSubmit(onSubmit)()}
+            loading={isSubmitting}
+            disabled={!isEditing || isSubmitting}
+          />
+        )}
 
-        {mode === "edit" && (
+        {mode === "edit" && !isViewMode && (
           <EditButton
             onClick={isEditing ? handleCancel : () => setIsEditing(true)}
             disabled={isSubmitting}

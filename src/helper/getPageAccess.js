@@ -1,107 +1,119 @@
-import { getLocalStorage } from "@/lib/localStorage";
+import { getLocalStorage }
+from "@/lib/localStorage";
 
-export const getPageAccess = (
-  pageCode
-) => {
+// used for every other module
+// except settings and master
+// they have separate logics
 
-  const permissions = getLocalStorage("permissions") || {};
+export const getPageAccess = ({
+  pageCode,
+  pageType,
+}) => {
 
-  const pageRoles = getLocalStorage("pageRoles") || {};
+  const permissions =
+    getLocalStorage(
+      "permissions"
+    ) || {};
 
-  // NORMAL PERMISSIONS
   const canView =
     permissions?.[
       `${pageCode}.VIEW`
     ];
 
-  const canEditPage =
+  const canEdit =
     permissions?.[
       `${pageCode}.EDIT`
     ];
 
-  // SPECIAL ROLES
-  const isCreator =
-    pageRoles?.[
-      `${pageCode}.CREATOR`
-    ];
-
-  const isApprover =
-    pageRoles?.[
+  const canApprove =
+    permissions?.[
       `${pageCode}.APPROVER`
     ];
 
-  // CREATOR
-
-  if (isCreator) {
-
-    return {
-      allowed: true,
-
-      // FULL EDIT MODE
-      disabled: false,
-
-      mode: "EDIT",
-
-      canApprove: false,
-
-      isCreator: true,
-      isApprover: false,
-    };
-  }
-
-  // APPROVER
-
-  if (isApprover) {
-
-    return {
-      allowed: true,
-
-      // READONLY
-      disabled: true,
-
-      mode: "APPROVER",
-
-      canApprove: true,
-
-      isCreator: false,
-      isApprover: true,
-    };
-  }
-
-  // VIEW / EDIT PAGE ACCESS
-
-  if (
+  const hasAccess =
     canView ||
-    canEditPage
-  ) {
-
-    return {
-      allowed: true,
-
-      // READONLY
-      disabled: true,
-
-      mode: "VIEW",
-
-      canApprove: false,
-
-      isCreator: false,
-      isApprover: false,
-    };
-  }
+    canEdit ||
+    canApprove;
 
   // NO ACCESS
 
+  if (!hasAccess) {
+
+    return {
+      allowed: false,
+    };
+  }
+
+  // LIST PAGE
+
+  if (pageType === "LIST") {
+
+    return {
+
+      allowed: true,
+
+      // SHOW ADD BUTTON
+      canAdd: !!canEdit,
+
+      // TABLE ROW CLICK
+      canOpenDetails: true,
+
+      canApprove,
+
+      mode: "list",
+    };
+  }
+
+  // ADD PAGE
+
+  if (pageType === "ADD") {
+
+    // ONLY EDIT USERS
+    if (!canEdit) {
+
+      return {
+        allowed: false,
+      };
+    }
+
+    return {
+
+      allowed: true,
+
+      disabled: false,
+
+      mode: "create",
+
+      canApprove: false,
+    };
+  }
+
+  // EDIT/DETAIL PAGE
+
+  if (
+    pageType === "EDIT"
+  ) {
+
+    return {
+
+      allowed: true,
+
+      // ONLY EDIT CAN MODIFY
+      disabled: !canEdit,
+
+      // APPROVAL BUTTON
+      canApprove,
+
+      mode:
+        canEdit
+          ? "edit"
+          : canApprove
+            ? "approver"
+            : "view",
+    };
+  }
+
   return {
     allowed: false,
-
-    disabled: true,
-
-    mode: "NO_ACCESS",
-
-    canApprove: false,
-
-    isCreator: false,
-    isApprover: false,
   };
 };
