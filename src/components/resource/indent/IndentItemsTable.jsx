@@ -393,11 +393,24 @@
 
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
-import { getInputClass } from "@/lib/formStyles";
-import SearchableSelect from "@/components/common/SearchableSelect";
 import { useState } from "react";
+
+import { Input } from "@/components/ui/input";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+
+import { Trash2, FileText } from "lucide-react";
+
+import { getInputClass } from "@/lib/formStyles";
+
+import SearchableSelect from "@/components/common/SearchableSelect";
 
 export default function IndentItemsTable({
   fields,
@@ -421,7 +434,7 @@ export default function IndentItemsTable({
     location: "",
   };
 
-  const [expandedCells, setExpandedCells] = useState({});
+  const [activeModal, setActiveModal] = useState(null);
 
   const totalQty = watch("items")?.reduce(
     (sum, item) => sum + Number(item.qty || 0),
@@ -432,13 +445,6 @@ export default function IndentItemsTable({
     (sum, item) => sum + Number(item?.ammenmendQty || 0),
     0,
   );
-
-  const toggleCell = (key) => {
-    setExpandedCells((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
 
   const handleItemSelect = (rowIndex, value, item) => {
     setValue(`items.${rowIndex}.itemCode`, item?.itemCode || "");
@@ -460,6 +466,42 @@ export default function IndentItemsTable({
     return value;
   };
 
+  const renderPreviewText = (text) => {
+    if (!text) {
+      return (
+        <span className="text-[#888] italic text-[13px]">No content added</span>
+      );
+    }
+
+    if (text.length <= 28) {
+      return text;
+    }
+
+    return `${text.trim().slice(0, 28).trim()}...`;
+  };
+
+  const openModal = (index, field) => {
+    setActiveModal({
+      index,
+      field,
+    });
+  };
+
+  const closeModal = () => {
+    if (activeModal) {
+      const fieldPath = `items.${activeModal.index}.${activeModal.field}`;
+
+      const currentValue = watch(fieldPath) || "";
+
+      setValue(fieldPath, currentValue.trim(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+
+    setActiveModal(null);
+  };
+
   return (
     <div className="flex-1 min-w-0">
       <div className="border border-[#b5b5b5] overflow-hidden">
@@ -468,7 +510,7 @@ export default function IndentItemsTable({
           BASIC
         </div>
 
-        {/* TABLE WRAPPER */}
+        {/* TABLE */}
         <div className="w-full overflow-x-auto">
           <div
             className={`
@@ -477,8 +519,8 @@ export default function IndentItemsTable({
               ${fields.length > 7 ? "max-h-[320px]" : ""}
             `}
           >
-            <table className="min-w-[1010px] w-full border-collapse text-sm table-fixed">
-              {/* TABLE HEADER */}
+            <table className="min-w-[1010px] w-full border-collapse text-sm">
+              {/* HEADER */}
               <thead className="sticky top-0 z-20 bg-[#d9d9d9]">
                 <tr>
                   <th className="border border-[#b5b5b5] w-[40px] text-center">
@@ -493,7 +535,7 @@ export default function IndentItemsTable({
                     Item Name
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[180px] text-left px-2">
+                  <th className="border border-[#b5b5b5] w-[220px] text-left px-2">
                     Note
                   </th>
 
@@ -505,36 +547,40 @@ export default function IndentItemsTable({
                     Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                  <th className="border border-[#b5b5b5] w-[100px] text-center">
                     Ammenmend Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[180px] text-center">
+                  <th className="border border-[#b5b5b5] w-[220px] text-left px-2">
                     Location
                   </th>
 
                   {isEditing && (
-                    <th className="border border-[#b5b5b5] w-[40px] text-center">
+                    <th className="border border-[#b5b5b5] w-[50px] text-center">
                       Action
                     </th>
                   )}
                 </tr>
               </thead>
 
-              {/* TABLE BODY */}
+              {/* BODY */}
               <tbody>
                 {fields.map((field, index) => {
                   const selectedItemCode = watch(`items.${index}.itemCode`);
 
+                  const noteValue = watch(`items.${index}.note`);
+
+                  const locationValue = watch(`items.${index}.location`);
+
                   return (
                     <tr key={field.id}>
-                      {/* SL NO */}
-                      <td className="border border-[#b5b5b5] text-center bg-[#f7f7f7] align-middle">
+                      {/* SL */}
+                      <td className="border border-[#b5b5b5] text-center bg-[#f7f7f7]">
                         {index + 1}
                       </td>
 
                       {/* ITEM CODE */}
-                      <td className="border border-[#b5b5b5] p-0 align-middle">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           {...register(`items.${index}.itemCode`)}
                           disabled
@@ -542,13 +588,13 @@ export default function IndentItemsTable({
                             ${getInputClass(false, true)}
                             border-0
                             rounded-none
-                            h-[32px]
+                            h-[36px]
                           `}
                         />
                       </td>
 
-                      {/* ITEM SELECT */}
-                      <td className="border border-[#b5b5b5] p-0 align-middle">
+                      {/* ITEM NAME */}
+                      <td className="border border-[#b5b5b5] p-0">
                         <SearchableSelect
                           options={itemsOptions}
                           value={selectedItemCode}
@@ -565,117 +611,50 @@ export default function IndentItemsTable({
                       </td>
 
                       {/* NOTE */}
-                      {/* <td
-                        className="border border-[#b5b5b5] p-0 cursor-pointer"
-                        onClick={() => toggleCell(`note-${index}`)}
-                      >
-                        <div
+                      <td className="border border-[#b5b5b5] p-0">
+                        <button
+                          type="button"
+                          onClick={() => openModal(index, "note")}
                           className={`
-                            px-1 py-1 text-sm
+                            w-full
+                            h-[36px]
+                            px-2
+                            flex
+                            items-center
+                            justify-between
+                            gap-2
+                            text-left
+                            transition-colors
+                            cursor-pointer
                             ${
-                              expandedCells[`note-${index}`]
-                                ? "whitespace-normal break-words min-h-[32px]"
-                                : "truncate whitespace-nowrap overflow-hidden h-[32px] flex items-center"
+                              !isEditing || isSubmitting
+                                ? "bg-[#edf8ed] cursor-default"
+                                : "bg-white hover:bg-[#f7f7f7] cursor-pointer"
                             }
                           `}
                         >
-                          <Input
-                            {...register(`items.${index}.note`)}
-                            disabled={!isEditing || isSubmitting}
-                            className={`
-                              ${getInputClass(
-                                errors?.items?.[index]?.note,
-                                !isEditing || isSubmitting,
-                              )}
-                              border-0
-                              rounded-none
-                              h-auto
-                              shadow-none
-                            `}
-                          />
-                        </div>
-                      </td> */}
-                      {/* NOTE */}
-                      <td className="border border-[#b5b5b5] p-0 align-stretch">
-                        {isEditing ? (
-                          <textarea
-                            {...register(`items.${index}.note`)}
-                            rows={expandedCells[`note-${index}`] ? 3 : 1}
-                            disabled={!isEditing || isSubmitting}
-                            className={`
-        ${getInputClass(
-          errors?.items?.[index]?.note,
-          !isEditing || isSubmitting,
-        )}
-        w-full
-        h-full
-        min-h-[32px]
-        resize-none
-        border-0
-        outline-none
-        overflow-hidden
-        text-sm
-        leading-5
-        px-2
-        py-1
-        bg-white
+                          <span className="truncate text-[13px]">
+                            {renderPreviewText(noteValue)}
+                          </span>
 
-        ${
-          expandedCells[`note-${index}`]
-            ? "whitespace-normal break-words"
-            : "truncate whitespace-nowrap"
-        }
-      `}
-                          />
-                        ) : (
-                          <div
+                          <span
                             className="
-        w-full
-        h-full
-        min-h-[32px]
-        px-2
-        py-1
-        text-sm
-        bg-[#edf8ed]
-        flex
-        flex-col
-        justify-center
-      "
+                              text-blue-600
+                              text-[11px]
+                              shrink-0
+                              flex
+                              items-center
+                              gap-1
+                            "
                           >
-                            <div
-                              className={
-                                expandedCells[`note-${index}`]
-                                  ? "whitespace-normal break-words"
-                                  : "truncate whitespace-nowrap overflow-hidden"
-                              }
-                            >
-                              {watch(`items.${index}.note`) || ""}
-                            </div>
-
-                            {(watch(`items.${index}.note`) || "").length >
-                              25 && (
-                              <button
-                                type="button"
-                                onClick={() => toggleCell(`note-${index}`)}
-                                className="
-            text-blue-600
-            text-[11px]
-            hover:underline
-            mt-[2px]
-            w-fit
-          "
-                              >
-                                {expandedCells[`note-${index}`]
-                                  ? "less"
-                                  : "...more"}
-                              </button>
-                            )}
-                          </div>
-                        )}
+                            <FileText className="w-3 h-3" />
+                            more
+                          </span>
+                        </button>
                       </td>
 
                       {/* UNIT */}
-                      <td className="border border-[#b5b5b5] p-0 align-middle">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           {...register(`items.${index}.unit`)}
                           disabled
@@ -683,14 +662,14 @@ export default function IndentItemsTable({
                             ${getInputClass(false, true)}
                             border-0
                             rounded-none
-                            h-[32px]
+                            h-[36px]
                             text-center
                           `}
                         />
                       </td>
 
                       {/* QTY */}
-                      <td className="border border-[#b5b5b5] p-0 align-middle">
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           type="number"
                           min={0}
@@ -704,149 +683,80 @@ export default function IndentItemsTable({
                           })}
                           disabled={!isEditing || isSubmitting}
                           className={`
-    ${getInputClass(errors?.items?.[index]?.qty, !isEditing || isSubmitting)}
-    border-0
-    rounded-none
-    h-[32px]
-    text-center
-  `}
+                            ${getInputClass(
+                              errors?.items?.[index]?.qty,
+                              !isEditing || isSubmitting,
+                            )}
+                            border-0
+                            rounded-none
+                            h-[36px]
+                            text-center
+                          `}
                         />
                       </td>
 
-                      {/* AMMENMEND QTY */}
-                      <td className="border border-[#b5b5b5] p-0 align-middle">
+                      {/* AMMENDMENT */}
+                      <td className="border border-[#b5b5b5] p-0">
                         <Input
                           type="number"
                           value={watch(`items.${index}.ammenmendQty`) || ""}
                           disabled
                           className={`
-                                ${getInputClass(false, true)}
-                                border-0
-                                rounded-none
-                                h-[32px]
-                                text-center
-                              `}
+                            ${getInputClass(false, true)}
+                            border-0
+                            rounded-none
+                            h-[36px]
+                            text-center
+                          `}
                         />
                       </td>
 
                       {/* LOCATION */}
-                      {/* <td
-                        className="border border-[#b5b5b5] p-0 cursor-pointer"
-                        onClick={() => toggleCell(`location-${index}`)}
-                      >
-                        <div
+                      <td className="border border-[#b5b5b5] p-0">
+                        <button
+                          type="button"
+                          onClick={() => openModal(index, "location")}
                           className={`
-                            ${
-                              expandedCells[`location-${index}`]
-                                ? "min-h-[32px]"
-                                : "h-[32px]"
-                            }
-                            overflow-hidden
+                            w-full
+                            h-[36px]
+                            px-2
+                            flex
+                            items-center
+                            justify-between
+                            gap-2
+                            text-left
+                            transition-colors
+                            cursor-pointer
+                          ${
+                            !isEditing || isSubmitting
+                              ? "bg-[#edf8ed] cursor-default"
+                              : "bg-white hover:bg-[#f7f7f7] cursor-pointer"
+                          }
                           `}
                         >
-                          <Input
-                            {...register(`items.${index}.location`)}
-                            disabled={!isEditing || isSubmitting}
-                            className={`
-                              ${getInputClass(
-                                errors?.items?.[index]?.location,
-                                !isEditing || isSubmitting,
-                              )}
-                              border-0
-                              rounded-none
-                              h-auto
-                              min-h-[32px]
-                              ${
-                                expandedCells[`location-${index}`]
-                                  ? "whitespace-normal break-words"
-                                  : "truncate whitespace-nowrap overflow-hidden"
-                              }
-                            `}
-                          />
-                        </div>
-                      </td> */}
-                      {/* LOCATION */}
-                      <td className="border border-[#b5b5b5] p-0 align-stretch">
-                        {isEditing ? (
-                          <textarea
-                            {...register(`items.${index}.location`)}
-                            rows={expandedCells[`location-${index}`] ? 3 : 1}
-                            disabled={!isEditing || isSubmitting}
-                            className={`
-        ${getInputClass(
-          errors?.items?.[index]?.location,
-          !isEditing || isSubmitting,
-        )}
-        w-full
-        h-full
-        min-h-[32px]
-        resize-none
-        border-0
-        outline-none
-        overflow-hidden
-        text-sm
-        leading-5
-        px-2
-        py-1
-        bg-white
+                          <span className="truncate text-[13px]">
+                            {renderPreviewText(locationValue)}
+                          </span>
 
-        ${
-          expandedCells[`location-${index}`]
-            ? "whitespace-normal break-words"
-            : "truncate whitespace-nowrap"
-        }
-      `}
-                          />
-                        ) : (
-                          <div
+                          <span
                             className="
-        w-full
-        h-full
-        min-h-[32px]
-        px-2
-        py-1
-        text-sm
-        bg-[#edf8ed]
-        flex
-        flex-col
-        justify-center
-      "
+                              text-blue-600
+                              text-[11px]
+                              shrink-0
+                              flex
+                              items-center
+                              gap-1
+                            "
                           >
-                            <div
-                              className={
-                                expandedCells[`location-${index}`]
-                                  ? "whitespace-normal break-words"
-                                  : "truncate whitespace-nowrap overflow-hidden"
-                              }
-                            >
-                              {watch(`items.${index}.location`) || ""}
-                            </div>
-
-                            {(watch(`items.${index}.location`) || "").length >
-                              20 && (
-                              <button
-                                type="button"
-                                onClick={() => toggleCell(`location-${index}`)}
-                                className="
-            text-blue-600
-            text-[11px]
-            hover:underline
-            mt-[2px]
-            w-fit
-          "
-                              >
-                                {expandedCells[`location-${index}`]
-                                  ? "less"
-                                  : "...more"}
-                              </button>
-                            )}
-                          </div>
-                        )}
+                            <FileText className="w-3 h-3" />
+                            more
+                          </span>
+                        </button>
                       </td>
 
                       {/* DELETE */}
                       {isEditing && (
-                        <td className="border border-[#b5b5b5] text-center ">
+                        <td className="border border-[#b5b5b5] text-center">
                           <button
                             type="button"
                             disabled={fields.length === 1}
@@ -862,7 +772,7 @@ export default function IndentItemsTable({
                 })}
               </tbody>
 
-              {/* TABLE FOOTER */}
+              {/* FOOTER */}
               <tfoot className="sticky bottom-0 z-20 bg-[#d9d9d9]">
                 <tr className="font-bold">
                   <td className="border border-[#b5b5b5]"></td>
@@ -875,32 +785,12 @@ export default function IndentItemsTable({
 
                   <td className="border border-[#b5b5b5]"></td>
 
-                  <td
-                    className="
-    border border-[#b5b5b5]
-    text-center
-    whitespace-nowrap
-    overflow-hidden
-    text-ellipsis
-    px-2
-  "
-                    title={totalQty}
-                  >
+                  <td className="border border-[#b5b5b5] text-center px-2">
                     {formatNumber(totalQty)}
                   </td>
 
-                  <td
-                    className="
-                      border border-[#b5b5b5]
-                      text-center
-                      whitespace-nowrap
-                      overflow-hidden
-                      text-ellipsis
-                      px-2
-                    "
-                    title={formatNumber(totalAmmenmendQty)}
-                  >
-                    {totalAmmenmendQty}
+                  <td className="border border-[#b5b5b5] text-center px-2">
+                    {formatNumber(totalAmmenmendQty)}
                   </td>
 
                   <td className="border border-[#b5b5b5]"></td>
@@ -936,6 +826,79 @@ export default function IndentItemsTable({
           </button>
         </div>
       )}
+
+      {/* MODAL */}
+      <Dialog
+        open={!!activeModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeModal();
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle className="text-[18px] font-semibold">
+              {activeModal?.field === "note"
+                ? "Note Details"
+                : "Location Details"}
+            </DialogTitle>
+          </DialogHeader>
+
+          {activeModal && (
+            <div className="space-y-3">
+              <div className="text-[13px] text-[#666]">
+                {activeModal?.field === "note"
+                  ? "Add detailed note information below."
+                  : "Add detailed location information below."}
+              </div>
+
+              <textarea
+                {...register(`items.${activeModal.index}.${activeModal.field}`)}
+                disabled={!isEditing || isSubmitting}
+                placeholder={
+                  activeModal?.field === "note"
+                    ? "Enter detailed note..."
+                    : "Enter detailed location..."
+                }
+                className={`
+                  ${getInputClass(
+                    errors?.items?.[activeModal.index]?.[activeModal.field],
+                    !isEditing || isSubmitting,
+                  )}
+                  w-full
+                  min-h-[220px]
+                  resize-none
+                  border
+                  rounded-md
+                  px-3
+                  py-3
+                  text-sm
+                  leading-6
+                  outline-none
+                `}
+              />
+
+              <div className="flex justify-between items-center">
+                <div className="text-[12px] text-[#888]">
+                  Character Count :{" "}
+                  {
+                    (
+                      watch(
+                        `items.${activeModal.index}.${activeModal.field}`,
+                      ) || ""
+                    ).trim().length
+                  }
+                </div>
+
+                <Button type="button" onClick={closeModal} className="h-[34px]">
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -286,7 +286,7 @@ export default function IndentForm({
 
     formData.append("saleOrderNo", values.saleOrderNo);
 
-    formData.append("remarks", values.remarks || "");
+    formData.append("remarks", values.remarks?.trim() || "");
 
     formData.append(
       "items",
@@ -296,9 +296,9 @@ export default function IndentForm({
 
           qty: Number(item.qty),
 
-          location: item.location,
+          location: item.location?.trim() || "",
 
-          note: item.note,
+          note: item.note?.trim() || "",
         })),
       ),
     );
