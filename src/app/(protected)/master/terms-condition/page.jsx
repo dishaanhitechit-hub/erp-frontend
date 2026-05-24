@@ -39,6 +39,8 @@ export default function TermsConditionPage() {
 
   const isViewMode = !canEdit;
 
+  const [expandedDescriptionId, setExpandedDescriptionId] = useState(null);
+
   const [errors, setErrors] = useState({
     header: false,
     termDescription: false,
@@ -403,21 +405,50 @@ export default function TermsConditionPage() {
                     {term?.category || ""}
                   </td>
 
-                  <td className="truncate border border-gray-300 px-2">
-                    {term?.term_description || ""}
+                  <td
+                      className="border border-gray-300 px-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        if (term) {
+                          setExpandedDescriptionId(
+                              expandedDescriptionId === term.termId
+                                  ? null
+                                  : term.termId
+                          );
+                        }
+                      }}
+                  >
+                    {term ? (
+                        <div
+                            className={`
+        cursor-pointer
+        ${
+                                expandedDescriptionId === term.termId
+                                    ? "whitespace-normal break-words"
+                                    : "truncate"
+                            }
+      `}
+                            title="Click to view full description"
+                        >
+                          {term.term_description || ""}
+                        </div>
+                    ) : (
+                        ""
+                    )}
                   </td>
                   {!isViewMode && (
-                    <td className="border border-gray-300 text-center">
-                      {term && (
-                        <button
-                          type="button"
-                          disabled={!editMode || loading}
-                          onClick={(e) => handleDelete(e, term.termId)}
-                          className={`
+                      <td className="border border-gray-300 text-center">
+                        {term && (
+                            <button
+                                type="button"
+                                disabled={!editMode || loading}
+                                onClick={(e) => handleDelete(e, term.termId)}
+                                className={`
                           inline-flex items-center justify-center gap-1 rounded-sm px-2 py-[2px] text-xs font-semibold
                           ${
-                            editMode
-                              ? "bg-red-500 text-white hover:bg-red-600"
+                                    editMode
+                                        ? "bg-red-500 text-white hover:bg-red-600"
                               : "bg-gray-200 text-gray-400 cursor-not-allowed"
                           }
                         `}
