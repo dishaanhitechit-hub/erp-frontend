@@ -14,10 +14,12 @@ import PageNotAvailable from "@/components/common/PageNotAvailable";
 import ApprovalActionModal from "@/components/common/ApprovalActionModal";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { useState } from "react";
+import HistoryTimelineSheet from "@/components/common/HistoryTimelineSheet";
 
 export default function Page() {
   const router = useRouter();
   const [openApproval, setOpenApproval] = useState(false);
+  const [openTimeline, setOpenTimeline] = useState(false);
 
   const { indentId } = useParams();
   const access = getPageAccess({
@@ -31,9 +33,8 @@ export default function Page() {
 
   const actions = getPageActions({
     onHome: () => router.push("/dashboard"),
-
     onBack: () => router.back(),
-
+    onTimeLine: () => setOpenTimeline(true),
     onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,
   });
 
@@ -48,7 +49,7 @@ export default function Page() {
         open={openApproval}
         onClose={() => setOpenApproval(false)}
         payload={{
-          id:indentId,
+          id: indentId,
         }}
         actions={[
           {
@@ -69,6 +70,13 @@ export default function Page() {
         onSuccess={() => {
           router.refresh();
         }}
+      />
+      <HistoryTimelineSheet
+        open={openTimeline}
+        onClose={() => setOpenTimeline(false)}
+        title="Indent History"
+        api={API_ENDPOINTS.RESOURCE.INDENT.HISTORY}
+        entityId={indentId}
       />
     </HeaderWrapper>
   );

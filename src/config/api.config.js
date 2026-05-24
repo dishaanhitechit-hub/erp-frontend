@@ -75,6 +75,7 @@ export const API_ENDPOINTS = {
             REBACK:"/resource/indent/reback",//indenId POST
             REJECT:"/resource/indent/reject",//indenId POST
             DELETE:"/resource/indent/delete",//indentId DELETE
+            HISTORY:"/resource/indent/history",//indentId GET
         }
     }
     

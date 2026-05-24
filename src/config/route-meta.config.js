@@ -1,4 +1,9 @@
 export const routeMetaConfig = [
+  //dashboard
+  {
+    basePath: "/dashboard",
+    breadcrumbs: ["Dashboard"],
+  },
   //settings
   {
     basePath: "/settings/company-details",
