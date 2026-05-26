@@ -107,8 +107,10 @@ export default function ProjectRolePage() {
       });
 
       const teams = Object.values(grouped);
-      setHoTeam(teams[0]?.list || []);
-      setSiteTeam(teams[1]?.list || []);
+      // setHoTeam(teams[0]?.list || []);
+      // setSiteTeam(teams[1]?.list || []);
+      setHoTeam(grouped[1]?.list || []);
+      setSiteTeam(grouped[2]?.list || []);
     } catch (err) {
       toast.error("Project not found");
     } finally {
