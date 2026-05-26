@@ -8,8 +8,6 @@ import {
   Pencil,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-
 import ExpandableTextField from "@/components/common/ExpandableTextField";
 
 import TermsSelectionModal from "../modals/TermsSelectionModal";
@@ -19,10 +17,11 @@ export default function OrderTermsTab({
   form,
 
   disabled,
+  openTermsModal,
+
+  setOpenTermsModal,
 }) {
 
-  const [openTermsModal, setOpenTermsModal] =
-    useState(false);
 
   const terms =
     form.watch(
@@ -52,107 +51,57 @@ export default function OrderTermsTab({
 
     <div
       className="
-        border
-        rounded-md
-
         bg-white
-
-        p-4
+        w-full
       "
     >
 
-      {/* HEADER */}
+      {/* TABLE SECTION */}
 
       <div
         className="
-          flex
-          items-center
-          justify-between
-
-          gap-3
-
-          mb-4
+          border
+          border-gray-300
         "
       >
 
-        <h2
+        {/* TITLE */}
+
+        <div
           className="
-            text-base
-            font-semibold
+            w-full
+
+            bg-[#F5EFCF]
+
+            border-b
+            border-gray-300
+
+            px-4
+            py-1.5
           "
         >
 
-          Terms & Conditions
-
-        </h2>
-
-        {!disabled && (
-
-          <Button
-
-            type="button"
-
-            onClick={() =>
-              setOpenTermsModal(
-                true,
-              )
-            }
-
+          <h2
             className="
-              h-9
-              px-4
+              text-[15px]
+              font-semibold
+              text-black
             "
           >
 
-            <Plus
-              className="
-                w-4
-                h-4
-                mr-1
-              "
-            />
+            Terms & Condition
 
-            Add Terms
-
-          </Button>
-        )}
-
-      </div>
-
-      {/* EMPTY */}
-
-      {!terms.length && (
-
-        <div
-          className="
-            h-[120px]
-
-            border
-            border-dashed
-
-            rounded-md
-
-            flex
-            items-center
-            justify-center
-
-            text-sm
-            text-gray-500
-          "
-        >
-
-          No Terms Added
+          </h2>
 
         </div>
-      )}
 
-      {/* TABLE */}
-
-      {!!terms.length && (
+        {/* TABLE */}
 
         <div
           className="
-            overflow-x-auto
+            overflow-auto
+
+            max-h-[420px]
           "
         >
 
@@ -163,29 +112,39 @@ export default function OrderTermsTab({
             "
           >
 
-            <thead>
+            <thead
+              className="
+                sticky
+                top-0
+                z-10
+              "
+            >
 
               <tr
                 className="
-                  bg-gray-100
+                  bg-[#D3D3D3]
                 "
               >
 
-                <th className="border p-2 text-sm min-w-[180px]">
+                <th className="border px-2 py-1 text-sm min-w-[70px]">
+                  Sl No.
+                </th>
+
+                <th className="border px-2 py-1 text-sm min-w-[180px]">
                   Header
                 </th>
 
-                <th className="border p-2 text-sm min-w-[180px]">
+                <th className="border px-2 py-1 text-sm min-w-[180px]">
                   Sub Header
                 </th>
 
-                <th className="border p-2 text-sm min-w-[320px]">
+                <th className="border px-2 py-1 text-sm min-w-[450px]">
                   Description
                 </th>
 
                 {!disabled && (
 
-                  <th className="border p-2 text-sm min-w-[120px]">
+                  <th className="border px-2 py-1 text-sm min-w-[120px]">
                     Action
                   </th>
                 )}
@@ -195,6 +154,38 @@ export default function OrderTermsTab({
             </thead>
 
             <tbody>
+
+              {/* EMPTY */}
+
+              {!terms.length && (
+
+                <tr>
+
+                  <td
+                    colSpan={
+                      disabled
+                        ? 4
+                        : 5
+                    }
+
+                    className="
+                      h-[120px]
+
+                      text-center
+
+                      text-sm
+                      text-gray-500
+                    "
+                  >
+
+                    No Terms Added
+
+                  </td>
+
+                </tr>
+              )}
+
+              {/* ROWS */}
 
               {terms.map(
                 (
@@ -208,9 +199,17 @@ export default function OrderTermsTab({
                     }
                   >
 
+                    {/* SL NO */}
+
+                    <td className="border px-2 py-[2px] text-sm text-center">
+
+                      {index + 1}
+
+                    </td>
+
                     {/* HEADER */}
 
-                    <td className="border p-2 text-sm">
+                    <td className="border px-2 py-[2px] text-sm">
 
                       {term.header}
 
@@ -218,7 +217,7 @@ export default function OrderTermsTab({
 
                     {/* SUB HEADER */}
 
-                    <td className="border p-2 text-sm">
+                    <td className="border px-2 py-[2px] text-sm">
 
                       {term.subHeader}
 
@@ -226,7 +225,7 @@ export default function OrderTermsTab({
 
                     {/* DESCRIPTION */}
 
-                    <td className="border p-2 align-top">
+                    <td className="border px-2 py-[2px] align-top">
 
                       <ExpandableTextField
 
@@ -240,7 +239,7 @@ export default function OrderTermsTab({
 
                         placeholder="No Description"
 
-                        minHeight="min-h-[42px]"
+                        minHeight="min-h-[32px]"
 
                         modalHeight="min-h-[220px]"
                       />
@@ -251,7 +250,7 @@ export default function OrderTermsTab({
 
                     {!disabled && (
 
-                      <td className="border p-2">
+                      <td className="border px-2 py-[2px]">
 
                         <div
                           className="
@@ -262,6 +261,8 @@ export default function OrderTermsTab({
                             gap-3
                           "
                         >
+
+                          {/* EDIT */}
 
                           <button
 
@@ -277,6 +278,8 @@ export default function OrderTermsTab({
                               text-blue-600
 
                               hover:text-blue-800
+
+                              transition
                             "
                           >
 
@@ -288,6 +291,8 @@ export default function OrderTermsTab({
                             />
 
                           </button>
+
+                          {/* DELETE */}
 
                           <button
 
@@ -303,6 +308,8 @@ export default function OrderTermsTab({
                               text-red-500
 
                               hover:text-red-700
+
+                              transition
                             "
                           >
 
@@ -329,7 +336,8 @@ export default function OrderTermsTab({
           </table>
 
         </div>
-      )}
+
+      </div>
 
       {/* MODAL */}
 

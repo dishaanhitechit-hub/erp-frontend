@@ -129,4 +129,17 @@ export const routeMetaConfig = [
     basePath: "/resource-management/procurement/indent/[id]",
     breadcrumbs: ["Resource Management", "Procurement","Indent","Edit"],
   },
+  ///resource-management/procurement/order/new
+  {
+    basePath: "/resource-management/procurement/order",
+    breadcrumbs: ["Resource Management", "Procurement","Order List"],
+  },
+  {
+    basePath: "/resource-management/procurement/order/new",
+    breadcrumbs: ["Resource Management", "Procurement","Order","New"],
+  },
+  {
+    basePath: "/resource-management/procurement/order/[id]",
+    breadcrumbs: ["Resource Management", "Procurement","Order","Edit"],
+  },
 ];

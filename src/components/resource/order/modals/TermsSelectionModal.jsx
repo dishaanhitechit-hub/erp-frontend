@@ -9,6 +9,7 @@ import {
 import {
   Check,
   Loader2,
+  Pencil,
   Search,
 } from "lucide-react";
 
@@ -48,11 +49,11 @@ export default function TermsSelectionModal({
   const [search, setSearch] =
     useState("");
 
-  const [terms, setTerms] =
-    useState([]);
-
   const [tempTerms, setTempTerms] =
     useState([]);
+
+  const [editableRows, setEditableRows] =
+    useState({});
 
   const existingTerms =
     form.watch(
@@ -132,10 +133,6 @@ export default function TermsSelectionModal({
                 };
               },
             );
-
-          setTerms(
-            merged,
-          );
 
           setTempTerms(
             merged,
@@ -315,6 +312,28 @@ export default function TermsSelectionModal({
       );
     };
 
+  // TOGGLE EDIT
+
+  const toggleEdit =
+    (
+      termId,
+    ) => {
+
+      setEditableRows(
+        (
+          prev,
+        ) => ({
+
+          ...prev,
+
+          [termId]:
+            !prev[
+              termId
+            ],
+        }),
+      );
+    };
+
   // SUBMIT
 
   const handleSubmit =
@@ -387,8 +406,8 @@ export default function TermsSelectionModal({
 
         <DialogHeader
           className="
-            px-6
-            py-4
+            px-5
+            py-3
 
             border-b
 
@@ -413,7 +432,9 @@ export default function TermsSelectionModal({
 
         <div
           className="
-            p-4
+            px-4
+            py-3
+
             border-b
           "
         >
@@ -422,7 +443,7 @@ export default function TermsSelectionModal({
             className="
               relative
               w-full
-              max-w-[350px]
+              max-w-[320px]
             "
           >
 
@@ -459,6 +480,7 @@ export default function TermsSelectionModal({
 
               className="
                 pl-9
+                h-9
               "
             />
 
@@ -472,7 +494,7 @@ export default function TermsSelectionModal({
           className="
             overflow-auto
 
-            max-h-[65vh]
+            max-h-[420px]
           "
         >
 
@@ -495,7 +517,7 @@ export default function TermsSelectionModal({
 
               <tr>
 
-                <th className="border p-2 min-w-[70px]">
+                <th className="border px-2 py-1 min-w-[60px]">
 
                   <div
                     className="
@@ -519,16 +541,20 @@ export default function TermsSelectionModal({
 
                 </th>
 
-                <th className="border p-2 min-w-[220px] text-sm">
+                <th className="border px-2 py-1 text-sm min-w-[180px]">
                   Header
                 </th>
 
-                <th className="border p-2 min-w-[220px] text-sm">
+                <th className="border px-2 py-1 text-sm min-w-[180px]">
                   Sub Header
                 </th>
 
-                <th className="border p-2 min-w-[400px] text-sm">
+                <th className="border px-2 py-1 text-sm min-w-[380px]">
                   Description
+                </th>
+
+                <th className="border px-2 py-1 text-sm min-w-[100px]">
+                  Action
                 </th>
 
               </tr>
@@ -542,9 +568,9 @@ export default function TermsSelectionModal({
                 <tr>
 
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="
-                      h-[200px]
+                      h-[180px]
                       text-center
                     "
                   >
@@ -558,8 +584,8 @@ export default function TermsSelectionModal({
 
                       <Loader2
                         className="
-                          w-6
-                          h-6
+                          w-5
+                          h-5
                           animate-spin
                         "
                       />
@@ -577,9 +603,9 @@ export default function TermsSelectionModal({
                 <tr>
 
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="
-                      h-[140px]
+                      h-[120px]
                       text-center
                       text-gray-500
                     "
@@ -606,7 +632,7 @@ export default function TermsSelectionModal({
 
                       {/* SELECT */}
 
-                      <td className="border p-2">
+                      <td className="border px-2 py-1">
 
                         <div
                           className="
@@ -639,7 +665,7 @@ export default function TermsSelectionModal({
 
                       {/* HEADER */}
 
-                      <td className="border p-2 text-sm">
+                      <td className="border px-2 py-1 text-sm">
 
                         {item.header}
 
@@ -647,7 +673,7 @@ export default function TermsSelectionModal({
 
                       {/* SUB HEADER */}
 
-                      <td className="border p-2 text-sm">
+                      <td className="border px-2 py-1 text-sm">
 
                         {item.subHeader}
 
@@ -655,7 +681,7 @@ export default function TermsSelectionModal({
 
                       {/* DESCRIPTION */}
 
-                      <td className="border p-2 align-top">
+                      <td className="border px-2 py-1">
 
                         <ExpandableTextField
 
@@ -675,17 +701,70 @@ export default function TermsSelectionModal({
                           }
 
                           disabled={
-                            !item.selected
+                            !editableRows[
+                              item.termId
+                            ]
                           }
 
                           title="Term Description"
 
                           placeholder="Enter Description"
 
-                          minHeight="min-h-[42px]"
+                          minHeight="min-h-[34px]"
 
                           modalHeight="min-h-[220px]"
                         />
+
+                      </td>
+
+                      {/* ACTION */}
+
+                      <td className="border px-2 py-1">
+
+                        <div
+                          className="
+                            flex
+                            justify-center
+                          "
+                        >
+
+                          <button
+
+                            type="button"
+
+                            onClick={() =>
+                              toggleEdit(
+                                item.termId,
+                              )
+                            }
+
+                            className="
+                              w-7
+                              h-7
+
+                              rounded-md
+
+                              border
+
+                              flex
+                              items-center
+                              justify-center
+
+                              hover:bg-blue-50
+                              transition
+                            "
+                          >
+
+                            <Pencil
+                              className="
+                                w-3.5
+                                h-3.5
+                              "
+                            />
+
+                          </button>
+
+                        </div>
 
                       </td>
 
@@ -709,8 +788,8 @@ export default function TermsSelectionModal({
 
             border-t
 
-            px-6
-            py-4
+            px-5
+            py-3
           "
         >
 

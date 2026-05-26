@@ -1,33 +1,16 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 
-import {
-  useForm,
-} from "react-hook-form";
+import { useForm } from "react-hook-form";
 
-import {
-  zodResolver,
-} from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-  Loader2,
-} from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 
-import {
-  toast,
-} from "sonner";
+import { toast } from "sonner";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import SaveButton from "@/components/common/SaveButton";
 
@@ -43,69 +26,54 @@ import OrderTermsTab from "./tabs/OrderTermsTab";
 
 import OrderSummaryTab from "./tabs/OrderSummaryTab";
 
-import {
-  orderSchema,
-} from "./schema/order.schema";
+import { orderSchema } from "./schema/order.schema";
 
-import {
-  apiRequest,
-} from "@/lib/apiClient";
+import { apiRequest } from "@/lib/apiClient";
 
-import {
-  API_ENDPOINTS,
-} from "@/config/api.config";
+import { API_ENDPOINTS } from "@/config/api.config";
 
-import {
-  getLocalStorage,
-} from "@/lib/localStorage";
+import { getLocalStorage } from "@/lib/localStorage";
 
 const defaultValues = {
+  categoryCode: "Purchases",
 
-  categoryCode:
-    "Purchases",
+  subCategoryCode: "",
 
-  subCategoryCode:
-    "",
+  vendorId: "",
 
-  vendorId:
-    "",
+  orderNo: "",
 
-  orderNo:
-    "",
+  orderDate: "",
 
-  orderDate:
-    "",
+  validityDate: "",
 
-  validityDate:
-    "",
+  partyAddress: "",
 
-  partyAddress:
-    "",
+  gstn: "",
 
-  gstn:
-    "",
+  site: "",
 
-  site:
-    "",
+  billingAddress: "",
 
-  billingAddress:
-    "",
+  shippingAddress: "",
 
-  shippingAddress:
-    "",
+  contactPerson: "",
 
-  orderMessage:
-    "",
+  contactNumber: "",
 
-  gstType:
-    "",
+  quotationNo: "",
+
+  quotationDate: "",
+
+  orderMessage: "",
+
+  gstType: "",
 
   items: [],
 
   terms: [],
 
   summary: {
-
     basicAmount: 0,
 
     gstAmount: 0,
@@ -115,88 +83,54 @@ const defaultValues = {
 };
 
 export default function OrderForm({
-
   mode = "create",
 
   orderId,
 }) {
+  const [activeTab, setActiveTab] = useState("items");
 
-  const [activeTab, setActiveTab] =
-    useState("items");
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [isEditing, setIsEditing] = useState(mode === "create");
 
-  const [isEditing, setIsEditing] =
-    useState(
-      mode === "create",
-    );
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [isSubmitted, setIsSubmitted] =
-    useState(false);
+  const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
 
-  const [allowSubmit, setAllowSubmit] =
-    useState(
-      mode === "edit",
-    );
+  const [fileName, setFileName] = useState("");
 
-  const [fileName, setFileName] =
-    useState("");
+  const [fileUrl, setFileUrl] = useState("");
 
-  const [fileUrl, setFileUrl] =
-    useState("");
+  const [attachedFile, setAttachedFile] = useState(null);
 
-  const [attachedFile, setAttachedFile] =
-    useState(null);
+  const [initialData, setInitialData] = useState(null);
 
-  const [initialData, setInitialData] =
-    useState(null);
+  const [initialFileData, setInitialFileData] = useState({
+    fileName: "",
 
-  const [initialFileData, setInitialFileData] =
-    useState({
+    fileUrl: "",
+  });
 
-      fileName: "",
+  const fileRef = useRef(null);
 
-      fileUrl: "",
-    });
+  const projectInfo = getLocalStorage("projectInfo");
 
-  const fileRef =
-    useRef(null);
-
-  const projectInfo =
-    getLocalStorage(
-      "projectInfo",
-    );
-
-  const projectCode =
-    projectInfo?.projectCode;
+  const projectCode = projectInfo?.projectCode;
 
   const disabled =
+    mode === "view" || mode === "approver" || !isEditing || isSubmitted;
 
-    mode === "view" ||
+  const form = useForm({
+    resolver: zodResolver(orderSchema),
 
-    mode === "approver" ||
+    defaultValues,
 
-    !isEditing ||
-
-    isSubmitted;
-
-  const form =
-    useForm({
-
-      resolver:
-        zodResolver(
-          orderSchema,
-        ),
-
-      defaultValues,
-
-      mode:
-        "onChange",
-    });
+    mode: "onChange",
+  });
+  const [openTermsModal, setOpenTermsModal] = useState(false);
+  const [openItemModal, setOpenItemModal] = useState(false);
 
   const {
-
     reset,
 
     watch,
@@ -207,558 +141,324 @@ export default function OrderForm({
 
     handleSubmit,
 
-    formState: {
-
-      isSubmitting,
-    },
+    formState: { isSubmitting },
   } = form;
 
-  const items =
-    watch(
-      "items",
-    ) || [];
+  const items = watch("items") || [];
 
   // LOAD ORDER
 
   useEffect(() => {
+    if (mode === "create" || !orderId) {
+      return;
+    }
 
-    if (
-      mode === "create" ||
+    const fetchOrder = async () => {
+      try {
+        setLoading(true);
 
-      !orderId
-    ) {
+        const res = await apiRequest({
+          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}${orderId}`,
+
+          method: "GET",
+        });
+
+        const data = res.data;
+
+        const formattedData = {
+          categoryCode: data.categoryCode || "Purchases",
+
+          subCategoryCode: data.subCategoryCode || "",
+
+          vendorId: data.vendorId || "",
+
+          orderNo: data.orderNo || "",
+
+          orderDate: data.orderDate || "",
+
+          validityDate: data.validityDate || "",
+
+          partyAddress: data.partyAddress || "",
+
+          gstn: data.gstn || "",
+
+          site: data.site || "",
+
+          billingAddress: data.billingAddress || "",
+
+          shippingAddress: data.shippingAddress || "",
+
+          contactPerson: data.contactPerson || "",
+
+          contactNumber: data.contactNumber || "",
+
+          quotationNo: data.quotationNo || "",
+
+          quotationDate: data.quotationDate || "",
+
+          orderMessage: data.orderMessage || "",
+
+          gstType: data.gstType || "",
+
+          items: data.items || [],
+
+          terms: data.terms || [],
+
+          summary: data.summary || {
+            basicAmount: 0,
+
+            gstAmount: 0,
+
+            totalAmount: 0,
+          },
+        };
+
+        reset(formattedData);
+
+        setInitialData(formattedData);
+
+        setFileUrl(data.orderFile || "");
+
+        const extractedFileName = data.orderFile?.split("/")?.pop() || "";
+
+        setInitialFileData({
+          fileName: extractedFileName,
+
+          fileUrl: data.orderFile || "",
+        });
+
+        if (
+          data.orderStatus !== "Reback" &&
+          data.orderStatus !== "Draft" &&
+          mode === "edit"
+        ) {
+          setIsSubmitted(true);
+
+          setIsEditing(false);
+        } else {
+          setIsEditing(false);
+
+          setAllowSubmit(true);
+        }
+      } catch (err) {
+        toast.error(err.message || "Failed to load order");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrder();
+  }, [orderId, mode, reset]);
+
+  // BUILD FORM DATA
+
+  const buildFormData = () => {
+    const values = getValues();
+
+    const formData = new FormData();
+
+    formData.append("projectCode", projectCode);
+
+    formData.append("categoryCode", values.categoryCode);
+
+    formData.append("subCategoryCode", values.subCategoryCode);
+
+    formData.append("vendorId", values.vendorId);
+
+    formData.append("orderDate", values.orderDate);
+
+    formData.append("validityDate", values.validityDate);
+
+    formData.append("billingAddress", values.billingAddress);
+
+    formData.append("shippingAddress", values.shippingAddress);
+
+    formData.append("contactPerson", values.contactPerson);
+
+    formData.append("contactNumber", values.contactNumber);
+
+    formData.append("quotationNo", values.quotationNo);
+
+    formData.append("quotationDate", values.quotationDate);
+
+    formData.append("orderMessage", values.orderMessage?.trim());
+
+    formData.append(
+      "items",
+
+      JSON.stringify(
+        values.items.map((item) => ({
+          indentItemId: item.indentItemId,
+
+          qty: Number(item.qty),
+
+          rate: Number(item.rate),
+
+          gstPercent: Number(item.gstPercent),
+        })),
+      ),
+    );
+
+    formData.append(
+      "terms",
+
+      JSON.stringify(values.terms.map((term) => term.termId)),
+    );
+
+    if (attachedFile) {
+      formData.append("orderFile", attachedFile);
+    }
+
+    return formData;
+  };
+
+  // SAVE DRAFT
+
+  const handleSaveDraft = async () => {
+    let toastId;
+
+    try {
+      toastId = toast.loading(
+        mode === "create" ? "Creating order..." : "Updating order...",
+      );
+
+      const payload = buildFormData();
+
+      const res = await apiRequest({
+        url:
+          mode === "create"
+            ? API_ENDPOINTS.RESOURCE.ORDER.CREATE_ORDER
+            : `${API_ENDPOINTS.RESOURCE.ORDER.UPDATE_ORDER_BY_ID}${orderId}`,
+
+        method: mode === "create" ? "POST" : "PUT",
+
+        data: payload,
+      });
+
+      if (res?.data?.orderNo) {
+        setValue(
+          "orderNo",
+
+          res.data.orderNo,
+        );
+      }
+
+      if (res?.data?.orderFile) {
+        setFileUrl(res.data.orderFile);
+
+        setInitialFileData({
+          fileName: res.data.orderFile?.split("/")?.pop() || "",
+
+          fileUrl: res.data.orderFile,
+        });
+      }
+
+      setInitialData(getValues());
+
+      setIsEditing(false);
+
+      setAllowSubmit(true);
+
+      toast.success(
+        "Draft saved successfully",
+
+        {
+          id: toastId,
+        },
+      );
+    } catch (err) {
+      toast.error(
+        err.message || "Failed to save draft",
+
+        {
+          id: toastId,
+        },
+      );
+    }
+  };
+
+  // SUBMIT
+
+  const onSubmit = async () => {
+    if (!items.length) {
+      toast.error("Please add at least one item");
 
       return;
     }
 
-    const fetchOrder =
-      async () => {
+    let toastId;
 
-        try {
+    try {
+      toastId = toast.loading("Submitting order...");
 
-          setLoading(
-            true,
-          );
+      await apiRequest({
+        url: `${API_ENDPOINTS.RESOURCE.ORDER.SUBMIT_ORDER_BY_ID}${orderId}`,
 
-          const res =
-            await apiRequest({
+        method: "POST",
+      });
 
-              url:
-                `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}${orderId}`,
+      toast.success(
+        "Order submitted successfully",
 
-              method:
-                "GET",
-            });
-
-          const data =
-            res.data;
-
-          const formattedData = {
-
-            categoryCode:
-              data.categoryCode || "Purchases",
-
-            subCategoryCode:
-              data.subCategoryCode || "",
-
-            vendorId:
-              data.vendorId || "",
-
-            orderNo:
-              data.orderNo || "",
-
-            orderDate:
-              data.orderDate || "",
-
-            validityDate:
-              data.validityDate || "",
-
-            partyAddress:
-              data.partyAddress || "",
-
-            gstn:
-              data.gstn || "",
-
-            site:
-              data.site || "",
-
-            billingAddress:
-              data.billingAddress || "",
-
-            shippingAddress:
-              data.shippingAddress || "",
-
-            orderMessage:
-              data.orderMessage || "",
-
-            gstType:
-              data.gstType || "",
-
-            items:
-              data.items || [],
-
-            terms:
-              data.terms || [],
-
-            summary:
-              data.summary || {
-
-                basicAmount: 0,
-
-                gstAmount: 0,
-
-                totalAmount: 0,
-              },
-          };
-
-          reset(
-            formattedData,
-          );
-
-          setInitialData(
-            formattedData,
-          );
-
-          setFileUrl(
-            data.orderFile ||
-              "",
-          );
-
-          const extractedFileName =
-            data.orderFile
-              ?.split("/")
-              ?.pop() || "";
-
-          setInitialFileData({
-
-            fileName:
-              extractedFileName,
-
-            fileUrl:
-              data.orderFile ||
-              "",
-          });
-
-          if (
-
-            data.orderStatus !==
-              "Reback" &&
-
-            data.orderStatus !==
-              "Draft" &&
-
-            mode === "edit"
-          ) {
-
-            setIsSubmitted(
-              true,
-            );
-
-            setIsEditing(
-              false,
-            );
-
-          } else {
-
-            setIsEditing(
-              false,
-            );
-
-            setAllowSubmit(
-              true,
-            );
-          }
-
-        } catch (err) {
-
-          toast.error(
-            err.message ||
-              "Failed to load order",
-          );
-
-        } finally {
-
-          setLoading(
-            false,
-          );
-        }
-      };
-
-    fetchOrder();
-
-  }, [
-    orderId,
-    mode,
-    reset,
-  ]);
-
-  // BUILD FORM DATA
-
-  const buildFormData =
-    () => {
-
-      const values =
-        getValues();
-
-      const formData =
-        new FormData();
-
-      formData.append(
-        "projectCode",
-        projectCode,
+        {
+          id: toastId,
+        },
       );
 
-      formData.append(
-        "categoryCode",
-        values.categoryCode,
+      setIsSubmitted(true);
+
+      setIsEditing(false);
+
+      setAllowSubmit(false);
+    } catch (err) {
+      toast.error(
+        err.message || "Failed to submit order",
+
+        {
+          id: toastId,
+        },
       );
-
-      formData.append(
-        "subCategoryCode",
-        values.subCategoryCode,
-      );
-
-      formData.append(
-        "vendorId",
-        values.vendorId,
-      );
-
-      formData.append(
-        "orderDate",
-        values.orderDate,
-      );
-
-      formData.append(
-        "validityDate",
-        values.validityDate,
-      );
-
-      formData.append(
-        "billingAddress",
-        values.billingAddress,
-      );
-
-      formData.append(
-        "shippingAddress",
-        values.shippingAddress,
-      );
-
-      formData.append(
-        "orderMessage",
-        values.orderMessage?.trim(),
-      );
-
-      formData.append(
-
-        "items",
-
-        JSON.stringify(
-
-          values.items.map(
-            (
-              item,
-            ) => ({
-
-              indentItemId:
-                item.indentItemId,
-
-              qty:
-                Number(
-                  item.qty,
-                ),
-
-              rate:
-                Number(
-                  item.rate,
-                ),
-
-              gstPercent:
-                Number(
-                  item.gstPercent,
-                ),
-            }),
-          ),
-        ),
-      );
-
-      formData.append(
-
-        "terms",
-
-        JSON.stringify(
-
-          values.terms.map(
-            (
-              term,
-            ) =>
-              term.termId,
-          ),
-        ),
-      );
-
-      if (
-        attachedFile
-      ) {
-
-        formData.append(
-          "orderFile",
-          attachedFile,
-        );
-      }
-
-      return formData;
-    };
-
-  // SAVE DRAFT
-
-  const handleSaveDraft =
-    async () => {
-
-      let toastId;
-
-      try {
-
-        toastId =
-          toast.loading(
-            mode === "create"
-              ? "Creating order..."
-              : "Updating order...",
-          );
-
-        const payload =
-          buildFormData();
-
-        const res =
-          await apiRequest({
-
-            url:
-
-              mode ===
-              "create"
-
-                ? API_ENDPOINTS
-                    .RESOURCE
-                    .ORDER
-                    .CREATE_ORDER
-
-                : `${API_ENDPOINTS.RESOURCE.ORDER.UPDATE_ORDER_BY_ID}${orderId}`,
-
-            method:
-
-              mode ===
-              "create"
-
-                ? "POST"
-
-                : "PUT",
-
-            data:
-              payload,
-          });
-
-        if (
-          res?.data?.orderNo
-        ) {
-
-          setValue(
-            "orderNo",
-
-            res.data.orderNo,
-          );
-        }
-
-        if (
-          res?.data?.orderFile
-        ) {
-
-          setFileUrl(
-            res.data.orderFile,
-          );
-
-          setInitialFileData({
-
-            fileName:
-              res.data.orderFile
-                ?.split("/")
-                ?.pop() || "",
-
-            fileUrl:
-              res.data.orderFile,
-          });
-        }
-
-        setInitialData(
-          getValues(),
-        );
-
-        setIsEditing(
-          false,
-        );
-
-        setAllowSubmit(
-          true,
-        );
-
-        toast.success(
-          "Draft saved successfully",
-
-          {
-            id: toastId,
-          },
-        );
-
-      } catch (err) {
-
-        toast.error(
-
-          err.message ||
-            "Failed to save draft",
-
-          {
-            id: toastId,
-          },
-        );
-      }
-    };
-
-  // SUBMIT
-
-  const onSubmit =
-    async () => {
-
-      if (
-        !items.length
-      ) {
-
-        toast.error(
-          "Please add at least one item",
-        );
-
-        return;
-      }
-
-      let toastId;
-
-      try {
-
-        toastId =
-          toast.loading(
-            "Submitting order...",
-          );
-
-        await apiRequest({
-
-          url:
-            `${API_ENDPOINTS.RESOURCE.ORDER.SUBMIT_ORDER_BY_ID}${orderId}`,
-
-          method:
-            "POST",
-        });
-
-        toast.success(
-          "Order submitted successfully",
-
-          {
-            id: toastId,
-          },
-        );
-
-        setIsSubmitted(
-          true,
-        );
-
-        setIsEditing(
-          false,
-        );
-
-        setAllowSubmit(
-          false,
-        );
-
-      } catch (err) {
-
-        toast.error(
-
-          err.message ||
-            "Failed to submit order",
-
-          {
-            id: toastId,
-          },
-        );
-      }
-    };
+    }
+  };
 
   // EDIT / CANCEL
 
-  const handleEdit =
-    () => {
+  const handleEdit = () => {
+    // CANCEL
 
-      // CANCEL
-
-      if (
-        isEditing
-      ) {
-
-        if (
-          initialData
-        ) {
-
-          reset(
-            initialData,
-          );
-        }
-
-        setAttachedFile(
-          null,
-        );
-
-        setFileUrl(
-          initialFileData.fileUrl,
-        );
-
-        setFileName(
-          "",
-        );
-
-        if (
-          fileRef.current
-        ) {
-
-          fileRef.current.value =
-            "";
-        }
-
-        setIsEditing(
-          false,
-        );
-
-        setAllowSubmit(
-          true,
-        );
-
-        return;
+    if (isEditing) {
+      if (initialData) {
+        reset(initialData);
       }
 
-      // EDIT
+      setAttachedFile(null);
 
-      setIsEditing(
-        true,
-      );
+      setFileUrl(initialFileData.fileUrl);
 
-      setAllowSubmit(
-        false,
-      );
-    };
+      setFileName("");
+
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
+
+      setIsEditing(false);
+
+      setAllowSubmit(true);
+
+      return;
+    }
+
+    // EDIT
+
+    setIsEditing(true);
+
+    setAllowSubmit(false);
+  };
 
   // LOADING
 
-  if (
-    loading
-  ) {
-
+  if (loading) {
     return (
-
       <div
         className="
           h-[300px]
@@ -768,7 +468,6 @@ export default function OrderForm({
           justify-center
         "
       >
-
         <Loader2
           className="
             w-6
@@ -776,181 +475,716 @@ export default function OrderForm({
             animate-spin
           "
         />
-
       </div>
     );
   }
 
-  return (
+  //   return (
+  //     <div
+  //       className="
+  //         p-3
+  //         space-y-4
+  //       "
+  //     >
+  //       {/* BASIC */}
 
+  //       <OrderBasicSection
+  //         form={form}
+  //         disabled={disabled}
+  //         fileName={fileName}
+  //         setFileName={setFileName}
+  //         fileUrl={fileUrl}
+  //         setFileUrl={setFileUrl}
+  //         attachedFile={attachedFile}
+  //         setAttachedFile={setAttachedFile}
+  //         fileRef={fileRef}
+  //       />
+
+  //       {/* TABS */}
+
+  //       <Tabs value={activeTab} onValueChange={setActiveTab}>
+  //         <div
+  //           className="
+  //     flex
+  //     items-center
+  //     justify-between
+
+  //     mb-1
+  //   "
+  //         >
+  //           {/* LEFT TABS */}
+
+  //           <TabsList
+  //   className="
+  //     h-auto
+
+  //     bg-transparent
+
+  //     p-0
+
+  //     gap-[2px]
+
+  //     rounded-none
+
+  //     border-0
+
+  //     shadow-none
+  //   "
+  // >
+
+  //   {/* SUMMARY */}
+
+  //   <TabsTrigger
+
+  //     value="summary"
+
+  //     className="
+  //       relative
+
+  //       h-[40px]
+
+  //       min-w-[125px]
+
+  //       rounded-none
+
+  //       border
+  //       border-[#5B6B8C]
+
+  //       border-b-0
+
+  //       bg-[#E5E5E5]
+
+  //       px-5
+
+  //       text-[15px]
+  //       font-semibold
+  //       text-black
+
+  //       data-[state=active]:bg-[#F4C400]
+
+  //       data-[state=active]:shadow-none
+
+  //       transition-none
+  //     "
+  //     style={{
+
+  //       clipPath:
+  //         "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
+  //     }}
+  //   >
+
+  //     Summary
+
+  //   </TabsTrigger>
+
+  //   {/* DETAILS */}
+
+  //   <TabsTrigger
+
+  //     value="items"
+
+  //     className="
+  //       relative
+
+  //       h-[40px]
+
+  //       min-w-[125px]
+
+  //       rounded-none
+
+  //       border
+  //       border-[#5B6B8C]
+
+  //       border-b-0
+
+  //       bg-[#E5E5E5]
+
+  //       px-5
+
+  //       text-[15px]
+  //       font-semibold
+  //       text-black
+
+  //       data-[state=active]:bg-[#F4C400]
+
+  //       data-[state=active]:shadow-none
+
+  //       transition-none
+  //     "
+  //     style={{
+
+  //       clipPath:
+  //         "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
+  //     }}
+  //   >
+
+  //     Details
+
+  //   </TabsTrigger>
+
+  //   {/* TERMS */}
+
+  //   <TabsTrigger
+
+  //     value="terms"
+
+  //     className="
+  //       relative
+
+  //       h-[40px]
+
+  //       min-w-[220px]
+
+  //       rounded-none
+
+  //       border
+  //       border-[#5B6B8C]
+
+  //       border-b-0
+
+  //       bg-[#E5E5E5]
+
+  //       px-5
+
+  //       text-[15px]
+  //       font-semibold
+  //       text-black
+
+  //       data-[state=active]:bg-[#F4C400]
+
+  //       data-[state=active]:shadow-none
+
+  //       transition-none
+  //     "
+  //     style={{
+
+  //       clipPath:
+  //         "polygon(0 0, 92% 0, 100% 100%, 0% 100%)",
+  //     }}
+  //   >
+
+  //     Terms & Conditions
+
+  //   </TabsTrigger>
+
+  // </TabsList>
+
+  //           {/* RIGHT ACTION BUTTONS */}
+
+  //           <div
+  //             className="
+  //       flex
+  //       items-center
+  //       gap-2
+  //     "
+  //           >
+  //             {/* ITEMS BUTTON */}
+
+  //             {activeTab === "items" && !disabled && (
+  //               <button
+  //                 type="button"
+  //                 onClick={() => setOpenItemModal(true)}
+  //                 className="
+  //           h-[34px]
+
+  //           min-w-[170px]
+
+  //           px-4
+
+  //           bg-[#9F96F2]
+
+  //           border
+  //           border-[#5D58A5]
+
+  //           rounded-md
+
+  //           text-black
+  //           text-sm
+  //           font-medium
+
+  //           flex
+  //           items-center
+  //           justify-center
+  //           gap-1
+
+  //           hover:opacity-90
+  //           transition
+  //         "
+  //               >
+  //                 + Add Order Items
+  //               </button>
+  //             )}
+
+  //             {/* TERMS BUTTON */}
+
+  //             {activeTab === "terms" && !disabled && (
+  //               <button
+  //                 type="button"
+  //                 onClick={() => setOpenTermsModal(true)}
+  //                 className="
+  //           h-[34px]
+
+  //           min-w-[150px]
+
+  //           px-4
+
+  //           bg-[#9F96F2]
+
+  //           border
+  //           border-[#5D58A5]
+
+  //           rounded-md
+
+  //           text-black
+  //           text-sm
+  //           font-medium
+
+  //           flex
+  //           items-center
+  //           justify-center
+  //           gap-1
+
+  //           hover:opacity-90
+  //           transition
+  //         "
+  //               >
+  //                 + Add T&C
+  //               </button>
+  //             )}
+  //           </div>
+  //         </div>
+
+  //         {/* ITEMS */}
+
+  //         <TabsContent value="items">
+  //           <OrderItemsTab
+  //             form={form}
+  //             disabled={disabled}
+  //             openItemModal={openItemModal}
+  //             setOpenItemModal={setOpenItemModal}
+  //           />
+  //         </TabsContent>
+
+  //         {/* TERMS */}
+
+  //         <TabsContent value="terms">
+  //           <OrderTermsTab
+  //             form={form}
+  //             disabled={disabled}
+  //             openTermsModal={openTermsModal}
+  //             setOpenTermsModal={setOpenTermsModal}
+  //           />
+  //         </TabsContent>
+
+  //         {/* SUMMARY */}
+
+  //         <TabsContent value="summary">
+  //           <OrderSummaryTab form={form} disabled={disabled} />
+  //         </TabsContent>
+  //       </Tabs>
+
+  //       {/* FOOTER */}
+
+  //       {mode !== "view" && mode !== "approver" && (
+  //         <div
+  //           className="
+  //             flex
+  //             justify-end
+  //             gap-3
+  //           "
+  //         >
+  //           {/* SAVE DRAFT */}
+
+  //           {((mode === "create" && isEditing) ||
+  //             (mode === "edit" && isEditing && !isSubmitted)) && (
+  //             <SaveDraftButton
+  //               onClick={() => handleSubmit(handleSaveDraft)()}
+  //               loading={isSubmitting}
+  //               disabled={isSubmitting}
+  //               requireConfirmation
+  //             />
+  //           )}
+
+  //           {/* SUBMIT */}
+
+  //           <SaveButton
+  //             onClick={() => handleSubmit(onSubmit)()}
+  //             loading={isSubmitting}
+  //             disabled={
+  //               !allowSubmit ||
+  //               isEditing ||
+  //               isSubmitted ||
+  //               !items.length ||
+  //               isSubmitting
+  //             }
+  //             requireConfirmation
+  //             confirmationTitle="Submit Order?"
+  //             confirmationMessage="Once submitted, this order will go for approval."
+  //           >
+  //             Submit
+  //           </SaveButton>
+
+  //           {/* EDIT */}
+
+  //           {mode === "edit" && !isSubmitted && (
+  //             <EditButton onClick={handleEdit} disabled={isSubmitting}>
+  //               {isEditing ? "Cancel" : "Edit"}
+  //             </EditButton>
+  //           )}
+  //         </div>
+  //       )}
+  //     </div>
+  //   );
+  return (
     <div
       className="
-        p-3
-        space-y-4
-      "
+      p-3
+    "
     >
+      {/* MAIN ERP LAYOUT */}
 
-      {/* BASIC */}
-
-      <OrderBasicSection
-
-        form={form}
-
-        disabled={
-          disabled
-        }
-
-        fileName={
-          fileName
-        }
-
-        setFileName={
-          setFileName
-        }
-
-        fileUrl={
-          fileUrl
-        }
-
-        setFileUrl={
-          setFileUrl
-        }
-
-        attachedFile={
-          attachedFile
-        }
-
-        setAttachedFile={
-          setAttachedFile
-        }
-
-        fileRef={
-          fileRef
-        }
-      />
-
-      {/* TABS */}
-
-      <Tabs
-
-        value={
-          activeTab
-        }
-
-        onValueChange={
-          setActiveTab
-        }
+      <div
+        className="
+        flex
+        items-start
+        gap-5
+      "
       >
-
-        <TabsList>
-
-          <TabsTrigger value="items">
-            Items
-          </TabsTrigger>
-
-          <TabsTrigger value="terms">
-            Terms & Conditions
-          </TabsTrigger>
-
-          <TabsTrigger value="summary">
-            Summary
-          </TabsTrigger>
-
-        </TabsList>
-
-        {/* ITEMS */}
-
-        <TabsContent value="items">
-
-          <OrderItemsTab
-
-            form={form}
-
-            disabled={
-              disabled
-            }
-          />
-
-        </TabsContent>
-
-        {/* TERMS */}
-
-        <TabsContent value="terms">
-
-          <OrderTermsTab
-
-            form={form}
-
-            disabled={
-              disabled
-            }
-          />
-
-        </TabsContent>
-
-        {/* SUMMARY */}
-
-        <TabsContent value="summary">
-
-          <OrderSummaryTab
-
-            form={form}
-
-            disabled={
-              disabled
-            }
-          />
-
-        </TabsContent>
-
-      </Tabs>
-
-      {/* FOOTER */}
-
-      {(mode !==
-        "view" &&
-
-        mode !==
-          "approver") && (
+        {/* LEFT SECTION */}
 
         <div
           className="
-            flex
-            justify-end
-            gap-3
-          "
+          w-[470px]
+          shrink-0
+        "
         >
+          <OrderBasicSection
+            form={form}
+            disabled={disabled}
+            fileName={fileName}
+            setFileName={setFileName}
+            fileUrl={fileUrl}
+            setFileUrl={setFileUrl}
+            attachedFile={attachedFile}
+            setAttachedFile={setAttachedFile}
+            fileRef={fileRef}
+          />
+        </div>
 
+        {/* ERP SEPARATOR */}
+
+        <div
+          className="
+          w-px
+          self-stretch
+          bg-[#BEBEBE]
+        "
+        />
+
+        {/* RIGHT SECTION */}
+
+        <div
+          className="
+          flex-1
+          min-w-0
+        "
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            {/* TOP BAR */}
+
+            <div
+              className="
+              flex
+              items-end
+              justify-between
+
+              mb-[2px]
+            "
+            >
+              {/* LEFT TABS */}
+
+              <TabsList
+                className="
+                h-auto
+
+                bg-transparent
+
+                p-0
+
+                gap-[2px]
+
+                rounded-none
+
+                border-0
+
+                shadow-none
+              "
+              >
+                {/* SUMMARY */}
+
+                <TabsTrigger
+                  value="summary"
+                  className="
+                  relative
+
+                  h-[40px]
+
+                  min-w-[125px]
+
+                  rounded-none
+
+                  border
+                  border-[#5B6B8C]
+
+                  border-b-0
+
+                  bg-[#E5E5E5]
+
+                  px-5
+
+                  text-[15px]
+                  font-semibold
+                  text-black
+
+                  data-[state=active]:bg-[#F4C400]
+
+                  data-[state=active]:shadow-none
+
+                  transition-none
+                "
+                  style={{
+                    clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
+                  }}
+                >
+                  Summary
+                </TabsTrigger>
+
+                {/* DETAILS */}
+
+                <TabsTrigger
+                  value="items"
+                  className="
+                  relative
+
+                  h-[40px]
+
+                  min-w-[125px]
+
+                  rounded-none
+
+                  border
+                  border-[#5B6B8C]
+
+                  border-b-0
+
+                  bg-[#E5E5E5]
+
+                  px-5
+
+                  text-[15px]
+                  font-semibold
+                  text-black
+
+                  data-[state=active]:bg-[#F4C400]
+
+                  data-[state=active]:shadow-none
+
+                  transition-none
+                "
+                  style={{
+                    clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
+                  }}
+                >
+                  Details
+                </TabsTrigger>
+
+                {/* TERMS */}
+
+                <TabsTrigger
+                  value="terms"
+                  className="
+                  relative
+
+                  h-[40px]
+
+                  min-w-[220px]
+
+                  rounded-none
+
+                  border
+                  border-[#5B6B8C]
+
+                  border-b-0
+
+                  bg-[#E5E5E5]
+
+                  px-5
+
+                  text-[15px]
+                  font-semibold
+                  text-black
+
+                  data-[state=active]:bg-[#F4C400]
+
+                  data-[state=active]:shadow-none
+
+                  transition-none
+                "
+                  style={{
+                    clipPath: "polygon(0 0, 92% 0, 100% 100%, 0% 100%)",
+                  }}
+                >
+                  Terms & Conditions
+                </TabsTrigger>
+              </TabsList>
+
+              {/* RIGHT ACTION BUTTONS */}
+
+              <div
+                className="
+                flex
+                items-center
+                gap-2
+
+                mb-[2px]
+              "
+              >
+                {/* ITEMS BUTTON */}
+
+                {activeTab === "items" && !disabled && (
+                  <button
+                    type="button"
+                    onClick={() => setOpenItemModal(true)}
+                    className="
+                    h-[34px]
+
+                    min-w-[170px]
+
+                    px-4
+
+                    bg-[#9F96F2]
+
+                    border
+                    border-[#5D58A5]
+
+                    rounded-md
+
+                    text-black
+                    text-sm
+                    font-medium
+
+                    flex
+                    items-center
+                    justify-center
+
+                    hover:opacity-90
+                    transition
+                  "
+                  >
+                    + Add Order Items
+                  </button>
+                )}
+
+                {/* TERMS BUTTON */}
+
+                {activeTab === "terms" && !disabled && (
+                  <button
+                    type="button"
+                    onClick={() => setOpenTermsModal(true)}
+                    className="
+                    h-[34px]
+
+                    min-w-[150px]
+
+                    px-4
+
+                    bg-[#9F96F2]
+
+                    border
+                    border-[#5D58A5]
+
+                    rounded-md
+
+                    text-black
+                    text-sm
+                    font-medium
+
+                    flex
+                    items-center
+                    justify-center
+
+                    hover:opacity-90
+                    transition
+                  "
+                  >
+                    + Add T&C
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* TAB CONTENT */}
+
+            <div
+              className="
+              border
+              border-[#CFCFCF]
+
+              bg-white
+            "
+            >
+              {/* ITEMS */}
+
+              <TabsContent value="items" className="m-0">
+                <OrderItemsTab
+                  form={form}
+                  disabled={disabled}
+                  openItemModal={openItemModal}
+                  setOpenItemModal={setOpenItemModal}
+                />
+              </TabsContent>
+
+              {/* TERMS */}
+
+              <TabsContent value="terms" className="m-0">
+                <OrderTermsTab
+                  form={form}
+                  disabled={disabled}
+                  openTermsModal={openTermsModal}
+                  setOpenTermsModal={setOpenTermsModal}
+                />
+              </TabsContent>
+
+              {/* SUMMARY */}
+
+              <TabsContent value="summary" className="m-0">
+                <OrderSummaryTab form={form} disabled={disabled} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+
+      {mode !== "view" && mode !== "approver" && (
+        <div
+          className="
+          flex
+          justify-end
+          gap-3
+
+          mt-5
+        "
+        >
           {/* SAVE DRAFT */}
 
-          {((mode ===
-            "create" &&
-
-            isEditing) ||
-
-            (mode ===
-              "edit" &&
-
-              isEditing &&
-
-              !isSubmitted)) && (
-
+          {((mode === "create" && isEditing) ||
+            (mode === "edit" && isEditing && !isSubmitted)) && (
             <SaveDraftButton
-
-              onClick={() =>
-                handleSubmit(
-                  handleSaveDraft,
-                )()
-              }
-
-              loading={
-                isSubmitting
-              }
-
-              disabled={
-                isSubmitting
-              }
-
+              onClick={() => handleSubmit(handleSaveDraft)()}
+              loading={isSubmitting}
+              disabled={isSubmitting}
               requireConfirmation
             />
           )}
@@ -958,69 +1192,160 @@ export default function OrderForm({
           {/* SUBMIT */}
 
           <SaveButton
-
-            onClick={() =>
-              handleSubmit(
-                onSubmit,
-              )()
-            }
-
-            loading={
-              isSubmitting
-            }
-
+            onClick={() => handleSubmit(onSubmit)()}
+            loading={isSubmitting}
             disabled={
-
               !allowSubmit ||
-
               isEditing ||
-
               isSubmitted ||
-
               !items.length ||
-
               isSubmitting
             }
-
             requireConfirmation
-
             confirmationTitle="Submit Order?"
-
             confirmationMessage="Once submitted, this order will go for approval."
           >
-
             Submit
-
           </SaveButton>
 
           {/* EDIT */}
 
-          {mode ===
-            "edit" &&
-
-            !isSubmitted && (
-
-            <EditButton
-
-              onClick={
-                handleEdit
-              }
-
-              disabled={
-                isSubmitting
-              }
-            >
-
-              {isEditing
-                ? "Cancel"
-                : "Edit"}
-
+          {mode === "edit" && !isSubmitted && (
+            <EditButton onClick={handleEdit} disabled={isSubmitting}>
+              {isEditing ? "Cancel" : "Edit"}
             </EditButton>
           )}
-
         </div>
       )}
-
     </div>
   );
+}
+
+{
+  /* <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div
+          className="
+    flex
+    items-center
+    justify-between
+
+    mb-1
+  "
+        >
+
+          <TabsList>
+            <TabsTrigger value="items">Details</TabsTrigger>
+
+            <TabsTrigger value="terms">Terms & Conditions</TabsTrigger>
+
+            <TabsTrigger value="summary">Summary</TabsTrigger>
+          </TabsList>
+
+
+          <div
+            className="
+      flex
+      items-center
+      gap-2
+    "
+          >
+
+            {activeTab === "items" && !disabled && (
+              <button
+                type="button"
+                onClick={() => setOpenItemModal(true)}
+                className="
+          h-[34px]
+
+          min-w-[170px]
+
+          px-4
+
+          bg-[#9F96F2]
+
+          border
+          border-[#5D58A5]
+
+          rounded-md
+
+          text-black
+          text-sm
+          font-medium
+
+          flex
+          items-center
+          justify-center
+          gap-1
+
+          hover:opacity-90
+          transition
+        "
+              >
+                + Add Order Items
+              </button>
+            )}
+
+
+            {activeTab === "terms" && !disabled && (
+              <button
+                type="button"
+                onClick={() => setOpenTermsModal(true)}
+                className="
+          h-[34px]
+
+          min-w-[150px]
+
+          px-4
+
+          bg-[#9F96F2]
+
+          border
+          border-[#5D58A5]
+
+          rounded-md
+
+          text-black
+          text-sm
+          font-medium
+
+          flex
+          items-center
+          justify-center
+          gap-1
+
+          hover:opacity-90
+          transition
+        "
+              >
+                + Add T&C
+              </button>
+            )}
+          </div>
+        </div>
+
+
+        <TabsContent value="items">
+          <OrderItemsTab
+            form={form}
+            disabled={disabled}
+            openItemModal={openItemModal}
+            setOpenItemModal={setOpenItemModal}
+          />
+        </TabsContent>
+
+
+        <TabsContent value="terms">
+          <OrderTermsTab
+            form={form}
+            disabled={disabled}
+            openTermsModal={openTermsModal}
+            setOpenTermsModal={setOpenTermsModal}
+          />
+        </TabsContent>
+
+
+        <TabsContent value="summary">
+          <OrderSummaryTab form={form} disabled={disabled} />
+        </TabsContent>
+      </Tabs> */
 }
