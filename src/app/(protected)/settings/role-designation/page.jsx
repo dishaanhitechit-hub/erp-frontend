@@ -44,6 +44,8 @@ export default function ProjectRolePage() {
 
   const [permissions, setPermissions] = useState({});
   const [selectedRole, setSelectedRole] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const inputClass =
     "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm";
@@ -217,10 +219,41 @@ export default function ProjectRolePage() {
   };
 
   // DELETE
-  const handleDeleteDesignation = (item) => {
-    console.log("Delete designation:", item);
+  const handleDeleteDesignation = async () => {
+    if (!deleteItem) return;
 
-    toast.warning(`Delete designation: ${item.designationName}`);
+    let toastId;
+
+    try {
+      setDeleteLoading(true);
+
+      toastId = toast.loading("Deleting...");
+
+      await apiRequest({
+        url: API_ENDPOINTS.SETTINGS.DELETE_ROLE,
+        method: "DELETE",
+        data: {
+          ProjectId: projectId,
+          TeamId: deleteItem.teamId,
+          DesignationId: deleteItem.designationId,
+        },
+      });
+
+      toast.success("Designation deleted successfully", {
+        id: toastId,
+      });
+
+      setDeleteItem(null);
+
+      // REFRESH DATA
+      handleSearch();
+    } catch (err) {
+      toast.error(err.message || "Failed to delete designation", {
+        id: toastId,
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   // handle Permissions
@@ -385,7 +418,8 @@ export default function ProjectRolePage() {
               {/* DELETE BUTTON */}
               <button
                 type="button"
-                onClick={() => handleDeleteDesignation(item)}
+                // onClick={() => handleDeleteDesignation(item)}
+                onClick={() => setDeleteItem(item)}
                 className="border rounded-sm p-1 hover:bg-red-100 transition"
               >
                 <Trash2 size={16} />
@@ -549,6 +583,50 @@ export default function ProjectRolePage() {
           onSave={handlePermissionSave}
         />
       </div>
+      <Dialog
+        open={!!deleteItem}
+        onOpenChange={(v) => {
+          if (!deleteLoading && !v) {
+            setDeleteItem(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Designation</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-black">
+                {deleteItem?.designationName}
+              </span>
+              ?
+            </p>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => setDeleteItem(null)}
+                className="border px-4 py-2 rounded-md text-sm"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={handleDeleteDesignation}
+                className="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-600"
+              >
+                {deleteLoading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
