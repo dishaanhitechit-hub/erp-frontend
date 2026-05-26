@@ -13,6 +13,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { getPageAccess } from "@/helper/getPageAccess";
 import PageNotAvailable from "@/components/common/PageNotAvailable";
+import { getLocalStorage } from "@/lib/localStorage";
 
 export default function Page() {
   const router = useRouter();
@@ -24,13 +25,22 @@ export default function Page() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [projectCode, setProjectCode] = useState("");
+
+  useEffect(() => {
+    const projectInfo = getLocalStorage("projectInfo") || {};
+    setProjectCode(projectInfo?.projectCode || "");
+  }, []);
 
   //  INITIAL LOAD
   useEffect(() => {
+    if (!projectCode) {
+      return;
+    };
     const fetchIndents = async () => {
       try {
         const res = await apiRequest({
-          url: API_ENDPOINTS.RESOURCE.INDENT.GET_ALL_INDENT,
+          url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_ALL_INDENT}?projectCode=${projectCode}`,
           method: "GET",
         });
 
@@ -64,7 +74,7 @@ export default function Page() {
     };
 
     fetchIndents();
-  }, []);
+  }, [projectCode]);
 
   // SEARCH HANDLER
   const handleSearch = ({ search, from, to }) => {

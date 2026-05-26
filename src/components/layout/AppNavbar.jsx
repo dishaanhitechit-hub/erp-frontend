@@ -23,10 +23,10 @@ export default function AppNavbar() {
   const router = useRouter();
   const [tcode, setTcode] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [showProjectSelect, setShowProjectSelect] = useState(false);
-  const [projectList, setProjectList] = useState([]);
-  const [loadingProjects, setLoadingProjects] = useState(false);
-  const projectRef = useRef(null);
+  // const [showProjectSelect, setShowProjectSelect] = useState(false);
+  // const [projectList, setProjectList] = useState([]);
+  // const [loadingProjects, setLoadingProjects] = useState(false);
+  // const projectRef = useRef(null);
   const profileRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
   const [role, setRole] = useState("");
@@ -69,23 +69,23 @@ export default function AppNavbar() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (projectRef.current && !projectRef.current.contains(e.target)) {
-        setShowProjectSelect(false);
-      }
+  // useEffect(() => {
+  //   const handleOutsideClick = (e) => {
+  //     if (projectRef.current && !projectRef.current.contains(e.target)) {
+  //       setShowProjectSelect(false);
+  //     }
 
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setShowProfile(false);
-      }
-    };
+  //     if (profileRef.current && !profileRef.current.contains(e.target)) {
+  //       setShowProfile(false);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+  //   document.addEventListener("mousedown", handleOutsideClick);
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleOutsideClick);
+  //   };
+  // }, []);
 
   const handleTCodeNavigate = () => {
     const route = tcodeConfig[tcode.toLowerCase().trim()];
@@ -97,38 +97,38 @@ export default function AppNavbar() {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      setLoadingProjects(true);
+  // const fetchProjects = async () => {
+  //   try {
+  //     setLoadingProjects(true);
 
-      const res = await apiRequest({
-        url: API_ENDPOINTS.SETTINGS.GET_ALL_PROJECTS,
-      });
+  //     const res = await apiRequest({
+  //       url: API_ENDPOINTS.SETTINGS.GET_ALL_PROJECTS,
+  //     });
 
-      setProjectList(res.data || []);
-    } catch (err) {
-      toast.error(err.message || "Failed to fetch projects");
-    } finally {
-      setLoadingProjects(false);
-    }
-  };
+  //     setProjectList(res.data || []);
+  //   } catch (err) {
+  //     toast.error(err.message || "Failed to fetch projects");
+  //   } finally {
+  //     setLoadingProjects(false);
+  //   }
+  // };
 
-  const handleProjectSelect = (value, item) => {
-    const projectData = {
-      projectId: item.id,
-      projectCode: item.projectCode,
-      projectName: item.projectName,
-      clientName: item.clientName,
-    };
+  // const handleProjectSelect = (value, item) => {
+  //   const projectData = {
+  //     projectId: item.id,
+  //     projectCode: item.projectCode,
+  //     projectName: item.projectName,
+  //     clientName: item.clientName,
+  //   };
 
-    setProjectInfo(projectData);
+  //   setProjectInfo(projectData);
 
-    setLocalStorage("projectInfo", JSON.stringify(projectData));
+  //   setLocalStorage("projectInfo", JSON.stringify(projectData));
 
-    setShowProjectSelect(false);
+  //   setShowProjectSelect(false);
 
-    toast.success("Project Selected");
-  };
+  //   toast.success("Project Selected");
+  // };
 
   const handleLogout = () => {
     clearAuthCookies();
@@ -212,20 +212,21 @@ export default function AppNavbar() {
                 />
               </button>
               <div
-                ref={projectRef}
+                // ref={projectRef}
                 className="relative flex items-center h-[32px]"
               >
                 <button
                   className="cursor-pointer flex items-center justify-center h-[32px]"
-                  onClick={async () => {
-                    const nextState = !showProjectSelect;
+                  // onClick={async () => {
+                  //   const nextState = !showProjectSelect;
 
-                    setShowProjectSelect(nextState);
+                  //   setShowProjectSelect(nextState);
 
-                    if (nextState && projectList.length === 0) {
-                      await fetchProjects();
-                    }
-                  }}
+                  //   if (nextState && projectList.length === 0) {
+                  //     await fetchProjects();
+                  //   }
+                  // }}
+                  onClick={() => router.push("/")}
                 >
                   <Image
                     src="/assets/icons/project-list.png"
@@ -235,7 +236,7 @@ export default function AppNavbar() {
                   />
                 </button>
 
-                {showProjectSelect && (
+                {/* {showProjectSelect && (
                   <div
                     className="
                               absolute
@@ -259,7 +260,7 @@ export default function AppNavbar() {
                       searchKeys={["projectName", "projectCode"]}
                     />
                   </div>
-                )}
+                )} */}
               </div>
             </div>
 

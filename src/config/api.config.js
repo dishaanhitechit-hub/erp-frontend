@@ -76,7 +76,21 @@ export const API_ENDPOINTS = {
             REJECT:"/resource/indent/reject",//indenId POST
             DELETE:"/resource/indent/delete",//indentId DELETE
             HISTORY:"/resource/indent/history",//indentId GET
-        }
+        },
+        ORDER:{
+            GET_ALL_ORDER:"/resource/order/list",
+            CREATE_ORDER:"/resource/order/create",
+            GET_ORDER_BY_ID:"/resource/order/",//id
+            UPDATE_ORDER_BY_ID:"/resource/order/update/",//id ,put
+            SUBMIT_ORDER_BY_ID:"/resource/order/submit/",//id ,post    
+            GET_ITEMS_BY_CATEGORY:"/resource/order/items-by-category",//?categoryCode=CAT001 get
+            APPROVE:"/resource/order/approve",//orderId POST
+            REBACK:"/resource/order/reback",//orderId POST
+            REJECT:"/resource/order/reject",//orderId POST
+            DELETE:"/resource/order/delete",//orderId DELETE
+            HISTORY:"/resource/order/history",//orderId GET
+        },
+
     }
     
 };

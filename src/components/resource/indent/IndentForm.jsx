@@ -377,7 +377,6 @@ export default function IndentForm({
 
       const res = await apiRequest({
         url: `${API_ENDPOINTS.RESOURCE.INDENT.SUBMIT_INDENT_BY_ID}${indentId}`,
-
         method: "POST",
       });
 
