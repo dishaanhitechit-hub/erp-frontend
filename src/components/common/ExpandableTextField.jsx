@@ -32,6 +32,8 @@ export default function ExpandableTextField({
   minHeight = "min-h-[42px]",
 
   modalHeight = "min-h-[180px]",
+
+  className = "",
 }) {
 
   const [open, setOpen] =
@@ -66,7 +68,7 @@ export default function ExpandableTextField({
       {/* FIELD */}
 
       <div
-        className={`
+        className={` ${className}
           relative
 
           ${getInputClass(

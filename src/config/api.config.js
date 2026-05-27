@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
             UPDATE_ORDER_BY_ID:"/resource/order/update/",//id ,put
             SUBMIT_ORDER_BY_ID:"/resource/order/submit/",//id ,post    
             GET_ITEMS_BY_CATEGORY:"/resource/order/items-by-category",//?categoryCode=CAT001 get
-            GET_INDENT_LIST:"/indent-pending",//projectCode subCategoryCode
+            GET_INDENT_LIST:"/resource/order/indent-pending",//projectCode subCategoryCode
             APPROVE:"/resource/order/approve",//orderId POST
             REBACK:"/resource/order/reback",//orderId POST
             REJECT:"/resource/order/reject",//orderId POST

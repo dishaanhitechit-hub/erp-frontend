@@ -11,7 +11,7 @@ const itemSchema = z.object({
   itemName:
     z.string(),
 
-  unit:
+  itemUnit:
     z.string()
       .optional(),
 
@@ -37,7 +37,7 @@ const itemSchema = z.object({
       })
 
       .min(
-        0,
+        0.001,
         "Rate must be valid",
       ),
 
@@ -50,7 +50,7 @@ const itemSchema = z.object({
       })
 
       .min(
-        0,
+        0.001,
       ),
 
   amount:
@@ -114,25 +114,32 @@ export const orderSchema =
       ),
 
     vendorId:
-      z.any({
-
+      z.string({
         required_error:
           "Party Name is required",
-      }),
+      }).min(1,"Party Name is required"),
 
     orderDate:
       z.string({
 
         required_error:
           "Order Date is required",
-      }),
+      })
+      .min(
+        1,
+        "Order Date is required",
+      ),
 
     validityDate:
       z.string({
 
         required_error:
           "Order Validity is required",
-      }),
+      })
+      .min(
+        1,
+        "Order Validity is required",
+      ),
 
     billingAddress:
       z.string({
@@ -157,6 +164,8 @@ export const orderSchema =
         1,
         "Shipping Address is required",
       ),
+      quotationNo : z.string().min(1,"Quotation No is required"),
+      quotationDate : z.string().min(1,"Quotation Date is required"),
 
     orderMessage:
       z.string()
@@ -166,6 +175,7 @@ export const orderSchema =
       z.enum([
         "IGST",
         "CGST_SGST",
+        ""
       ])
       .optional(),
 
@@ -184,7 +194,10 @@ export const orderSchema =
         termSchema,
       )
 
-      .optional(),
+      .min(
+    1,
+    "At least one term is required",
+  ),
 
     orderFile:
       z.any()
@@ -254,23 +267,23 @@ export const orderSchema =
 
       // GST TYPE VALIDATION
 
-      if (
-        !data.gstType
-      ) {
+      // if (
+      //   !data.gstType
+      // ) {
 
-        ctx.addIssue({
+      //   ctx.addIssue({
 
-          code:
-            z.ZodIssueCode
-              .custom,
+      //     code:
+      //       z.ZodIssueCode
+      //         .custom,
 
-          path: [
-            "gstType",
-          ],
+      //     path: [
+      //       "gstType",
+      //     ],
 
-          message:
-            "Select GST Type",
-        });
-      }
+      //     message:
+      //       "Select GST Type",
+      //   });
+      // }
     },
   );

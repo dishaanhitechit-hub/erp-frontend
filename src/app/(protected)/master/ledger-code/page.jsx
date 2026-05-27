@@ -41,7 +41,7 @@ export default function Page() {
           ledgerId: p.ledgerId,
           sl: index + 1,
           ledgerCode: p.ledgerCode,
-          primaryContactPerson: p.primaryContactPerson,
+          ledgerName: p.ledgerName,
           categoryName: p.categoryName,
           whatsappNumber: p.whatsappNumber,
         }));
@@ -78,7 +78,7 @@ export default function Page() {
   const columns = [
     { header: "Sl. no", accessor: "sl" },
     { header: "Ledger Code", accessor: "ledgerCode" },
-    { header: "Party Name", accessor: "primaryContactPerson" },
+    { header: "Party Name", accessor: "ledgerName" },
     { header: "Category", accessor: "categoryName" },
     { header: "Mobile", accessor: "whatsappNumber" },
   ];

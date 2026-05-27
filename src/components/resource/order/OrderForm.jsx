@@ -117,9 +117,6 @@ export default function OrderForm({
 
   const projectCode = projectInfo?.projectCode;
 
-  const disabled =
-    mode === "view" || mode === "approver" || !isEditing || isSubmitted;
-
   const form = useForm({
     resolver: zodResolver(orderSchema),
 
@@ -143,6 +140,13 @@ export default function OrderForm({
 
     formState: { isSubmitting },
   } = form;
+
+  const disabled =
+    mode === "view" ||
+    mode === "approver" ||
+    !isEditing ||
+    isSubmitted ||
+    isSubmitting;
 
   const items = watch("items") || [];
 
@@ -295,6 +299,8 @@ export default function OrderForm({
           rate: Number(item.rate),
 
           gstPercent: Number(item.gstPercent),
+
+          note: item.note || "",
         })),
       ),
     );
@@ -302,7 +308,12 @@ export default function OrderForm({
     formData.append(
       "terms",
 
-      JSON.stringify(values.terms.map((term) => term.termId)),
+      JSON.stringify(values.terms.map((term) => ({
+      termId:
+        term.termId,
+      description:
+        term.description || "",
+    }))),
     );
 
     if (attachedFile) {
@@ -316,6 +327,23 @@ export default function OrderForm({
 
   const handleSaveDraft = async () => {
     let toastId;
+    console.log("working");
+    let values = getValues();
+    const validItems = values.items?.filter((item) => item?.indentItemId) || [];
+
+    if (!validItems.length) {
+      toast.error("Please add at least one order item");
+
+      return;
+    }
+
+    const validTerms = values.terms?.filter((term) => term?.termId) || [];
+
+    if (!validTerms.length) {
+      toast.error("Please add at least one term & condition");
+
+      return;
+    }
 
     try {
       toastId = toast.loading(
@@ -380,8 +408,14 @@ export default function OrderForm({
   // SUBMIT
 
   const onSubmit = async () => {
-    if (!items.length) {
+    let values = getValues();
+    if (!values.items?.length) {
       toast.error("Please add at least one item");
+
+      return;
+    }
+    if (!values.terms?.length) {
+      toast.error("Please add at least one term & condition");
 
       return;
     }
@@ -455,6 +489,41 @@ export default function OrderForm({
     setAllowSubmit(false);
   };
 
+  const validateTableSections = ({
+    values,
+
+    requireItems = false,
+
+    requireTerms = false,
+  }) => {
+    // ITEMS
+
+    if (requireItems) {
+      const validItems =
+        values.items?.filter((item) => item?.indentItemId) || [];
+
+      if (!validItems.length) {
+        toast.error("Please add at least one order item");
+
+        return false;
+      }
+    }
+
+    // TERMS
+
+    if (requireTerms) {
+      const validTerms = values.terms?.filter((term) => term?.termId) || [];
+
+      if (!validTerms.length) {
+        toast.error("Please add at least one term & condition");
+
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   // LOADING
 
   if (loading) {
@@ -478,385 +547,27 @@ export default function OrderForm({
       </div>
     );
   }
-
-  //   return (
-  //     <div
-  //       className="
-  //         p-3
-  //         space-y-4
-  //       "
-  //     >
-  //       {/* BASIC */}
-
-  //       <OrderBasicSection
-  //         form={form}
-  //         disabled={disabled}
-  //         fileName={fileName}
-  //         setFileName={setFileName}
-  //         fileUrl={fileUrl}
-  //         setFileUrl={setFileUrl}
-  //         attachedFile={attachedFile}
-  //         setAttachedFile={setAttachedFile}
-  //         fileRef={fileRef}
-  //       />
-
-  //       {/* TABS */}
-
-  //       <Tabs value={activeTab} onValueChange={setActiveTab}>
-  //         <div
-  //           className="
-  //     flex
-  //     items-center
-  //     justify-between
-
-  //     mb-1
-  //   "
-  //         >
-  //           {/* LEFT TABS */}
-
-  //           <TabsList
-  //   className="
-  //     h-auto
-
-  //     bg-transparent
-
-  //     p-0
-
-  //     gap-[2px]
-
-  //     rounded-none
-
-  //     border-0
-
-  //     shadow-none
-  //   "
-  // >
-
-  //   {/* SUMMARY */}
-
-  //   <TabsTrigger
-
-  //     value="summary"
-
-  //     className="
-  //       relative
-
-  //       h-[40px]
-
-  //       min-w-[125px]
-
-  //       rounded-none
-
-  //       border
-  //       border-[#5B6B8C]
-
-  //       border-b-0
-
-  //       bg-[#E5E5E5]
-
-  //       px-5
-
-  //       text-[15px]
-  //       font-semibold
-  //       text-black
-
-  //       data-[state=active]:bg-[#F4C400]
-
-  //       data-[state=active]:shadow-none
-
-  //       transition-none
-  //     "
-  //     style={{
-
-  //       clipPath:
-  //         "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
-  //     }}
-  //   >
-
-  //     Summary
-
-  //   </TabsTrigger>
-
-  //   {/* DETAILS */}
-
-  //   <TabsTrigger
-
-  //     value="items"
-
-  //     className="
-  //       relative
-
-  //       h-[40px]
-
-  //       min-w-[125px]
-
-  //       rounded-none
-
-  //       border
-  //       border-[#5B6B8C]
-
-  //       border-b-0
-
-  //       bg-[#E5E5E5]
-
-  //       px-5
-
-  //       text-[15px]
-  //       font-semibold
-  //       text-black
-
-  //       data-[state=active]:bg-[#F4C400]
-
-  //       data-[state=active]:shadow-none
-
-  //       transition-none
-  //     "
-  //     style={{
-
-  //       clipPath:
-  //         "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
-  //     }}
-  //   >
-
-  //     Details
-
-  //   </TabsTrigger>
-
-  //   {/* TERMS */}
-
-  //   <TabsTrigger
-
-  //     value="terms"
-
-  //     className="
-  //       relative
-
-  //       h-[40px]
-
-  //       min-w-[220px]
-
-  //       rounded-none
-
-  //       border
-  //       border-[#5B6B8C]
-
-  //       border-b-0
-
-  //       bg-[#E5E5E5]
-
-  //       px-5
-
-  //       text-[15px]
-  //       font-semibold
-  //       text-black
-
-  //       data-[state=active]:bg-[#F4C400]
-
-  //       data-[state=active]:shadow-none
-
-  //       transition-none
-  //     "
-  //     style={{
-
-  //       clipPath:
-  //         "polygon(0 0, 92% 0, 100% 100%, 0% 100%)",
-  //     }}
-  //   >
-
-  //     Terms & Conditions
-
-  //   </TabsTrigger>
-
-  // </TabsList>
-
-  //           {/* RIGHT ACTION BUTTONS */}
-
-  //           <div
-  //             className="
-  //       flex
-  //       items-center
-  //       gap-2
-  //     "
-  //           >
-  //             {/* ITEMS BUTTON */}
-
-  //             {activeTab === "items" && !disabled && (
-  //               <button
-  //                 type="button"
-  //                 onClick={() => setOpenItemModal(true)}
-  //                 className="
-  //           h-[34px]
-
-  //           min-w-[170px]
-
-  //           px-4
-
-  //           bg-[#9F96F2]
-
-  //           border
-  //           border-[#5D58A5]
-
-  //           rounded-md
-
-  //           text-black
-  //           text-sm
-  //           font-medium
-
-  //           flex
-  //           items-center
-  //           justify-center
-  //           gap-1
-
-  //           hover:opacity-90
-  //           transition
-  //         "
-  //               >
-  //                 + Add Order Items
-  //               </button>
-  //             )}
-
-  //             {/* TERMS BUTTON */}
-
-  //             {activeTab === "terms" && !disabled && (
-  //               <button
-  //                 type="button"
-  //                 onClick={() => setOpenTermsModal(true)}
-  //                 className="
-  //           h-[34px]
-
-  //           min-w-[150px]
-
-  //           px-4
-
-  //           bg-[#9F96F2]
-
-  //           border
-  //           border-[#5D58A5]
-
-  //           rounded-md
-
-  //           text-black
-  //           text-sm
-  //           font-medium
-
-  //           flex
-  //           items-center
-  //           justify-center
-  //           gap-1
-
-  //           hover:opacity-90
-  //           transition
-  //         "
-  //               >
-  //                 + Add T&C
-  //               </button>
-  //             )}
-  //           </div>
-  //         </div>
-
-  //         {/* ITEMS */}
-
-  //         <TabsContent value="items">
-  //           <OrderItemsTab
-  //             form={form}
-  //             disabled={disabled}
-  //             openItemModal={openItemModal}
-  //             setOpenItemModal={setOpenItemModal}
-  //           />
-  //         </TabsContent>
-
-  //         {/* TERMS */}
-
-  //         <TabsContent value="terms">
-  //           <OrderTermsTab
-  //             form={form}
-  //             disabled={disabled}
-  //             openTermsModal={openTermsModal}
-  //             setOpenTermsModal={setOpenTermsModal}
-  //           />
-  //         </TabsContent>
-
-  //         {/* SUMMARY */}
-
-  //         <TabsContent value="summary">
-  //           <OrderSummaryTab form={form} disabled={disabled} />
-  //         </TabsContent>
-  //       </Tabs>
-
-  //       {/* FOOTER */}
-
-  //       {mode !== "view" && mode !== "approver" && (
-  //         <div
-  //           className="
-  //             flex
-  //             justify-end
-  //             gap-3
-  //           "
-  //         >
-  //           {/* SAVE DRAFT */}
-
-  //           {((mode === "create" && isEditing) ||
-  //             (mode === "edit" && isEditing && !isSubmitted)) && (
-  //             <SaveDraftButton
-  //               onClick={() => handleSubmit(handleSaveDraft)()}
-  //               loading={isSubmitting}
-  //               disabled={isSubmitting}
-  //               requireConfirmation
-  //             />
-  //           )}
-
-  //           {/* SUBMIT */}
-
-  //           <SaveButton
-  //             onClick={() => handleSubmit(onSubmit)()}
-  //             loading={isSubmitting}
-  //             disabled={
-  //               !allowSubmit ||
-  //               isEditing ||
-  //               isSubmitted ||
-  //               !items.length ||
-  //               isSubmitting
-  //             }
-  //             requireConfirmation
-  //             confirmationTitle="Submit Order?"
-  //             confirmationMessage="Once submitted, this order will go for approval."
-  //           >
-  //             Submit
-  //           </SaveButton>
-
-  //           {/* EDIT */}
-
-  //           {mode === "edit" && !isSubmitted && (
-  //             <EditButton onClick={handleEdit} disabled={isSubmitting}>
-  //               {isEditing ? "Cancel" : "Edit"}
-  //             </EditButton>
-  //           )}
-  //         </div>
-  //       )}
-  //     </div>
-  //   );
   return (
-    <div
-      className="
-      p-3
-    "
-    >
-      {/* MAIN ERP LAYOUT */}
-
+    <>
       <div
         className="
-        flex
-        items-start
-        gap-5
-      "
+    flex
+    flex-col
+    xl:flex-row
+    items-start
+    gap-5
+    p-3
+  "
       >
         {/* LEFT SECTION */}
 
         <div
           className="
-          w-[470px]
-          shrink-0
-        "
+      w-full
+      xl:w-auto
+
+      shrink-0
+    "
         >
           <OrderBasicSection
             form={form}
@@ -875,83 +586,99 @@ export default function OrderForm({
 
         <div
           className="
-          w-px
-          self-stretch
-          bg-[#BEBEBE]
-        "
+      hidden
+      xl:block
+
+      w-px
+      self-stretch
+
+      bg-[#BEBEBE]
+    "
         />
 
         {/* RIGHT SECTION */}
 
         <div
           className="
-          flex-1
-          min-w-0
-        "
+      w-full
+      min-w-0
+
+      overflow-x-auto
+    "
         >
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* TOP BAR */}
 
             <div
               className="
-              flex
-              items-end
-              justify-between
+          flex
+          flex-col
+          lg:flex-row
 
-              mb-[2px]
-            "
+          lg:items-end
+          lg:justify-between
+
+          gap-3
+
+          mb-[2px]
+
+          min-w-[900px]
+        "
             >
               {/* LEFT TABS */}
 
               <TabsList
                 className="
-                h-auto
+            h-auto
 
-                bg-transparent
+            bg-transparent
 
-                p-0
+            p-0
 
-                gap-[2px]
+            gap-[2px]
 
-                rounded-none
+            rounded-none
 
-                border-0
+            border-0
 
-                shadow-none
-              "
+            shadow-none
+
+            flex
+            flex-wrap
+          "
               >
                 {/* SUMMARY */}
 
                 <TabsTrigger
                   value="summary"
                   className="
-                  relative
+              relative
 
-                  h-[40px]
+              h-[40px]
 
-                  min-w-[125px]
+              min-w-[125px]
 
-                  rounded-none
+              rounded-none
 
-                  border
-                  border-[#5B6B8C]
+              border
+              border-[#5B6B8C]
 
-                  border-b-0
+              border-b-0
 
-                  bg-[#E5E5E5]
+              bg-[#E5E5E5]
 
-                  px-5
+              px-5
 
-                  text-[15px]
-                  font-semibold
-                  text-black
+              text-[15px]
+              font-semibold
+              text-black
 
-                  data-[state=active]:bg-[#F4C400]
+              data-[state=active]:bg-[#F4C400]
 
-                  data-[state=active]:shadow-none
+              data-[state=active]:shadow-none
 
-                  transition-none
-                "
+              transition-none
+            "
                   style={{
                     clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
                   }}
@@ -964,33 +691,33 @@ export default function OrderForm({
                 <TabsTrigger
                   value="items"
                   className="
-                  relative
+              relative
 
-                  h-[40px]
+              h-[40px]
 
-                  min-w-[125px]
+              min-w-[125px]
 
-                  rounded-none
+              rounded-none
 
-                  border
-                  border-[#5B6B8C]
+              border
+              border-[#5B6B8C]
 
-                  border-b-0
+              border-b-0
 
-                  bg-[#E5E5E5]
+              bg-[#E5E5E5]
 
-                  px-5
+              px-5
 
-                  text-[15px]
-                  font-semibold
-                  text-black
+              text-[15px]
+              font-semibold
+              text-black
 
-                  data-[state=active]:bg-[#F4C400]
+              data-[state=active]:bg-[#F4C400]
 
-                  data-[state=active]:shadow-none
+              data-[state=active]:shadow-none
 
-                  transition-none
-                "
+              transition-none
+            "
                   style={{
                     clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)",
                   }}
@@ -1003,33 +730,33 @@ export default function OrderForm({
                 <TabsTrigger
                   value="terms"
                   className="
-                  relative
+              relative
 
-                  h-[40px]
+              h-[40px]
 
-                  min-w-[220px]
+              min-w-[220px]
 
-                  rounded-none
+              rounded-none
 
-                  border
-                  border-[#5B6B8C]
+              border
+              border-[#5B6B8C]
 
-                  border-b-0
+              border-b-0
 
-                  bg-[#E5E5E5]
+              bg-[#E5E5E5]
 
-                  px-5
+              px-5
 
-                  text-[15px]
-                  font-semibold
-                  text-black
+              text-[15px]
+              font-semibold
+              text-black
 
-                  data-[state=active]:bg-[#F4C400]
+              data-[state=active]:bg-[#F4C400]
 
-                  data-[state=active]:shadow-none
+              data-[state=active]:shadow-none
 
-                  transition-none
-                "
+              transition-none
+            "
                   style={{
                     clipPath: "polygon(0 0, 92% 0, 100% 100%, 0% 100%)",
                   }}
@@ -1042,12 +769,12 @@ export default function OrderForm({
 
               <div
                 className="
-                flex
-                items-center
-                gap-2
+            flex
+            items-center
+            gap-2
 
-                mb-[2px]
-              "
+            lg:justify-end
+          "
               >
                 {/* ITEMS BUTTON */}
 
@@ -1056,30 +783,30 @@ export default function OrderForm({
                     type="button"
                     onClick={() => setOpenItemModal(true)}
                     className="
-                    h-[34px]
+                  h-[34px]
 
-                    min-w-[170px]
+                  min-w-[170px]
 
-                    px-4
+                  px-4
 
-                    bg-[#9F96F2]
+                  bg-[#9F96F2]
 
-                    border
-                    border-[#5D58A5]
+                  border
+                  border-[#5D58A5]
 
-                    rounded-md
+                  rounded-md
 
-                    text-black
-                    text-sm
-                    font-medium
+                  text-black
+                  text-sm
+                  font-medium
 
-                    flex
-                    items-center
-                    justify-center
+                  flex
+                  items-center
+                  justify-center
 
-                    hover:opacity-90
-                    transition
-                  "
+                  hover:opacity-90
+                  transition
+                "
                   >
                     + Add Order Items
                   </button>
@@ -1092,30 +819,30 @@ export default function OrderForm({
                     type="button"
                     onClick={() => setOpenTermsModal(true)}
                     className="
-                    h-[34px]
+                  h-[34px]
 
-                    min-w-[150px]
+                  min-w-[150px]
 
-                    px-4
+                  px-4
 
-                    bg-[#9F96F2]
+                  bg-[#9F96F2]
 
-                    border
-                    border-[#5D58A5]
+                  border
+                  border-[#5D58A5]
 
-                    rounded-md
+                  rounded-md
 
-                    text-black
-                    text-sm
-                    font-medium
+                  text-black
+                  text-sm
+                  font-medium
 
-                    flex
-                    items-center
-                    justify-center
+                  flex
+                  items-center
+                  justify-center
 
-                    hover:opacity-90
-                    transition
-                  "
+                  hover:opacity-90
+                  transition
+                "
                   >
                     + Add T&C
                   </button>
@@ -1127,11 +854,13 @@ export default function OrderForm({
 
             <div
               className="
-              border
-              border-[#CFCFCF]
+          border
+          border-[#CFCFCF]
 
-              bg-white
-            "
+          bg-white
+
+          min-w-[900px]
+        "
             >
               {/* ITEMS */}
 
@@ -1164,7 +893,6 @@ export default function OrderForm({
           </Tabs>
         </div>
       </div>
-
       {/* FOOTER */}
 
       {mode !== "view" && mode !== "approver" && (
@@ -1182,7 +910,23 @@ export default function OrderForm({
           {((mode === "create" && isEditing) ||
             (mode === "edit" && isEditing && !isSubmitted)) && (
             <SaveDraftButton
-              onClick={() => handleSubmit(handleSaveDraft)()}
+              onClick={() => {
+                const values = getValues();
+
+                const isValid = validateTableSections({
+                  values,
+
+                  requireItems: true,
+
+                  requireTerms: true,
+                });
+
+                if (!isValid) {
+                  return;
+                }
+
+                handleSubmit(handleSaveDraft)();
+              }}
               loading={isSubmitting}
               disabled={isSubmitting}
               requireConfirmation
@@ -1192,13 +936,29 @@ export default function OrderForm({
           {/* SUBMIT */}
 
           <SaveButton
-            onClick={() => handleSubmit(onSubmit)()}
+            onClick={() => {
+              const values = getValues();
+
+              const isValid = validateTableSections({
+                values,
+
+                requireItems: true,
+
+                requireTerms: true,
+              });
+
+              if (!isValid) {
+                return;
+              }
+
+              handleSubmit(onSubmit)();
+            }}
             loading={isSubmitting}
             disabled={
               !allowSubmit ||
               isEditing ||
               isSubmitted ||
-              !items.length ||
+              // !items.length ||
               isSubmitting
             }
             requireConfirmation
@@ -1217,135 +977,6 @@ export default function OrderForm({
           )}
         </div>
       )}
-    </div>
+    </>
   );
-}
-
-{
-  /* <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div
-          className="
-    flex
-    items-center
-    justify-between
-
-    mb-1
-  "
-        >
-
-          <TabsList>
-            <TabsTrigger value="items">Details</TabsTrigger>
-
-            <TabsTrigger value="terms">Terms & Conditions</TabsTrigger>
-
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-          </TabsList>
-
-
-          <div
-            className="
-      flex
-      items-center
-      gap-2
-    "
-          >
-
-            {activeTab === "items" && !disabled && (
-              <button
-                type="button"
-                onClick={() => setOpenItemModal(true)}
-                className="
-          h-[34px]
-
-          min-w-[170px]
-
-          px-4
-
-          bg-[#9F96F2]
-
-          border
-          border-[#5D58A5]
-
-          rounded-md
-
-          text-black
-          text-sm
-          font-medium
-
-          flex
-          items-center
-          justify-center
-          gap-1
-
-          hover:opacity-90
-          transition
-        "
-              >
-                + Add Order Items
-              </button>
-            )}
-
-
-            {activeTab === "terms" && !disabled && (
-              <button
-                type="button"
-                onClick={() => setOpenTermsModal(true)}
-                className="
-          h-[34px]
-
-          min-w-[150px]
-
-          px-4
-
-          bg-[#9F96F2]
-
-          border
-          border-[#5D58A5]
-
-          rounded-md
-
-          text-black
-          text-sm
-          font-medium
-
-          flex
-          items-center
-          justify-center
-          gap-1
-
-          hover:opacity-90
-          transition
-        "
-              >
-                + Add T&C
-              </button>
-            )}
-          </div>
-        </div>
-
-
-        <TabsContent value="items">
-          <OrderItemsTab
-            form={form}
-            disabled={disabled}
-            openItemModal={openItemModal}
-            setOpenItemModal={setOpenItemModal}
-          />
-        </TabsContent>
-
-
-        <TabsContent value="terms">
-          <OrderTermsTab
-            form={form}
-            disabled={disabled}
-            openTermsModal={openTermsModal}
-            setOpenTermsModal={setOpenTermsModal}
-          />
-        </TabsContent>
-
-
-        <TabsContent value="summary">
-          <OrderSummaryTab form={form} disabled={disabled} />
-        </TabsContent>
-      </Tabs> */
 }
