@@ -73,13 +73,13 @@ const defaultValues = {
 
   terms: [],
 
-  summary: {
-    basicAmount: 0,
+  ccSummary: [],
 
-    gstAmount: 0,
+  basicAmount: 0,
 
-    totalAmount: 0,
-  },
+  gstAmount: 0,
+
+  totalAmount: 0,
 };
 
 export default function OrderForm({
@@ -174,7 +174,7 @@ export default function OrderForm({
 
           subCategoryCode: data.subCategoryCode || "",
 
-          vendorId: data.vendorId || "",
+          vendorId: String(data.vendorId || ""),
 
           orderNo: data.orderNo || "",
 
@@ -182,19 +182,19 @@ export default function OrderForm({
 
           validityDate: data.validityDate || "",
 
-          partyAddress: data.partyAddress || "",
+          // partyAddress: data.partyAddress || "",
 
-          gstn: data.gstn || "",
+          // gstn: data.gstn || "",
 
-          site: data.site || "",
+          site: data.projectCode || "",
 
           billingAddress: data.billingAddress || "",
 
           shippingAddress: data.shippingAddress || "",
 
-          contactPerson: data.contactPerson || "",
+          // contactPerson: data.contactPerson || "",
 
-          contactNumber: data.contactNumber || "",
+          // contactNumber: data.contactNumber || "",
 
           quotationNo: data.quotationNo || "",
 
@@ -208,32 +208,32 @@ export default function OrderForm({
 
           terms: data.terms || [],
 
-          summary: data.summary || {
-            basicAmount: 0,
+          ccSummary: data.ccSummary || [],
 
-            gstAmount: 0,
+          basicAmount: Number(data.basicAmount || 0),
 
-            totalAmount: 0,
-          },
+          gstAmount: Number(data.gstAmount || 0),
+
+          totalAmount: Number(data.totalAmount || 0),
         };
 
         reset(formattedData);
 
         setInitialData(formattedData);
 
-        setFileUrl(data.orderFile || "");
+        setFileUrl(data.attachedQuota || "");
 
-        const extractedFileName = data.orderFile?.split("/")?.pop() || "";
+        const extractedFileName = data.attachedQuota?.split("/")?.pop() || "";
 
         setInitialFileData({
           fileName: extractedFileName,
 
-          fileUrl: data.orderFile || "",
+          fileUrl: data.attachedQuota || "",
         });
 
         if (
-          data.orderStatus !== "Reback" &&
-          data.orderStatus !== "Draft" &&
+          data.status !== "Reback" &&
+          data.status !== "Draft" &&
           mode === "edit"
         ) {
           setIsSubmitted(true);
@@ -308,12 +308,12 @@ export default function OrderForm({
     formData.append(
       "terms",
 
-      JSON.stringify(values.terms.map((term) => ({
-      termId:
-        term.termId,
-      description:
-        term.description || "",
-    }))),
+      JSON.stringify(
+        values.terms.map((term) => ({
+          termId: term.termId,
+          description: term.description || "",
+        })),
+      ),
     );
 
     if (attachedFile) {

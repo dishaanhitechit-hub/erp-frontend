@@ -37,7 +37,6 @@ export default function OrderItemsTab({
 
   const {
     fields,
-
     remove,
   } = useFieldArray({
     control,

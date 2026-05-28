@@ -208,7 +208,8 @@ export default function OrderItemSelectionModal({
     }
 
     // BUILD FINAL ITEMS
-
+    //change
+    
     const formatted = selectedRows.map((item) => ({
       indentItemId: item.indentItemId,
 
@@ -226,16 +227,44 @@ export default function OrderItemSelectionModal({
 
       gstPercent: item.gstPercent || "",
 
-      amount: 0,
+      amount: Number(
+        (Number(item.orderQty || 0) * Number(item.rate || 0)).toFixed(3),
+      ),
 
-      gstAmount: 0,
+      gstAmount: Number(
+        (
+          (Number(item.orderQty || 0) *
+            Number(item.rate || 0) *
+            Number(item.gstPercent || 0)) /
+          100
+        ).toFixed(3),
+      ),
 
       location: item.location || "",
 
       note: item.note || "",
     }));
 
-    form.setValue("items", formatted);
+    const existingSavedItems = existingItems.filter(
+      (existing) =>
+        !formatted.some(
+          (newItem) =>
+            String(newItem.indentItemId) === String(existing.indentItemId),
+        ),
+    );
+
+    form.setValue(
+      "items",
+
+      [...existingSavedItems, ...formatted],
+
+      {
+        shouldValidate: true,
+        shouldDirty: true,
+      },
+    );
+
+    // form.setValue("items", formatted);
 
     onClose?.();
   };

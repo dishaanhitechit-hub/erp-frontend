@@ -82,7 +82,7 @@ export const API_ENDPOINTS = {
             GET_ALL_ORDER:"/resource/order/list",
             CREATE_ORDER:"/resource/order/create",
             GET_ORDER_BY_ID:"/resource/order/details",//id
-            UPDATE_ORDER_BY_ID:"/resource/order/update/",//id ,put
+            UPDATE_ORDER_BY_ID:"/resource/order/edit/",//id ,put
             SUBMIT_ORDER_BY_ID:"/resource/order/submit/",//id ,post    
             GET_ITEMS_BY_CATEGORY:"/resource/order/items-by-category",//?categoryCode=CAT001 get
             GET_INDENT_LIST:"/resource/order/indent-pending",//projectCode subCategoryCode

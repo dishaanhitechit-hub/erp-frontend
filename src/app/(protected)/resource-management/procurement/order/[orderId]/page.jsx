@@ -67,7 +67,7 @@ export default function Page() {
         open={openApproval}
         onClose={() => setOpenApproval(false)}
         payload={{
-          orderId,
+          id:orderId,
         }}
         actions={[
           {

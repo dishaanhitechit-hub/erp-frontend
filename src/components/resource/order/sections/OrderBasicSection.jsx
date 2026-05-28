@@ -197,9 +197,8 @@ export default function OrderBasicSection({
     gap-y-5
     "
     >
-      
       {/* CATEGORY SECTION */}
-      
+
       <div
         className="
         flex
@@ -234,21 +233,8 @@ export default function OrderBasicSection({
                   disabled={disabled}
                 >
                   <SelectTrigger
-                    className="
-                    h-[36px]
-                    w-full
-                    rounded-md
-                    border
-                    border-l-0
-                    border-[#3F3F3F]
-                    bg-white
-                    px-4
-                    text-[15px]
-                    text-[#7A7A7A]
-                    font-medium
-                    focus:ring-0
-                    focus:ring-offset-0
-                  "
+                    className={`${getInputClass(errors.categoryCode, disabled)} w-full
+            h-[36px]`}
                   >
                     <SelectValue placeholder="Purchases/Work/Service" />
                   </SelectTrigger>
@@ -292,26 +278,8 @@ export default function OrderBasicSection({
                   disabled={disabled}
                 >
                   <SelectTrigger
-                    className="
-                    h-[36px]
-                    w-full
-                    rounded-md
-
-                    border
-                    border-l-0
-                    border-[#3F3F3F]
-
-                    bg-white
-
-                    px-4
-
-                    text-[15px]
-                    text-[#7A7A7A]
-                    font-medium
-
-                    focus:ring-0
-                    focus:ring-offset-0
-                  "
+                    className={`${getInputClass(errors.subCategoryCode, disabled)} w-full
+            h-[36px]`}
                   >
                     <SelectValue placeholder="Materials/Composite/PRW/Hire" />
                   </SelectTrigger>
@@ -329,9 +297,8 @@ export default function OrderBasicSection({
           </div>
         </div>
       </div>
-      
+
       {/* ORDER SECTION */}
-      
 
       <div
         className="
@@ -353,7 +320,7 @@ export default function OrderBasicSection({
             {...register("orderNo")}
             disabled
             placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
+            className={`${getInputClass(false, true)} w-[220px]
             h-[34px]`}
           />
         </div>
@@ -371,7 +338,7 @@ export default function OrderBasicSection({
             type="date"
             {...register("orderDate")}
             disabled={disabled}
-          className={`${getInputClass(errors.orderDate,disabled)} w-[220px]
+            className={`${getInputClass(errors.orderDate, disabled)} w-[220px]
             h-[34px]`}
           />
         </div>
@@ -389,14 +356,13 @@ export default function OrderBasicSection({
             type="date"
             {...register("validityDate")}
             disabled={disabled}
-          className={`${getInputClass(errors.validityDate,disabled)} w-[220px]
+            className={`${getInputClass(errors.validityDate, disabled)} w-[220px]
             h-[34px]`}
           />
         </div>
       </div>
-      
+
       {/* PARTY SECTION */}
-      
 
       <div
         className="
@@ -429,7 +395,7 @@ export default function OrderBasicSection({
                   disabled={disabled}
                 >
                   <SelectTrigger
-                  className={`${getInputClass(errors.vendorId,disabled)} w-full
+                    className={`${getInputClass(errors.vendorId, disabled)} w-full
             h-[36px]`}
                   >
                     <SelectValue placeholder="Filter from Vendor List" />
@@ -460,13 +426,29 @@ export default function OrderBasicSection({
             Party Address
           </div>
 
-          <Input
-            {...register("partyAddress")}
-            disabled
-            placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
-            h-[34px]`}
-          />
+          <div
+            className="
+    w-[220px]
+    min-w-[220px]
+    max-w-[220px]
+  "
+          >
+            <Controller
+              control={control}
+              name="partyAddress"
+              render={({ field }) => (
+                <ExpandableTextField
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={true}
+                  title="Party Address"
+                  placeholder="[Auto]"
+                  minHeight="min-h-[36px]"
+                  modalHeight="min-h-[220px]"
+                />
+              )}
+            />
+          </div>
         </div>
 
         {/* PARTY GST */}
@@ -478,19 +460,33 @@ export default function OrderBasicSection({
             Party GSTN
           </div>
 
-          <Input
-            {...register("gstn")}
-            disabled
-            placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
-            h-[34px]`}
-          />
+          <div
+            className="
+    w-[220px]
+    min-w-[220px]
+    max-w-[220px]
+  "
+          >
+            <Controller
+              control={control}
+              name="gstn"
+              render={({ field }) => (
+                <ExpandableTextField
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={true}
+                  title="Party GSTN"
+                  placeholder="[Auto]"
+                  minHeight="min-h-[36px]"
+                  modalHeight="min-h-[180px]"
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
 
-      
       {/* PROJECT SECTION */}
-      
 
       <div
         className="
@@ -512,7 +508,7 @@ export default function OrderBasicSection({
             value={projectInfo?.projectCode || ""}
             disabled
             placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
+            className={`${getInputClass(false, true)} w-[220px]
             h-[34px]`}
           />
         </div>
@@ -594,9 +590,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      
       {/* CONTACT SECTION */}
-      
 
       <div
         className="
@@ -609,7 +603,8 @@ export default function OrderBasicSection({
 
         <div className="flex items-center">
           <div
-            className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>
+            className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}
+          >
             Contact Person
           </div>
 
@@ -617,7 +612,7 @@ export default function OrderBasicSection({
             {...register("contactPerson")}
             disabled
             placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
+            className={`${getInputClass(false, true)} w-[220px]
             h-[34px]`}
           />
         </div>
@@ -635,15 +630,13 @@ export default function OrderBasicSection({
             {...register("contactNumber")}
             disabled
             placeholder="[Auto]"
-            className={`${getInputClass(false,true)} w-[220px]
+            className={`${getInputClass(false, true)} w-[220px]
             h-[34px]`}
           />
         </div>
       </div>
 
-      
       {/* QUOTATION SECTION */}
-      
 
       <div
         className="
@@ -664,7 +657,7 @@ export default function OrderBasicSection({
           <Input
             {...register("quotationNo")}
             disabled={disabled}
-      className={`${getInputClass(errors.quotationNo,disabled)} w-[220px]
+            className={`${getInputClass(errors.quotationNo, disabled)} w-[220px]
          min-w-[220px]
          max-w-[220px]
             h-[34px]`}
@@ -684,16 +677,15 @@ export default function OrderBasicSection({
             type="date"
             {...register("quotationDate")}
             disabled={disabled}
-      className={`${getInputClass(errors.quotationDate,disabled)} w-[220px]
+            className={`${getInputClass(errors.quotationDate, disabled)} w-[220px]
          min-w-[220px]
          max-w-[220px]
             h-[34px]`}
           />
         </div>
       </div>
-      
+
       {/* ORDER MESSAGE SECTION */}
-      
 
       <div>
         <div className="flex items-start">
@@ -729,7 +721,7 @@ export default function OrderBasicSection({
                   placeholder="Text"
                   minHeight="min-h-[60px]"
                   modalHeight="min-h-[220px]"
-                   className="
+                  className="
     break-all
     whitespace-pre-wrap
   "
@@ -739,9 +731,8 @@ export default function OrderBasicSection({
           </div>
         </div>
       </div>
-      
+
       {/* FILE SECTION */}
-      
 
       <div>
         {/* FILE LABEL */}
@@ -857,4 +848,3 @@ export default function OrderBasicSection({
     </div>
   );
 }
-

@@ -16,7 +16,6 @@ import { Maximize2 } from "lucide-react";
 import { getInputClass } from "@/lib/formStyles";
 
 export default function ExpandableTextField({
-
   value = "",
 
   onChange,
@@ -35,46 +34,31 @@ export default function ExpandableTextField({
 
   className = "",
 }) {
+  const [open, setOpen] = useState(false);
 
-  const [open, setOpen] =
-    useState(false);
+  const [localValue, setLocalValue] = useState("");
 
-  const [localValue, setLocalValue] =
-    useState("");
+  const currentValue = value || "";
 
-  const currentValue =
-    value || "";
+  const handleSave = () => {
+    const trimmed = localValue.trim();
 
-  const handleSave =
-    () => {
+    onChange?.(trimmed);
 
-      const trimmed =
-        localValue.trim();
+    setOpen(false);
+  };
 
-      onChange?.(
-        trimmed,
-      );
-
-      setOpen(false);
-    };
-
-  const showExpand =
-    currentValue.length > 40;
+  const showExpand = currentValue.length > 40;
 
   return (
-
     <>
-
       {/* FIELD */}
 
       <div
         className={` ${className}
           relative
 
-          ${getInputClass(
-            error,
-            disabled,
-          )}
+          ${getInputClass(error, disabled)}
 
           ${minHeight}
 
@@ -87,39 +71,32 @@ export default function ExpandableTextField({
           break-words
 
           whitespace-pre-wrap
+          overflow-hidden
         `}
       >
-
         {currentValue ? (
-
           <p
             className="
               text-sm
-              leading-6
+              leading-4
               pr-7
+              overflow-hidden
+  text-ellipsis
+  whitespace-nowrap
+  block
+  w-full
             "
           >
-
-            {showExpand
-              ? `${currentValue.slice(
-                  0,
-                  40,
-                )}...`
-              : currentValue}
-
+            {showExpand ? `${currentValue.slice(0, 40)}...` : currentValue}
           </p>
-
         ) : (
-
           <p
             className="
               text-sm
               text-gray-400
             "
           >
-
             {placeholder}
-
           </p>
         )}
 
@@ -127,16 +104,11 @@ export default function ExpandableTextField({
 
         <button
           type="button"
-
           onClick={() => {
-
-            setLocalValue(
-              currentValue,
-            );
+            setLocalValue(currentValue);
 
             setOpen(true);
           }}
-
           className="
             absolute
             top-2
@@ -149,82 +121,43 @@ export default function ExpandableTextField({
             transition-colors
           "
         >
-
           <Maximize2
             className="
               w-4
               h-4
             "
           />
-
         </button>
-
       </div>
 
       {/* MODAL */}
 
       <Dialog
         open={open}
-        onOpenChange={(
-          value,
-        ) => {
-
+        onOpenChange={(value) => {
           if (!value) {
-
-            setLocalValue(
-              currentValue,
-            );
+            setLocalValue(currentValue);
           }
 
-          setOpen(
-            value,
-          );
+          setOpen(value);
         }}
       >
-
         <DialogContent
           className="
             sm:max-w-[650px]
           "
         >
-
           <DialogHeader>
-
-            <DialogTitle>
-
-              {title}
-
-            </DialogTitle>
-
+            <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
 
           {/* TEXTAREA */}
 
           <textarea
-
-            value={
-              open
-                ? localValue
-                : currentValue
-            }
-
-            disabled={
-              disabled
-            }
-
-            onChange={(
-              e,
-            ) =>
-              setLocalValue(
-                e.target
-                  .value,
-              )
-            }
-
-            placeholder={
-              placeholder
-            }
-
+            value={open ? localValue : currentValue}
+            disabled={disabled}
+            onChange={(e) => setLocalValue(e.target.value)}
+            placeholder={placeholder}
             className={`
               w-full
 
@@ -244,11 +177,7 @@ export default function ExpandableTextField({
               focus:ring-2
               focus:ring-slate-300
 
-              ${
-                disabled
-                  ? "bg-[#dff4df]"
-                  : "bg-white"
-              }
+              ${disabled ? "bg-[#dff4df]" : "bg-white"}
             `}
           />
 
@@ -262,46 +191,26 @@ export default function ExpandableTextField({
               pt-2
             "
           >
-
             <Button
               type="button"
               variant="outline"
               onClick={() => {
+                setLocalValue(currentValue);
 
-                setLocalValue(
-                  currentValue,
-                );
-
-                setOpen(
-                  false,
-                );
+                setOpen(false);
               }}
             >
-
               Close
-
             </Button>
 
             {!disabled && (
-
-              <Button
-                type="button"
-                onClick={
-                  handleSave
-                }
-              >
-
+              <Button type="button" onClick={handleSave}>
                 Save
-
               </Button>
             )}
-
           </div>
-
         </DialogContent>
-
       </Dialog>
-
     </>
   );
 }

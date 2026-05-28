@@ -1,503 +1,12 @@
-// "use client";
-
-// import {
-//   useEffect,
-//   useMemo,
-// } from "react";
-
-// import { Checkbox } from "@/components/ui/checkbox";
-
-// import { Input } from "@/components/ui/input";
-
-// import { getInputClass } from "@/lib/formStyles";
-
-// export default function OrderSummaryTab({
-
-//   form,
-
-//   disabled,
-// }) {
-
-//   const {
-
-//     watch,
-
-//     setValue,
-//   } = form;
-
-//   const items =
-//     watch(
-//       "items",
-//     ) || [];
-
-//   const gstType =
-//     watch(
-//       "gstType",
-//     ) || "";
-
-//   // CALCULATIONS
-
-//   const calculations =
-//     useMemo(() => {
-
-//       const basicAmount =
-//         items.reduce(
-//           (
-//             total,
-//             item,
-//           ) =>
-
-//             total +
-//             Number(
-//               item.amount ||
-//                 0,
-//             ),
-
-//           0,
-//         );
-
-//       const gstAmount =
-//         items.reduce(
-//           (
-//             total,
-//             item,
-//           ) =>
-
-//             total +
-//             Number(
-//               item.gstAmount ||
-//                 0,
-//             ),
-
-//           0,
-//         );
-
-//       const totalAmount =
-
-//         basicAmount +
-//         gstAmount;
-
-//       return {
-
-//         basicAmount:
-//           Number(
-//             basicAmount.toFixed(
-//               3,
-//             ),
-//           ),
-
-//         gstAmount:
-//           Number(
-//             gstAmount.toFixed(
-//               3,
-//             ),
-//           ),
-
-//         totalAmount:
-//           Number(
-//             totalAmount.toFixed(
-//               3,
-//             ),
-//           ),
-//       };
-
-//     }, [items]);
-
-//   // SYNC SUMMARY
-
-//   useEffect(() => {
-
-//     setValue(
-
-//       "summary.basicAmount",
-
-//       calculations.basicAmount,
-//     );
-
-//     setValue(
-
-//       "summary.gstAmount",
-
-//       calculations.gstAmount,
-//     );
-
-//     setValue(
-
-//       "summary.totalAmount",
-
-//       calculations.totalAmount,
-//     );
-
-//   }, [
-//     calculations,
-//     setValue,
-//   ]);
-
-//   // GST LOGIC
-
-//   const isIGST =
-//     gstType ===
-//     "IGST";
-
-//   const isCGSTSGST =
-//     gstType ===
-//     "CGST_SGST";
-
-//   const handleIGST =
-//     (
-//       checked,
-//     ) => {
-
-//       if (
-//         checked
-//       ) {
-
-//         setValue(
-//           "gstType",
-//           "IGST",
-//         );
-
-//       } else {
-
-//         setValue(
-//           "gstType",
-//           "",
-//         );
-//       }
-//     };
-
-//   const handleCGSTSGST =
-//     (
-//       checked,
-//     ) => {
-
-//       if (
-//         checked
-//       ) {
-
-//         setValue(
-
-//           "gstType",
-
-//           "CGST_SGST",
-//         );
-
-//       } else {
-
-//         setValue(
-//           "gstType",
-//           "",
-//         );
-//       }
-//     };
-
-//   return (
-
-//     <div
-//       className="
-//         space-y-4
-//       "
-//     >
-
-//       {/* SUMMARY */}
-
-//       <div
-//         className="
-//           border
-//           rounded-md
-
-//           bg-white
-
-//           p-4
-//         "
-//       >
-
-//         <h2
-//           className="
-//             text-base
-//             font-semibold
-
-//             mb-4
-//           "
-//         >
-
-//           Summary
-
-//         </h2>
-
-//         <div
-//           className="
-//             overflow-x-auto
-//           "
-//         >
-
-//           <table
-//             className="
-//               w-full
-//               border-collapse
-//             "
-//           >
-
-//             <tbody>
-
-//               {/* BASIC */}
-
-//               <tr>
-
-//                 <td className="border p-3 font-medium bg-gray-50 w-[300px]">
-//                   Basic Amount
-//                 </td>
-
-//                 <td className="border p-3">
-
-//                   <Input
-
-//                     value={
-//                       calculations.basicAmount
-//                     }
-
-//                     disabled
-
-//                     className={getInputClass(
-//                       null,
-//                       true,
-//                     )}
-//                   />
-
-//                 </td>
-
-//               </tr>
-
-//               {/* GST */}
-
-//               <tr>
-
-//                 <td className="border p-3 font-medium bg-gray-50">
-//                   GST Amount
-//                 </td>
-
-//                 <td className="border p-3">
-
-//                   <Input
-
-//                     value={
-//                       calculations.gstAmount
-//                     }
-
-//                     disabled
-
-//                     className={getInputClass(
-//                       null,
-//                       true,
-//                     )}
-//                   />
-
-//                 </td>
-
-//               </tr>
-
-//               {/* TOTAL */}
-
-//               <tr>
-
-//                 <td className="border p-3 font-medium bg-gray-50">
-//                   Total Invoice Amount
-//                 </td>
-
-//                 <td className="border p-3">
-
-//                   <Input
-
-//                     value={
-//                       calculations.totalAmount
-//                     }
-
-//                     disabled
-
-//                     className={getInputClass(
-//                       null,
-//                       true,
-//                     )}
-//                   />
-
-//                 </td>
-
-//               </tr>
-
-//             </tbody>
-
-//           </table>
-
-//         </div>
-
-//       </div>
-
-//       {/* GST SECTION */}
-
-//       <div
-//         className="
-//           border
-//           rounded-md
-
-//           bg-white
-
-//           p-4
-//         "
-//       >
-
-//         <h2
-//           className="
-//             text-base
-//             font-semibold
-
-//             mb-4
-//           "
-//         >
-
-//           GST Selection
-
-//         </h2>
-
-//         <div
-//           className="
-//             flex
-//             flex-wrap
-//             items-center
-
-//             gap-6
-//           "
-//         >
-
-//           {/* IGST */}
-
-//           <div
-//             className="
-//               flex
-//               items-center
-//               gap-2
-//             "
-//           >
-
-//             <Checkbox
-
-//               checked={
-//                 isIGST
-//               }
-
-//               disabled={
-//                 disabled
-//               }
-
-//               onCheckedChange={
-//                 handleIGST
-//               }
-//             />
-
-//             <label
-//               className="
-//                 text-sm
-//                 font-medium
-//               "
-//             >
-
-//               IGST
-
-//             </label>
-
-//           </div>
-
-//           {/* CGST */}
-
-//           <div
-//             className="
-//               flex
-//               items-center
-//               gap-2
-//             "
-//           >
-
-//             <Checkbox
-
-//               checked={
-//                 isCGSTSGST
-//               }
-
-//               disabled={
-//                 disabled
-//               }
-
-//               onCheckedChange={
-//                 handleCGSTSGST
-//               }
-//             />
-
-//             <label
-//               className="
-//                 text-sm
-//                 font-medium
-//               "
-//             >
-
-//               CGST
-
-//             </label>
-
-//           </div>
-
-//           {/* SGST */}
-
-//           <div
-//             className="
-//               flex
-//               items-center
-//               gap-2
-//             "
-//           >
-
-//             <Checkbox
-
-//               checked={
-//                 isCGSTSGST
-//               }
-
-//               disabled={
-//                 disabled
-//               }
-
-//               onCheckedChange={
-//                 handleCGSTSGST
-//               }
-//             />
-
-//             <label
-//               className="
-//                 text-sm
-//                 font-medium
-//               "
-//             >
-
-//               SGST
-
-//             </label>
-
-//           </div>
-
-//         </div>
-
-//       </div>
-
-//     </div>
-//   );
-// }
 "use client";
 
 import { useEffect, useMemo } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { toWords } from "number-to-words";
 
 export default function OrderSummaryTab({
   form,
-
   disabled,
 }) {
   const {
@@ -510,55 +19,61 @@ export default function OrderSummaryTab({
 
   const gstType = watch("gstType") || "";
 
-  const summaryData = watch("summaryTable") || [];
+  const ccSummary = watch("ccSummary") || [];
+
+  const backendBasicAmount = Number(watch("basicAmount") || 0);
+
+  const backendGstAmount = Number(watch("gstAmount") || 0);
+
+  const backendTotalAmount = Number(watch("totalAmount") || 0);
 
   // CALCULATIONS
 
-  const calculations = useMemo(() => {
-    const basicAmount = items.reduce(
-      (total, item) => total + Number(item.amount || 0),
+  // const calculations = useMemo(() => {
+  //   const basicAmount = items.reduce(
+  //     (total, item) => total + Number(item.amount || 0),
 
-      0,
-    );
+  //     0,
+  //   );
 
-    const gstAmount = items.reduce(
-      (total, item) => total + Number(item.gstAmount || 0),
+  //   const gstAmount = items.reduce(
+  //     (total, item) => total + Number(item.gstAmount || 0),
 
-      0,
-    );
+  //     0,
+  //   );
 
-    const totalAmount = basicAmount + gstAmount;
+  //   const totalAmount = basicAmount + gstAmount;
 
-    return {
-      basicAmount: Number(basicAmount.toFixed(2)),
+  //   return {
+  //     basicAmount: Number(basicAmount.toFixed(2)),
 
-      gstAmount: Number(gstAmount.toFixed(2)),
+  //     gstAmount: Number(gstAmount.toFixed(2)),
 
-      totalAmount: Number(totalAmount.toFixed(2)),
-    };
-  }, [items]);
+  //     totalAmount: Number(totalAmount.toFixed(2)),
+  //   };
+  // }, [items]);
 
-  // SUMMARY SYNC
+  // // SUMMARY SYNC
 
-  useEffect(() => {
-    setValue(
-      "summary.basicAmount",
+  // useEffect(() => {
+  //   setValue(
+  //     "summary.basicAmount",
 
-      calculations.basicAmount,
-    );
+  //     calculations.basicAmount,
+  //   );
 
-    setValue(
-      "summary.gstAmount",
+  //   setValue(
+  //     "summary.gstAmount",
 
-      calculations.gstAmount,
-    );
+  //     calculations.gstAmount,
+  //   );
 
-    setValue(
-      "summary.totalAmount",
+  //   setValue(
+  //     "summary.totalAmount",
 
-      calculations.totalAmount,
-    );
-  }, [calculations, setValue]);
+  //     calculations.totalAmount,
+  //   );
+  // }, [calculations, setValue]);
 
   // GST LOGIC
 
@@ -588,11 +103,18 @@ export default function OrderSummaryTab({
 
   // GST VALUES
 
-  const igstAmount = isIGST ? calculations.gstAmount : 0;
+  const igstAmount = isIGST ? backendGstAmount : 0;
 
-  const cgstAmount = isCGSTSGST ? calculations.gstAmount / 2 : 0;
+  const cgstAmount = isCGSTSGST ? backendGstAmount / 2 : 0;
 
-  const sgstAmount = isCGSTSGST ? calculations.gstAmount / 2 : 0;
+  const sgstAmount = isCGSTSGST ? backendGstAmount / 2 : 0;
+
+  const amountInWords =
+  `${toWords(
+    Math.floor(
+      backendTotalAmount,
+    ),
+  )} Only`;
 
   return (
     <div
@@ -665,8 +187,8 @@ export default function OrderSummaryTab({
             </thead>
 
             <tbody>
-              {summaryData.length
-                ? summaryData.map((item, index) => (
+              {ccSummary.length
+                ? ccSummary.map((item, index) => (
                     <tr key={index}>
                       <td className="border px-2 py-[2px] text-center text-sm">
                         {index + 1}
@@ -680,8 +202,8 @@ export default function OrderSummaryTab({
                         {item.ccName}
                       </td>
 
-                      <td className="border px-2 py-[2px] text-sm text-right">
-                        {Number(item.amount || 0).toFixed(2)}
+                      <td className="border px-2 py-[2px] text-right text-sm">
+                        {Number(item.basicAmount || 0).toFixed(2)}
                       </td>
                     </tr>
                   ))
@@ -714,7 +236,7 @@ export default function OrderSummaryTab({
                 <td className="border px-2 py-1 text-center text-sm">TOTAL</td>
 
                 <td className="border px-2 py-1 text-center text-sm">
-                  {calculations.basicAmount.toFixed(2)}
+                  {backendBasicAmount.toFixed(2)}
                 </td>
               </tr>
             </tbody>
@@ -786,7 +308,7 @@ export default function OrderSummaryTab({
               <td className="border px-2 py-[2px] text-center">
                 <Checkbox
                   checked={isIGST}
-                  disabled={disabled}
+                  disabled={false}
                   onCheckedChange={handleIGST}
                 />
               </td>
@@ -806,7 +328,7 @@ export default function OrderSummaryTab({
               <td className="border px-2 py-[2px] text-center">
                 <Checkbox
                   checked={isCGSTSGST}
-                  disabled={disabled}
+                  disabled={false}
                   onCheckedChange={handleCGSTSGST}
                 />
               </td>
@@ -826,7 +348,7 @@ export default function OrderSummaryTab({
               <td className="border px-2 py-[2px] text-center">
                 <Checkbox
                   checked={isCGSTSGST}
-                  disabled={disabled}
+                  disabled={false}
                   onCheckedChange={handleCGSTSGST}
                 />
               </td>
@@ -855,7 +377,7 @@ export default function OrderSummaryTab({
               <td className="border px-2 py-1 text-center text-sm">TOTAL</td>
 
               <td className="border px-2 py-1 text-center text-sm">
-                {calculations.gstAmount.toFixed(2)}
+                {backendGstAmount.toFixed(2)}
               </td>
             </tr>
           </tbody>
@@ -905,7 +427,7 @@ export default function OrderSummaryTab({
               rounded-sm
             "
           >
-            {calculations.basicAmount.toFixed(2)}
+            {backendBasicAmount.toFixed(2)}
           </div>
         </div>
 
@@ -945,7 +467,7 @@ export default function OrderSummaryTab({
               rounded-sm
             "
           >
-            {calculations.gstAmount.toFixed(2)}
+            {backendGstAmount.toFixed(2)}
           </div>
         </div>
 
@@ -985,7 +507,7 @@ export default function OrderSummaryTab({
               rounded-sm
             "
           >
-            {calculations.totalAmount.toFixed(2)}
+            {backendTotalAmount.toFixed(2)}
           </div>
         </div>
 
@@ -1024,10 +546,7 @@ export default function OrderSummaryTab({
               rounded-sm
             "
           >
-            {calculations.totalAmount.toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-            })}{" "}
-            Only
+            {amountInWords}
           </div>
         </div>
       </div>
