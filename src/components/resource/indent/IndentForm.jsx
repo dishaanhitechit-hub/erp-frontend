@@ -20,6 +20,7 @@ import { getInputClass } from "@/lib/formStyles";
 import { getLocalStorage } from "@/lib/localStorage";
 
 import IndentItemsTable from "@/components/resource/indent/IndentItemsTable";
+import ExpandableTextField from "@/components/common/ExpandableTextField";
 
 const indentSchema = z.object({
   categoryCode: z.string().min(1),
@@ -219,14 +220,20 @@ export default function IndentForm({
           fileUrl: data.indentFile || "",
         });
         // data.indentStatus === "Submitted" || data.indentStatus==="Approved"
-        if ((data.indentStatus !== "Reback" && data.indentStatus!=="Draft") && mode === "edit") {
+        if (
+          data.indentStatus !== "Reback" &&
+          data.indentStatus !== "Draft" &&
+          mode === "edit"
+        ) {
           setIsSubmitted(true);
 
           setIsEditing(false);
           let msg;
-          if(data.indentStatus==="Rejected") msg ="Indent already Rejected."
-          else if(data.indentStatus==="Approved") msg ="Indent already Approved."
-          else msg ="Indent already Submitted";
+          if (data.indentStatus === "Rejected")
+            msg = "Indent already Rejected.";
+          else if (data.indentStatus === "Approved")
+            msg = "Indent already Approved.";
+          else msg = "Indent already Submitted";
           toast.info(msg || "Indent already submitted");
         } else {
           setIsEditing(false);
@@ -583,17 +590,19 @@ export default function IndentForm({
           <div className="md:flex md:items-start">
             <div className={labelClass}>Remarks</div>
 
-            <textarea
-              {...register("remarks")}
-              disabled={disabled}
-              className={`
-            ${getInputClass(errors.remarks, disabled)}
-            flex-1
-            -ml-px
-            min-h-[70px]
-            p-2
-          `}
-            />
+            <div className="flex-1 -ml-px max-w-[210px]">
+              <ExpandableTextField
+                value={watch("remarks")}
+                onChange={(val) => setValue("remarks", val)}
+                disabled={disabled}
+                error={errors.remarks}
+                title="Remarks"
+                placeholder="Enter remarks"
+                subHeader="Provide additional remarks or important notes."
+                minHeight="min-h-[36px]"
+                modalHeight="min-h-[220px]"
+              />
+            </div>
           </div>
 
           {/* ATTACHMENT */}
