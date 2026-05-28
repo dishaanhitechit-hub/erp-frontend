@@ -93,7 +93,7 @@ export default function ExpandableTextField({
       >
         {currentValue ? (
           <p
-            className="
+            className={`
               text-sm
               leading-4
               pr-7
@@ -102,7 +102,8 @@ export default function ExpandableTextField({
   whitespace-nowrap
   block
   w-full
-            "
+  ${disabled ? "text-[#6f7b6f]" : "text-black"}
+            `}
           >
             {showExpand ? `${currentValue.slice(0, 40)}...` : currentValue}
           </p>
@@ -160,24 +161,16 @@ export default function ExpandableTextField({
             placeholder={placeholder}
             className={`
               w-full
-
               ${modalHeight}
-
               border
               rounded-md
-
               p-3
-
               text-sm
-
               resize-none
-
               outline-none
-
               focus:ring-2
               focus:ring-slate-300
-
-              ${disabled ? "bg-[#dff4df]" : "bg-white"}
+              ${disabled ? "bg-[#dff4df] text-[#6f7b6f]" : "bg-white text-black"}
             `}
           />
 
