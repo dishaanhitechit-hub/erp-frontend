@@ -96,18 +96,29 @@ export default function ApprovalActionModal({
 
       toast.success(res?.message || "Action completed");
 
-      resetModalState();
+      // resetModalState();
 
-      onClose?.();
+      // onClose?.();
 
-      onSuccess?.(res);
+      // onSuccess?.(res);
+      handleClose();
+      setTimeout(() => {
+          onSuccess?.(res);
+        }, 300);
     } catch (err) {
       toast.error(err?.message || "Action failed");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!value) {
+          handleClose();
+        }
+      }}
+    >
       <DialogContent
         className="
           sm:max-w-[560px]

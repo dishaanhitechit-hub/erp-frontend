@@ -42,6 +42,7 @@ export default function IndentItemsTable({
   };
 
   const [activeModal, setActiveModal] = useState(null);
+  const [tempValue, setTempValue] = useState("");
 
   const totalQty = watch("items")?.reduce(
     (sum, item) => sum + Number(item.qty || 0),
@@ -88,25 +89,23 @@ export default function IndentItemsTable({
   };
 
   const openModal = (index, field) => {
-    setActiveModal({
-      index,
-      field,
-    });
+    const currentValue = watch(`items.${index}.${field}`) || "";
+    setTempValue(currentValue);
+    setActiveModal({ index, field });
   };
 
   const closeModal = () => {
-    if (activeModal) {
-      const fieldPath = `items.${activeModal.index}.${activeModal.field}`;
-
-      const currentValue = watch(fieldPath) || "";
-
-      setValue(fieldPath, currentValue.trim(), {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-    }
-
+    setTempValue("");
     setActiveModal(null);
+  };
+  const handleSave = () => {
+    if (!activeModal) return;
+    const fieldPath = `items.${activeModal.index}.${activeModal.field}`;
+    setValue(fieldPath, tempValue.trim(), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    closeModal();
   };
 
   return (
@@ -438,9 +437,7 @@ export default function IndentItemsTable({
       <Dialog
         open={!!activeModal}
         onOpenChange={(open) => {
-          if (!open) {
-            closeModal();
-          }
+          if (!open) closeModal();
         }}
       >
         <DialogContent className="sm:max-w-[650px]">
@@ -461,7 +458,8 @@ export default function IndentItemsTable({
               </div>
 
               <textarea
-                {...register(`items.${activeModal.index}.${activeModal.field}`)}
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
                 disabled={!isEditing || isSubmitting}
                 placeholder={
                   activeModal?.field === "note"
@@ -469,38 +467,49 @@ export default function IndentItemsTable({
                     : "Enter detailed location..."
                 }
                 className={`
-                  ${getInputClass(
-                    errors?.items?.[activeModal.index]?.[activeModal.field],
-                    !isEditing || isSubmitting,
-                  )}
-                  w-full
-                  min-h-[220px]
-                  resize-none
-                  border
-                  rounded-md
-                  px-3
-                  py-3
-                  text-sm
-                  leading-6
-                  outline-none
-                `}
+            ${getInputClass(
+              errors?.items?.[activeModal.index]?.[activeModal.field],
+              !isEditing || isSubmitting,
+            )}
+            w-full
+            min-h-[220px]
+            resize-none
+            border
+            rounded-md
+            px-3
+            py-3
+            text-sm
+            leading-6
+            outline-none
+          `}
               />
 
               <div className="flex justify-between items-center">
                 <div className="text-[12px] text-[#888]">
-                  Character Count :{" "}
-                  {
-                    (
-                      watch(
-                        `items.${activeModal.index}.${activeModal.field}`,
-                      ) || ""
-                    ).trim().length
-                  }
+                  Character Count : {tempValue.trim().length}
                 </div>
 
-                <Button type="button" onClick={closeModal} className="h-[34px]">
-                  Close
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closeModal}
+                    className="h-[34px] bg"
+                  >
+                    Close
+                  </Button>
+
+                  {/* Save only in edit mode */}
+                  {isEditing && !isSubmitting && (
+                    <Button
+                      type="button"
+                      onClick={handleSave}
+                      className="h-[34px]"
+                    >
+                      Save
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}

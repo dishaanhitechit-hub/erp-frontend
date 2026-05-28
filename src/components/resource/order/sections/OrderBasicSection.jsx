@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Download } from "lucide-react";
+import { Download, FileText, Upload } from "lucide-react";
 
 import { Controller } from "react-hook-form";
 
@@ -736,112 +736,146 @@ export default function OrderBasicSection({
 
       <div>
         {/* FILE LABEL */}
-
         <div
           className="
-      inline-flex
-      items-center
-      justify-center
-      min-h-[38px]
-      px-6
-      bg-[#FFE7A3]
-      border
-      border-[#E29B34]
-      rounded-[8px]
-      text-[15px]
-      font-semibold
-      text-black
+            inline-flex
+            items-center
+            justify-center
+            min-h-[38px]
+            px-6
+            bg-[#FFE7A3]
+            border
+            border-[#E29B34]
+            rounded-[8px]
+            text-[15px]
+            font-semibold
+            text-black
     "
         >
           Attached Party Quotation
         </div>
 
         {/* FILE AREA */}
-
         <div className="mt-3">
-          {/* FILE INPUT */}
-
-          {!disabled && (
-            <div
-              className="
-          flex
-          flex-col
-          gap-2
-        "
-            >
+          {!disabled ? (
+            <div className="w-[220px]">
+              {/* Hidden native input — always mounted so ref works */}
               <input
                 ref={fileRef}
                 type="file"
                 accept=".pdf"
+                className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
 
                   if (!file) {
+                    // User opened picker and cancelled — clear state
+                    setAttachedFile(null);
+                    setFileName("");
+                    if (fileUrl?.startsWith("blob:")) {
+                      URL.revokeObjectURL(fileUrl);
+                    }
+                    setFileUrl("");
+                    // Reset input so onChange fires again next time same file picked
+                    if (fileRef.current) fileRef.current.value = "";
                     return;
                   }
 
+                  // New file selected
                   setAttachedFile(file);
-
                   setFileName(file.name);
-
                   if (fileUrl?.startsWith("blob:")) {
                     URL.revokeObjectURL(fileUrl);
                   }
-
                   setFileUrl(URL.createObjectURL(file));
+                  // Reset so re-selecting same file still triggers onChange
+                  if (fileRef.current) fileRef.current.value = "";
                 }}
-                className="
-            block
-
-            w-[220px]
-
-            text-sm
-          "
               />
 
-              {/* NEW FILE NAME */}
-
-              {/* {attachedFile && fileName && (
-                <div
+              {fileName ? (
+                /* FILE SELECTED STATE — show filename, click to change */
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
                   className="
-              text-sm
-              text-gray-700
-              break-all
+                        w-full
+                        h-[36px]
+                        px-3
+                        flex
+                        items-center
+                        gap-2
+                        rounded-md
+                        border
+                        border-gray-300
+                        bg-gray-50
+                        hover:bg-gray-100
+                        transition-colors
+                        cursor-pointer
+                        text-left
             "
                 >
-                  {fileName}
-                </div>
-              )} */}
+                  <FileText className="w-4 h-4 text-gray-500 shrink-0" />
+                  <span
+                    className="text-sm text-gray-700 truncate flex-1"
+                    title={fileName}
+                  >
+                    {fileName}
+                  </span>
+                </button>
+              ) : (
+                /* NO FILE STATE — styled clickable upload area */
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="
+              w-full
+              h-[36px]
+              px-3
+              flex
+              items-center
+              gap-2
+              rounded-md
+              border
+              border-dashed
+              border-gray-300
+              bg-white
+              hover:bg-gray-50
+              hover:border-gray-400
+              transition-colors
+              cursor-pointer
+              text-left
+            "
+                >
+                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="text-sm text-gray-400">
+                    Click to upload PDF
+                  </span>
+                </button>
+              )}
             </div>
-          )}
-
-          {/* EXISTING FILE DOWNLOAD */}
-
-          {!attachedFile && fileUrl && (
-            <a
-              href={fileUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="
-          inline-flex
-          items-center
-          gap-2
-
-          text-blue-700
-          text-sm
-          font-medium
-
-          hover:underline
-        "
-            >
-              <Download
+          ) : (
+            /* DISABLED — download only */
+            !attachedFile &&
+            fileUrl && (
+              <a
+                href={fileUrl}
+                target="_blank"
+                rel="noreferrer"
                 className="
-            w-4
-            h-4
+                  inline-flex
+                  items-center
+                  gap-2
+                  text-blue-700
+                  text-sm
+                  font-medium
+                  hover:underline
           "
-              />
-              Download Attachment
-            </a>
+              >
+                <Download className="w-4 h-4" />
+                Download Attachment
+              </a>
+            )
           )}
         </div>
       </div>

@@ -28,6 +28,8 @@ export default function ExpandableTextField({
 
   title = "Text",
 
+  subHeader = "Add a detailed description.",
+
   minHeight = "min-h-[42px]",
 
   modalHeight = "min-h-[180px]",
@@ -39,6 +41,16 @@ export default function ExpandableTextField({
   const [localValue, setLocalValue] = useState("");
 
   const currentValue = value || "";
+
+  const handleOpen = () => {
+    setLocalValue(currentValue);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setLocalValue(currentValue);
+    setOpen(false);
+  };
 
   const handleSave = () => {
     const trimmed = localValue.trim();
@@ -55,6 +67,10 @@ export default function ExpandableTextField({
       {/* FIELD */}
 
       <div
+        role="button"
+        tabIndex={0}
+        onClick={handleOpen}
+        onKeyDown={(e) => e.key === "Enter" && handleOpen()}
         className={` ${className}
           relative
 
@@ -72,6 +88,7 @@ export default function ExpandableTextField({
 
           whitespace-pre-wrap
           overflow-hidden
+          cursor-pointer
         `}
       >
         {currentValue ? (
@@ -100,46 +117,25 @@ export default function ExpandableTextField({
           </p>
         )}
 
-        {/* EXPAND BUTTON */}
-
-        <button
-          type="button"
-          onClick={() => {
-            setLocalValue(currentValue);
-
-            setOpen(true);
-          }}
+        <span
           className="
             absolute
             top-2
             right-2
-
             text-gray-500
-
-            hover:text-black
-
-            transition-colors
           "
         >
-          <Maximize2
-            className="
-              w-4
-              h-4
-            "
-          />
-        </button>
+          <Maximize2 className="w-4 h-4" />
+        </span>
       </div>
 
       {/* MODAL */}
 
       <Dialog
         open={open}
-        onOpenChange={(value) => {
-          if (!value) {
-            setLocalValue(currentValue);
-          }
-
-          setOpen(value);
+        onOpenChange={(val) => {
+          if (!val) handleClose();
+          else setOpen(true);
         }}
       >
         <DialogContent
@@ -149,6 +145,10 @@ export default function ExpandableTextField({
         >
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
+            {/* SUB HEADER — only renders if prop provided */}
+            {subHeader && (
+              <p className="text-[13px] text-[#666] mt-1">{subHeader}</p>
+            )}
           </DialogHeader>
 
           {/* TEXTAREA */}
@@ -182,32 +182,23 @@ export default function ExpandableTextField({
           />
 
           {/* FOOTER */}
+          <div className="flex justify-between items-center pt-2">
+            {/* CHAR COUNT */}
+            <span className="text-[12px] text-[#888]">
+              Character Count : {localValue.trim().length}
+            </span>
 
-          <div
-            className="
-              flex
-              justify-end
-              gap-2
-              pt-2
-            "
-          >
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setLocalValue(currentValue);
-
-                setOpen(false);
-              }}
-            >
-              Close
-            </Button>
-
-            {!disabled && (
-              <Button type="button" onClick={handleSave}>
-                Save
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleClose}>
+                Close
               </Button>
-            )}
+
+              {!disabled && (
+                <Button type="button" onClick={handleSave}>
+                  Save
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

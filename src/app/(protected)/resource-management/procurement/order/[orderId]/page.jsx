@@ -89,6 +89,7 @@ export default function Page() {
           },
         ]}
         onSuccess={() => {
+          setOpenApproval(false);
           router.refresh();
         }}
       />
