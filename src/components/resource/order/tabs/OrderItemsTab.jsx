@@ -221,11 +221,22 @@ export default function OrderItemsTab({
 
                       {/* ITEM NAME */}
 
-                      <td className="border px-2 py-[2px]">
-                        <Input
+                      <td
+                        className="
+                              border
+                              px-2
+                              py-[2px]
+                              align-top
+                              overflow-hidden
+                            "
+                      >
+                        <ExpandableTextField
                           value={items[index]?.itemName || ""}
-                          disabled
-                          className={getInputClass(null, true)}
+                          disabled={true}
+                          title="Item Name"
+                          placeholder="Item Name"
+                          minHeight="min-h-[34px]"
+                          modalHeight="min-h-[180px]"
                         />
                       </td>
 
@@ -278,49 +289,49 @@ export default function OrderItemsTab({
 
                       <td className="border px-2 py-[2px]">
                         <div className="min-w-[105px]">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.rate`}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              type="number"
-                              step="0.001"
-                              disabled={disabled}
-                              className={getInputClass(
-  errors?.items?.[index]?.rate,
-  disabled,
-)}
-                              onChange={(e) => {
-                                const value = e.target.value;
+                          <Controller
+                            control={control}
+                            name={`items.${index}.rate`}
+                            render={({ field }) => (
+                              <Input
+                                {...field}
+                                type="number"
+                                step="0.001"
+                                disabled={disabled}
+                                className={getInputClass(
+                                  errors?.items?.[index]?.rate,
+                                  disabled,
+                                )}
+                                onChange={(e) => {
+                                  const value = e.target.value;
 
-                                field.onChange(value);
+                                  field.onChange(value);
 
-                                const qty = Number(items[index]?.qty || 0);
+                                  const qty = Number(items[index]?.qty || 0);
 
-                                const rate = Number(value || 0);
+                                  const rate = Number(value || 0);
 
-                                const gstPercent = Number(
-                                  items[index]?.gstPercent || 0,
-                                );
+                                  const gstPercent = Number(
+                                    items[index]?.gstPercent || 0,
+                                  );
 
-                                const amount = qty * rate;
+                                  const amount = qty * rate;
 
-                                const gstAmount = (amount * gstPercent) / 100;
+                                  const gstAmount = (amount * gstPercent) / 100;
 
-                                setValue(
-                                  `items.${index}.amount`,
-                                  Number(amount.toFixed(3)),
-                                );
+                                  setValue(
+                                    `items.${index}.amount`,
+                                    Number(amount.toFixed(3)),
+                                  );
 
-                                setValue(
-                                  `items.${index}.gstAmount`,
-                                  Number(gstAmount.toFixed(3)),
-                                );
-                              }}
-                            />
-                          )}
-                        />
+                                  setValue(
+                                    `items.${index}.gstAmount`,
+                                    Number(gstAmount.toFixed(3)),
+                                  );
+                                }}
+                              />
+                            )}
+                          />
                         </div>
                       </td>
 
@@ -337,49 +348,47 @@ export default function OrderItemsTab({
 
                       <td className="border px-2 py-[2px]">
                         <div className="min-w-[90px]">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.gstPercent`}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              type="number"
-                              step="0.001"
-                              disabled={disabled}
-                              
-                              className={getInputClass(
-  errors?.items?.[index]
-    ?.gstPercent,
-  disabled,
-)}
-                              onChange={(e) => {
-                                const value = e.target.value;
+                          <Controller
+                            control={control}
+                            name={`items.${index}.gstPercent`}
+                            render={({ field }) => (
+                              <Input
+                                {...field}
+                                type="number"
+                                step="0.001"
+                                disabled={disabled}
+                                className={getInputClass(
+                                  errors?.items?.[index]?.gstPercent,
+                                  disabled,
+                                )}
+                                onChange={(e) => {
+                                  const value = e.target.value;
 
-                                field.onChange(value);
+                                  field.onChange(value);
 
-                                const qty = Number(items[index]?.qty || 0);
+                                  const qty = Number(items[index]?.qty || 0);
 
-                                const rate = Number(items[index]?.rate || 0);
+                                  const rate = Number(items[index]?.rate || 0);
 
-                                const gstPercent = Number(value || 0);
+                                  const gstPercent = Number(value || 0);
 
-                                const amount = qty * rate;
+                                  const amount = qty * rate;
 
-                                const gstAmount = (amount * gstPercent) / 100;
+                                  const gstAmount = (amount * gstPercent) / 100;
 
-                                setValue(
-                                  `items.${index}.amount`,
-                                  Number(amount.toFixed(3)),
-                                );
+                                  setValue(
+                                    `items.${index}.amount`,
+                                    Number(amount.toFixed(3)),
+                                  );
 
-                                setValue(
-                                  `items.${index}.gstAmount`,
-                                  Number(gstAmount.toFixed(3)),
-                                );
-                              }}
-                            />
-                          )}
-                        />
+                                  setValue(
+                                    `items.${index}.gstAmount`,
+                                    Number(gstAmount.toFixed(3)),
+                                  );
+                                }}
+                              />
+                            )}
+                          />
                         </div>
                       </td>
 

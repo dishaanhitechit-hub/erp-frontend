@@ -429,26 +429,6 @@ export default function OrderBasicSection({
                   disabled={disabled}
                 >
                   <SelectTrigger
-                  //   className="
-                  //   h-[36px]
-                  //   w-full
-                  //   rounded-md
-
-                  //   border
-                  //   border-l-0
-                  //   border-[#3F3F3F]
-
-                  //   bg-white
-
-                  //   px-4
-
-                  //   text-[15px]
-                  //   text-[#7A7A7A]
-                  //   font-medium
-
-                  //   focus:ring-0
-                  //   focus:ring-offset-0
-                  // "
                   className={`${getInputClass(errors.vendorId,disabled)} w-full
             h-[36px]`}
                   >

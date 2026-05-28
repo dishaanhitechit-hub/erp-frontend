@@ -162,7 +162,7 @@ export default function OrderForm({
         setLoading(true);
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}${orderId}`,
+          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}/${orderId}`,
 
           method: "GET",
         });

@@ -81,7 +81,7 @@ export const API_ENDPOINTS = {
         ORDER:{
             GET_ALL_ORDER:"/resource/order/list",
             CREATE_ORDER:"/resource/order/create",
-            GET_ORDER_BY_ID:"/resource/order/",//id
+            GET_ORDER_BY_ID:"/resource/order/details",//id
             UPDATE_ORDER_BY_ID:"/resource/order/update/",//id ,put
             SUBMIT_ORDER_BY_ID:"/resource/order/submit/",//id ,post    
             GET_ITEMS_BY_CATEGORY:"/resource/order/items-by-category",//?categoryCode=CAT001 get

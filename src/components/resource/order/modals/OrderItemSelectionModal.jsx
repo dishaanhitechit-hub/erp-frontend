@@ -27,6 +27,8 @@ import { getLocalStorage } from "@/lib/localStorage";
 
 import { getInputClass } from "@/lib/formStyles";
 
+import ExpandableTextField from "@/components/common/ExpandableTextField";
+
 export default function OrderItemSelectionModal({
   open,
 
@@ -91,7 +93,7 @@ export default function OrderItemSelectionModal({
 
             orderQty: existing?.qty || item.orderQty || item.balanceQty,
 
-            note: existing?.note || "",
+            note: existing?.note || item.note || "",
 
             location: existing?.location || item.location || "",
 
@@ -380,6 +382,8 @@ export default function OrderItemSelectionModal({
 
                 <th className="border p-2 min-w-[140px] text-sm">Order Qty</th>
 
+                <th className="border p-2 min-w-[200px] text-sm">Note</th>
+
                 <th className="border p-2 min-w-[200px] text-sm">Location</th>
               </tr>
             </thead>
@@ -388,7 +392,7 @@ export default function OrderItemSelectionModal({
               {loading && (
                 <tr>
                   <td
-                    colSpan={10}
+                    colSpan={11}
                     className="
                       h-[200px]
                       text-center
@@ -468,11 +472,22 @@ export default function OrderItemSelectionModal({
 
                       {/* NAME */}
 
-                      <td className="border p-2 text-sm">{item.itemName}</td>
+                      <td className="border p-2">
+                        <ExpandableTextField
+                          value={item.itemName}
+                          disabled
+                          title="Item Name"
+                          placeholder="Item Name"
+                          minHeight="min-h-[38px]"
+                          modalHeight="min-h-[180px]"
+                        />
+                      </td>
 
                       {/* UNIT */}
 
-                      <td className="border p-2 text-sm">{item.itemUnit || "-"}</td>
+                      <td className="border p-2 text-sm">
+                        {item.itemUnit || "-"}
+                      </td>
 
                       {/* INDENT QTY */}
 
@@ -509,9 +524,31 @@ export default function OrderItemSelectionModal({
                         />
                       </td>
 
+                      {/* NOTE */}
+
+                      <td className="border p-2">
+                        <ExpandableTextField
+                          value={item.note}
+                          disabled
+                          title="Note"
+                          placeholder="Note"
+                          minHeight="min-h-[38px]"
+                          modalHeight="min-h-[180px]"
+                        />
+                      </td>
+
                       {/* LOCATION */}
 
-                      <td className="border p-2 text-sm">{item.location}</td>
+                      <td className="border p-2">
+                        <ExpandableTextField
+                          value={item.location}
+                          disabled
+                          title="Location"
+                          placeholder="Location"
+                          minHeight="min-h-[38px]"
+                          modalHeight="min-h-[180px]"
+                        />
+                      </td>
                     </tr>
                   );
                 })}
