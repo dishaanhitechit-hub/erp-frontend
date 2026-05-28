@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
 
 export default function NotFoundPage() {
   const router = useRouter();
@@ -28,8 +28,18 @@ export default function NotFoundPage() {
           or is temporarily unavailable.
         </p>
 
-        {/* BUTTON */}
-        <div className="pt-4">
+        {/* BUTTONS */}
+        <div className="pt-4 flex items-center gap-3">
+          
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            className="flex items-center gap-2 px-6 py-2 text-sm cursor-pointer"
+          >
+            <ArrowLeft size={16} />
+            Go Back
+          </Button>
+
           <Button
             onClick={() => router.push("/dashboard")}
             className="flex items-center gap-2 px-6 py-2 text-sm cursor-pointer"
