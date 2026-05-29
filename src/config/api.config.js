@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://web-production-2118d.up.railway.app"; //change here later
+const API_BASE_URL = "https://web-production-f0050.up.railway.app"; //change here later
 
 export const API_ENDPOINTS = {
     LOGIN: "/auth/login",
