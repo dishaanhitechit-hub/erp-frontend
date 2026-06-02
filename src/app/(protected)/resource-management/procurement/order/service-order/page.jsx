@@ -186,7 +186,7 @@ export default function Page() {
             showDateRange={true}
             actions={
               access.canAdd
-                ? [{ label: "+ Create Service Order", onClick: () => router.push("/resource-management/procurement/service-order/new") }]
+                ? [{ label: "+ Create Service Order", onClick: () => router.push("/resource-management/procurement/order/service-order/new") }]
                 : []
             }
           />
@@ -195,7 +195,7 @@ export default function Page() {
             columns={columns}
             data={filteredData}
             onRowClick={(row) => {
-              router.push(`/resource-management/procurement/service-order/${row.id}`);
+              router.push(`/resource-management/procurement/order/service-order/${row.id}`);
             }}
           />
 

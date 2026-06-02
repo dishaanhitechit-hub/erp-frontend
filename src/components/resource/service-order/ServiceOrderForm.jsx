@@ -224,7 +224,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
       if(mode ==="create" && res.data.orderId){
         setTimeout(() => {
         router.push(
-          `/resource-management/procurement/service-order/${res.data.orderId}`,
+          `/resource-management/procurement/order/service-order/${res.data.orderId}`,
         );
       }, 500);
       }
