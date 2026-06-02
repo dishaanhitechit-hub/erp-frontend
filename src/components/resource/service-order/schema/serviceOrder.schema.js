@@ -1,12 +1,11 @@
 import { z } from "zod";
 
 const itemSchema = z.object({
-  indentItemId: z.any().optional(),
   itemCode: z.string(),
   itemName: z.string(),
   itemUnit: z.string().optional(),
   qty: z.coerce.number({ required_error: "Qty is required" }).min(0.001, "Qty must be greater than 0"),
-  rate: z.coerce.number({ required_error: "Rate is required" }).min(0.001, "Rate must be valid"),
+  rate: z.coerce.number({ required_error: "Rate is required" }).min(0, "Rate must be 0 or more"),
   gstPercent: z.coerce.number({ required_error: "GST is required" }).min(0),
   amount: z.number().optional(),
   gstAmount: z.number().optional(),
@@ -21,14 +20,13 @@ const termSchema = z.object({
   description: z.string(),
 });
 
-export const orderSchema = z
+export const serviceOrderSchema = z
   .object({
     categoryCode: z.string({ required_error: "Category is required" }).min(1, "Category is required"),
 
-    // Always "Material" in display, sends MAT_001 to API
-    subCategoryCode: z.string({ required_error: "Sub Category is required" }).min(1, "Sub Category is required"),
+    // multi-select array — at least one required
+    subCategoryCodes: z.array(z.string()).min(1, "Select at least one sub category"),
 
-    // "Project Work" or "Fixed Asset" — determines assetOnly flag
     costHead: z.string({ required_error: "Cost Head is required" }).min(1, "Cost Head is required"),
 
     vendorId: z.string({ required_error: "Party Name is required" }).min(1, "Party Name is required"),
@@ -39,19 +37,6 @@ export const orderSchema = z
     quotationNo: z.string().min(1, "Quotation No is required"),
     quotationDate: z.string().min(1, "Quotation Date is required"),
     orderMessage: z.string().optional(),
-    gstType: z.enum(["IGST", "CGST_SGST", ""]).optional(),
     items: z.array(itemSchema).min(1, "At least one item is required"),
     terms: z.array(termSchema).min(1, "At least one term is required"),
-    orderFile: z.any().optional(),
-  })
-  .superRefine((data, ctx) => {
-    const file = data.orderFile;
-    if (file && file instanceof File) {
-      if (file.type !== "application/pdf") {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["orderFile"], message: "Only PDF file allowed" });
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["orderFile"], message: "File size must be below 5MB" });
-      }
-    }
   });

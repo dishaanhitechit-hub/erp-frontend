@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Download, FileText, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, Download, FileText, Upload } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -14,29 +14,35 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass, labelClass } from "@/lib/formStyles";
 import { getLocalStorage } from "@/lib/localStorage";
 
-// CHANGED: New category values for existing Order module
-const ORDER_CATEGORIES = [
-  { label: "Purchases Order", value: "Purchases Order" },
-  { label: "Customer Supply Order", value: "Customer Supply Order" },
-  { label: "Site Transfer Order", value: "Site Transfer Order" },
-];
-
-const COST_HEAD_OPTIONS = {
-  "Purchases Order": [
-    { label: "Project Work", value: "Project Work" },
-    { label: "Fixed Asset", value: "Fixed Asset" },
-  ],
-  "Customer Supply Order": [
-    { label: "Project Work", value: "Project Work" },
-  ],
-  // SubCategory: Material only; assetOnly = costHead === "Fixed Asset" (handled in modal)
-  "Site Transfer Order": [
-    { label: "Project Work", value: "Project Work" },
-    { label: "Fixed Asset", value: "Fixed Asset" },
-  ],
+// Category config — drives subCategory options, costHead options, and assetOnly flag
+const CATEGORY_CONFIG = {
+  "Work Order": {
+    subCategories: [
+      { label: "Service", value: "SER_001" },
+      { label: "Composite", value: "COM_001" },
+    ],
+    costHeads: [{ label: "Project Work", value: "Project Work" }],
+    multiSelect: true,
+    assetOnly: false,
+  },
+  "Hire Order": {
+    subCategories: [{ label: "Service", value: "SER_001" }],
+    costHeads: [{ label: "Project Work", value: "Project Work" }],
+    multiSelect: false,
+    assetOnly: false,
+  },
+  // Site Transfer Order moved to existing Order module
+  "Job Contract Order": {
+    subCategories: [{ label: "Expenses", value: "EXP_001" }],
+    costHeads: [{ label: "Project Work", value: "Project Work" }],
+    multiSelect: false,
+    assetOnly: false,
+  },
 };
 
-export default function OrderBasicSection({
+const SERVICE_ORDER_CATEGORIES = Object.keys(CATEGORY_CONFIG);
+
+export default function ServiceOrderBasicSection({
   form,
   disabled,
   fileName,
@@ -50,6 +56,8 @@ export default function OrderBasicSection({
   const [ledgerList, setLedgerList] = useState([]);
   const [billingOptions, setBillingOptions] = useState([]);
   const [shippingOptions, setShippingOptions] = useState([]);
+  const [subDropdownOpen, setSubDropdownOpen] = useState(false);
+  const subDropdownRef = useRef(null);
 
   const { register, control, setValue, watch, formState: { errors } } = form;
 
@@ -58,6 +66,21 @@ export default function OrderBasicSection({
 
   const selectedVendorId = watch("vendorId");
   const categoryCode = watch("categoryCode");
+  const subCategoryCodes = watch("subCategoryCodes") || [];
+
+  const categoryConfig = CATEGORY_CONFIG[categoryCode] || CATEGORY_CONFIG["Work Order"];
+
+  // Close sub dropdown on outside click
+  useEffect(() => {
+    if (!subDropdownOpen) return;
+    const handleOutside = (e) => {
+      if (subDropdownRef.current && !subDropdownRef.current.contains(e.target)) {
+        setSubDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [subDropdownOpen]);
 
   // LOAD LEDGERS
   useEffect(() => {
@@ -117,15 +140,39 @@ export default function OrderBasicSection({
     setValue("contactNumber", selectedVendor.primaryContactNumber || "");
   }, [selectedVendorId, ledgerList, setValue]);
 
-  // CHANGED: When category changes reset costHead and items
+  // When category changes — reset sub/costHead/items
   const handleCategoryChange = (value) => {
     setValue("categoryCode", value);
-    setValue("subCategoryCode", "MAT_001");
-    setValue("costHead", "");
+    const config = CATEGORY_CONFIG[value];
+    // Auto-set single sub category options
+    if (!config.multiSelect) {
+      setValue("subCategoryCodes", [config.subCategories[0].value]);
+    } else {
+      setValue("subCategoryCodes", []);
+    }
+    // Auto-set costHead if only one option
+    if (config.costHeads.length === 1) {
+      setValue("costHead", config.costHeads[0].value);
+    } else {
+      setValue("costHead", "");
+    }
     setValue("items", []);
   };
 
-  const costHeadOptions = COST_HEAD_OPTIONS[categoryCode] || COST_HEAD_OPTIONS["Purchases Order"];
+  // Multi-select toggle
+  const toggleSubCategory = (value) => {
+    const current = subCategoryCodes;
+    const exists = current.includes(value);
+    const updated = exists ? current.filter((v) => v !== value) : [...current, value];
+    setValue("subCategoryCodes", updated, { shouldValidate: true });
+  };
+
+  const subLabel = subCategoryCodes.length > 0
+    ? categoryConfig.subCategories
+        .filter((o) => subCategoryCodes.includes(o.value))
+        .map((o) => o.label)
+        .join(", ")
+    : "Select";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-x-6 gap-y-5">
@@ -133,7 +180,7 @@ export default function OrderBasicSection({
       {/* CATEGORY SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
 
-        {/* CATEGORY — CHANGED: "Purchases Order" / "Customer Supply Order" */}
+        {/* CATEGORY */}
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Category</div>
           <div className="w-[220px] min-w-[220px] max-w-[220px]">
@@ -150,8 +197,8 @@ export default function OrderBasicSection({
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {ORDER_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    {SERVICE_ORDER_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -160,28 +207,77 @@ export default function OrderBasicSection({
           </div>
         </div>
 
-        {/* SUB CATEGORY — CHANGED: always "Material" for both categories */}
+        {/* SUB CATEGORY — multi-select for Work Order, single for others */}
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Sub Category</div>
           <div className="w-[220px] min-w-[220px] max-w-[220px]">
-            <Controller
-              control={control}
-              name="subCategoryCode"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
-                  <SelectTrigger className={`${getInputClass(errors.subCategoryCode, disabled)} w-full h-[36px]`}>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="MAT_001">Material</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
+            {categoryConfig.multiSelect ? (
+              // MULTI-SELECT dropdown
+              <div ref={subDropdownRef} className="relative">
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => !disabled && setSubDropdownOpen((p) => !p)}
+                  className={`
+                    ${getInputClass(errors.subCategoryCodes, disabled)}
+                    w-full h-[36px] px-3 flex items-center justify-between text-sm
+                  `}
+                >
+                  <span className={`truncate ${!subCategoryCodes.length ? "text-gray-400" : ""}`}>
+                    {subLabel}
+                  </span>
+                  <ChevronDown size={14} className="shrink-0 ml-1 text-gray-500" />
+                </button>
+
+                {subDropdownOpen && (
+                  <div className="absolute top-full left-0 z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
+                    {categoryConfig.subCategories.map((opt) => {
+                      const checked = subCategoryCodes.includes(opt.value);
+                      return (
+                        <div
+                          key={opt.value}
+                          onClick={() => toggleSubCategory(opt.value)}
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        >
+                          <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer" />
+                          <span className="text-sm text-gray-700">{opt.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* {errors.subCategoryCodes && (
+                  <p className="text-xs text-red-500 mt-0.5">{errors.subCategoryCodes.message}</p>
+                )} */}
+              </div>
+            ) : (
+              // SINGLE select — only one option, show as disabled select
+              <Controller
+                control={control}
+                name="subCategoryCodes"
+                render={({ field }) => (
+                  <Select
+                    value={field.value?.[0] || ""}
+                    onValueChange={(val) => field.onChange([val])}
+                    disabled={disabled}
+                  >
+                    <SelectTrigger className={`${getInputClass(errors.subCategoryCodes, disabled)} w-full h-[36px]`}>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryConfig.subCategories.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            )}
           </div>
         </div>
 
-        {/* COST HEAD — CHANGED: new field; options vary by category */}
+        {/* COST HEAD */}
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Cost Head</div>
           <div className="w-[220px] min-w-[220px] max-w-[220px]">
@@ -189,20 +285,12 @@ export default function OrderBasicSection({
               control={control}
               name="costHead"
               render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(val) => {
-                    field.onChange(val);
-                    // Clear items — costHead change means different assetOnly = different item list
-                    setValue("items", []);
-                  }}
-                  disabled={disabled}
-                >
+                <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
                   <SelectTrigger className={`${getInputClass(errors.costHead, disabled)} w-full h-[36px]`}>
                     <SelectValue placeholder="Select Cost Head" />
                   </SelectTrigger>
                   <SelectContent>
-                    {costHeadOptions.map((opt) => (
+                    {categoryConfig.costHeads.map((opt) => (
                       <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                     ))}
                   </SelectContent>
@@ -213,7 +301,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* ORDER SECTION — unchanged */}
+      {/* ORDER SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order No</div>
@@ -229,7 +317,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* PARTY SECTION — unchanged */}
+      {/* PARTY SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Party Name</div>
@@ -276,7 +364,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* PROJECT SECTION — unchanged */}
+      {/* PROJECT SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Site</div>
@@ -314,7 +402,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* CONTACT SECTION — unchanged */}
+      {/* CONTACT SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Contact Person</div>
@@ -326,7 +414,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* QUOTATION SECTION — unchanged */}
+      {/* QUOTATION SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Quotation No</div>
@@ -338,7 +426,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* ORDER MESSAGE — unchanged */}
+      {/* ORDER MESSAGE */}
       <div>
         <div className="flex items-start">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order Message</div>
@@ -350,7 +438,7 @@ export default function OrderBasicSection({
         </div>
       </div>
 
-      {/* FILE SECTION — unchanged */}
+      {/* FILE SECTION — same as order module */}
       <div>
         <div className="inline-flex items-center justify-center min-h-[38px] px-6 bg-[#FFE7A3] border border-[#E29B34] rounded-[8px] text-[15px] font-semibold text-black">
           Attached Party Quotation

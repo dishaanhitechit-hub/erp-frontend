@@ -153,7 +153,7 @@ export default function Page() {
     });
   };
 
-  // SUMMARY DATA
+  // SUMMARY DATA //need to change here category changed 
   const summaryData = useMemo(() => {
     const categoryList = ["Purchase Order", "Work Order", "Service Order"];
 

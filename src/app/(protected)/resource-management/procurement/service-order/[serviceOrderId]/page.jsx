@@ -10,14 +10,17 @@ import PageNotAvailable from "@/components/common/PageNotAvailable";
 import ApprovalActionModal from "@/components/common/ApprovalActionModal";
 import HistoryTimelineSheet from "@/components/common/HistoryTimelineSheet";
 import { API_ENDPOINTS } from "@/config/api.config";
-import OrderForm from "@/components/resource/order/OrderForm";
+import ServiceOrderForm from "@/components/resource/service-order/ServiceOrderForm";
+
+const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
 
 export default function Page() {
   const router = useRouter();
-  const { orderId } = useParams();
+  const { serviceOrderId } = useParams();
   const [openApproval, setOpenApproval] = useState(false);
   const [openTimeline, setOpenTimeline] = useState(false);
 
+  // Access uses "order" pageCode — same module access as order
   const access = getPageAccess({ pageCode: "order", pageType: "EDIT" });
 
   if (!access.allowed) return <PageNotAvailable />;
@@ -30,16 +33,20 @@ export default function Page() {
 
   return (
     <HeaderWrapper header={<PageHeader actions={actions} />}>
-      <OrderForm mode={access.mode} canApprove={access.canApprove} orderId={orderId} />
+      <ServiceOrderForm
+        mode={access.mode}
+        canApprove={access.canApprove}
+        serviceOrderId={serviceOrderId}
+      />
 
       <ApprovalActionModal
         open={openApproval}
         onClose={() => setOpenApproval(false)}
-        payload={{ id: orderId }}
+        payload={{ id: serviceOrderId }}
         actions={[
-          { type: "approve", api: API_ENDPOINTS.RESOURCE.ORDER.APPROVE },
-          { type: "reback", api: API_ENDPOINTS.RESOURCE.ORDER.REBACK },
-          { type: "reject", api: API_ENDPOINTS.RESOURCE.ORDER.REJECT },
+          { type: "approve", api: PW.APPROVE },
+          { type: "reback", api: PW.REBACK },
+          { type: "reject", api: PW.REJECT },
         ]}
         onSuccess={() => { setOpenApproval(false); router.refresh(); }}
       />
@@ -47,9 +54,9 @@ export default function Page() {
       <HistoryTimelineSheet
         open={openTimeline}
         onClose={() => setOpenTimeline(false)}
-        title="Order History"
-        api={API_ENDPOINTS.RESOURCE.ORDER.HISTORY}
-        entityId={orderId}
+        title="Service Order History"
+        api={PW.HISTORY}
+        entityId={serviceOrderId}
       />
     </HeaderWrapper>
   );

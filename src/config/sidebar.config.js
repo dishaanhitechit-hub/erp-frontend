@@ -108,6 +108,11 @@ export const sidebarConfig = [
             path: "/resource-management/procurement/order",
             permissionKey: "order",
           },
+          {
+            title: "Service Order",
+            path: "/resource-management/procurement/service-order",
+            permissionKey: "order",
+          },
         ],
       },
       {

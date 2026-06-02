@@ -9,26 +9,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SaveButton from "@/components/common/SaveButton";
 import EditButton from "@/components/common/EditButton";
 import SaveDraftButton from "@/components/common/SaveDraftButton";
-import OrderBasicSection from "./sections/OrderBasicSection";
-import OrderItemsTab from "./tabs/OrderItemsTab";
-import OrderTermsTab from "./tabs/OrderTermsTab";
-import OrderSummaryTab from "./tabs/OrderSummaryTab";
-import { orderSchema } from "./schema/order.schema";
+import ServiceOrderBasicSection from "./sections/ServiceOrderBasicSection";
+import ServiceOrderItemsTab from "./tabs/ServiceOrderItemsTab";
+import OrderTermsTab from "@/components/resource/order/tabs/OrderTermsTab";
+import OrderSummaryTab from "@/components/resource/order/tabs/OrderSummaryTab";
+import { serviceOrderSchema } from "./schema/serviceOrder.schema";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 
+const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
+
 const defaultValues = {
-  categoryCode: "Purchases Order",
-  subCategoryCode: "MAT_001",
-  costHead: "",          // CHANGED: new field
+  categoryCode: "Work Order",
+  subCategoryCodes: [],
+  costHead: "Project Work",
   vendorId: "",
   orderNo: "",
   orderDate: "",
   validityDate: "",
   partyAddress: "",
   gstn: "",
-  site: "",
   billingAddress: "",
   shippingAddress: "",
   contactPerson: "",
@@ -36,7 +37,6 @@ const defaultValues = {
   quotationNo: "",
   quotationDate: "",
   orderMessage: "",
-  gstType: "",
   items: [],
   terms: [],
   ccSummary: [],
@@ -45,65 +45,63 @@ const defaultValues = {
   totalAmount: 0,
 };
 
-export default function OrderForm({ mode = "create", orderId }) {
+export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
   const [activeTab, setActiveTab] = useState("items");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(mode === "create");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
-  const [fileName, setFileName] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
-  const [attachedFile, setAttachedFile] = useState(null);
   const [initialData, setInitialData] = useState(null);
-  const [initialFileData, setInitialFileData] = useState({ fileName: "", fileUrl: "" });
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openItemModal, setOpenItemModal] = useState(false);
 
+  // FILE STATE — same as order module
+  const [fileName, setFileName] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [attachedFile, setAttachedFile] = useState(null);
+  const [initialFileData, setInitialFileData] = useState({ fileName: "", fileUrl: "" });
   const fileRef = useRef(null);
+
   const projectInfo = getLocalStorage("projectInfo");
   const projectCode = projectInfo?.projectCode;
 
   const form = useForm({
-    resolver: zodResolver(orderSchema),
+    resolver: zodResolver(serviceOrderSchema),
     defaultValues,
     mode: "onChange",
   });
 
   const { reset, watch, setValue, getValues, handleSubmit, formState: { isSubmitting } } = form;
 
-  const costHead = watch("costHead");
-
   const disabled =
     mode === "view" || mode === "approver" || !isEditing || isSubmitted || isSubmitting;
 
   // ─── LOAD ORDER ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (mode === "create" || !orderId) return;
+    if (mode === "create" || !serviceOrderId) return;
 
     const fetchOrder = async () => {
       try {
         setLoading(true);
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}/${orderId}`,
+          url: `${PW.GET_ORDER_BY_ID}/${serviceOrderId}`,
           method: "GET",
         });
         const data = res.data;
 
         const formattedData = {
-          categoryCode: data.categoryCode || "Purchases Order",
-          subCategoryCode: data.subCategoryCode || "MAT_001",
-          costHead: data.costHead || "",   // CHANGED: load costHead
+          categoryCode: data.categoryCode || "Work Order",
+          subCategoryCodes: data.subCategoryCodes || [],
+          costHead: data.costHead || "Project Work",
           vendorId: String(data.vendorId || ""),
           orderNo: data.orderNo || "",
           orderDate: data.orderDate || "",
           validityDate: data.validityDate || "",
-          site: data.projectCode || "",
           billingAddress: data.billingAddress || "",
           shippingAddress: data.shippingAddress || "",
           quotationNo: data.quotationNo || "",
           quotationDate: data.quotationDate || "",
           orderMessage: data.orderMessage || "",
-          gstType: data.gstType || "",
           items: data.items || [],
           terms: data.terms || [],
           ccSummary: data.ccSummary || [],
@@ -114,12 +112,13 @@ export default function OrderForm({ mode = "create", orderId }) {
 
         reset(formattedData);
         setInitialData(formattedData);
+
+        // FILE — same as order module
         setFileUrl(data.orderFile || "");
         const extractedFileName = data.orderFile?.split("/")?.pop() || "";
         setInitialFileData({ fileName: extractedFileName, fileUrl: data.orderFile || "" });
 
-        // FIXED: check what IS editable rather than what isn't —
-        // null/undefined/unexpected workflowStatus was incorrectly triggering isSubmitted=true
+        // FIXED: same as OrderForm — case-insensitive editable workflowStatus check
         const isEditableStatus = ["draft", "reback"].includes(
           (data.workflowStatus || "").toLowerCase()
         );
@@ -131,28 +130,24 @@ export default function OrderForm({ mode = "create", orderId }) {
           setAllowSubmit(true);
         }
       } catch (err) {
-        toast.error(err.message || "Failed to load order");
+        toast.error(err.message || "Failed to load service order");
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrder();
-  }, [orderId, mode, reset]);
+  }, [serviceOrderId, mode, reset]);
 
-  // ─── BUILD PAYLOAD (FormData — supports file) ─────────────────────────────
+  // ─── BUILD PAYLOAD — FormData to support file upload like order module ────
   const buildFormData = () => {
     const values = getValues();
     const formData = new FormData();
 
     formData.append("projectCode", projectCode);
     formData.append("categoryCode", values.categoryCode);
-
-    // CHANGED: subCategoryCode always MAT_001; assetOnly based on costHead
-    formData.append("subCategoryCode", "MAT_001");
+    formData.append("subCategoryCodes", JSON.stringify(values.subCategoryCodes));
     formData.append("costHead", values.costHead);
-    formData.append("assetOnly", values.costHead === "Fixed Asset" ? "true" : "false");
-
     formData.append("vendorId", values.vendorId);
     formData.append("orderDate", values.orderDate);
     formData.append("validityDate", values.validityDate);
@@ -168,7 +163,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       "items",
       JSON.stringify(
         values.items.map((item) => ({
-          indentItemId: item.indentItemId,
+          itemCode: item.itemCode,
           qty: Number(item.qty),
           rate: Number(item.rate),
           gstPercent: Number(item.gstPercent),
@@ -184,11 +179,13 @@ export default function OrderForm({ mode = "create", orderId }) {
         values.terms.map((term) => ({
           termId: term.termId,
           description: term.description || "",
+          sequenceNo: term.sequenceNo || 0,
         }))
       )
     );
 
     if (attachedFile) formData.append("orderFile", attachedFile);
+
     return formData;
   };
 
@@ -200,12 +197,12 @@ export default function OrderForm({ mode = "create", orderId }) {
     if (!values.terms?.filter((t) => t?.termId).length) { toast.error("Please add at least one term & condition"); return; }
 
     try {
-      toastId = toast.loading(mode === "create" ? "Creating order..." : "Updating order...");
+      toastId = toast.loading(mode === "create" ? "Creating service order..." : "Updating service order...");
 
       const res = await apiRequest({
         url: mode === "create"
-          ? API_ENDPOINTS.RESOURCE.ORDER.CREATE_ORDER
-          : `${API_ENDPOINTS.RESOURCE.ORDER.UPDATE_ORDER_BY_ID}${orderId}`,
+          ? PW.CREATE_ORDER
+          : `${PW.UPDATE_ORDER_BY_ID}${serviceOrderId}`,
         method: mode === "create" ? "POST" : "PUT",
         data: buildFormData(),
       });
@@ -234,17 +231,14 @@ export default function OrderForm({ mode = "create", orderId }) {
 
     let toastId;
     try {
-      toastId = toast.loading("Submitting order...");
-      await apiRequest({
-        url: `${API_ENDPOINTS.RESOURCE.ORDER.SUBMIT_ORDER_BY_ID}${orderId}`,
-        method: "POST",
-      });
-      toast.success("Order submitted successfully", { id: toastId });
+      toastId = toast.loading("Submitting service order...");
+      await apiRequest({ url: `${PW.SUBMIT_ORDER_BY_ID}${serviceOrderId}`, method: "POST" });
+      toast.success("Service order submitted successfully", { id: toastId });
       setIsSubmitted(true);
       setIsEditing(false);
       setAllowSubmit(false);
     } catch (err) {
-      toast.error(err.message || "Failed to submit order", { id: toastId });
+      toast.error(err.message || "Failed to submit service order", { id: toastId });
     }
   };
 
@@ -283,7 +277,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
         {/* LEFT SECTION */}
         <div className="w-full xl:w-auto shrink-0">
-          <OrderBasicSection
+          <ServiceOrderBasicSection
             form={form}
             disabled={disabled}
             fileName={fileName}
@@ -316,35 +310,22 @@ export default function OrderForm({ mode = "create", orderId }) {
 
               <div className="flex items-center gap-2 lg:justify-end">
                 {activeTab === "items" && !disabled && (
-                  <button
-                    type="button"
-                    onClick={() => setOpenItemModal(true)}
-                    className="h-[34px] min-w-[170px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition"
-                  >
-                    + Add Order Items
+                  <button type="button" onClick={() => setOpenItemModal(true)} className="h-[34px] min-w-[180px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition">
+                    + Add Service Items
                   </button>
                 )}
                 {activeTab === "terms" && !disabled && (
-                  <button
-                    type="button"
-                    onClick={() => setOpenTermsModal(true)}
-                    className="h-[34px] min-w-[150px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition"
-                  >
+                  <button type="button" onClick={() => setOpenTermsModal(true)} className="h-[34px] min-w-[150px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition">
                     + Add T&C
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="border border-[#CFCFCF] bg-white min-w-[900px]">
+            {/* FIXED: position-relative creates a new stacking context so sticky thead works correctly */}
+            <div className="border border-[#CFCFCF] bg-white min-w-[900px] relative">
               <TabsContent value="items" className="m-0">
-                {/* CHANGED: always OrderItemsTab; assetOnly handled in modal via costHead */}
-                <OrderItemsTab
-                  form={form}
-                  disabled={disabled}
-                  openItemModal={openItemModal}
-                  setOpenItemModal={setOpenItemModal}
-                />
+                <ServiceOrderItemsTab form={form} disabled={disabled} openItemModal={openItemModal} setOpenItemModal={setOpenItemModal} />
               </TabsContent>
               <TabsContent value="terms" className="m-0">
                 <OrderTermsTab form={form} disabled={disabled} openTermsModal={openTermsModal} setOpenTermsModal={setOpenTermsModal} />
@@ -380,7 +361,7 @@ export default function OrderForm({ mode = "create", orderId }) {
             loading={isSubmitting}
             disabled={!allowSubmit || isEditing || isSubmitted || isSubmitting}
             requireConfirmation
-            confirmationTitle="Submit Order?"
+            confirmationTitle="Submit Service Order?"
             confirmationMessage="Once submitted, this order will go for approval."
           >
             Submit

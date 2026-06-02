@@ -48,8 +48,8 @@ export default function OrderItemSelectionModal({
 
   const projectCode = projectInfo?.projectCode;
 
-  const subCategoryCode = form.watch("subCategoryCode");
-
+  // CHANGED: costHead determines assetOnly — Fixed Asset = true, else false
+  const costHead = form.watch("costHead");
   const existingItems = form.watch("items") || [];
 
   // LOAD ITEMS
@@ -59,11 +59,9 @@ export default function OrderItemSelectionModal({
       return;
     }
 
-    if (!subCategoryCode) {
-      toast.error("Please select sub category first");
-
+    if (!costHead) {
+      toast.error("Please select cost head first");
       onClose?.();
-
       return;
     }
 
@@ -71,9 +69,11 @@ export default function OrderItemSelectionModal({
       try {
         setLoading(true);
 
-        const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_INDENT_LIST}?projectCode=${projectCode}&subCategoryCode=${subCategoryCode}`,
+        // CHANGED: costHead determines assetOnly; subCategoryCode always MAT_001
+        const assetOnly = costHead === "Fixed Asset";
 
+        const res = await apiRequest({
+          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_INDENT_LIST}?projectCode=${projectCode}&subCategoryCode=MAT_001&assetOnly=${assetOnly}`,
           method: "GET",
         });
 
@@ -114,7 +114,7 @@ export default function OrderItemSelectionModal({
     };
 
     fetchItems();
-  }, [open, subCategoryCode, projectCode, existingItems, onClose]);
+  }, [open, costHead, projectCode, existingItems, onClose]);
 
   // SEARCH FILTER
 
