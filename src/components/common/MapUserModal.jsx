@@ -409,12 +409,12 @@ export default function MapUserModal({
                                                         type="checkbox"
                                                         checked={
                                                             permissions?.[
-                                                                child.path
+                                                                child.permissionKey
                                                                 ]?.view || false
                                                         }
                                                         onChange={(e) =>
                                                             handleCheckbox(
-                                                                child.path,
+                                                                child.permissionKey,
                                                                 "view",
                                                                 e.target.checked
                                                             )
@@ -441,12 +441,12 @@ export default function MapUserModal({
                                                         type="checkbox"
                                                         checked={
                                                             permissions?.[
-                                                                child.path
+                                                                child.permissionKey
                                                                 ]?.edit || false
                                                         }
                                                         onChange={(e) =>
                                                             handleCheckbox(
-                                                                child.path,
+                                                                child.permissionKey,
                                                                 "edit",
                                                                 e.target.checked
                                                             )
