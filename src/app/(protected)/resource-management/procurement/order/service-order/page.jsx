@@ -14,8 +14,9 @@ import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { getPageAccess } from "@/helper/getPageAccess";
 import PageNotAvailable from "@/components/common/PageNotAvailable";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogClose, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { getLocalStorage } from "@/lib/localStorage";
 
 const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
@@ -211,38 +212,48 @@ export default function Page() {
                 </button>
               </DialogTrigger>
 
-              <DialogContent className="max-w-[600px] p-0">
-                <DialogHeader className="px-6 py-4 border-b bg-slate-50">
-                  <DialogTitle className="text-lg font-semibold">Service Order Summary</DialogTitle>
-                </DialogHeader>
+              <DialogContent
+                showCloseButton={false}
+                className="w-[95vw] sm:w-auto sm:min-w-[560px] sm:max-w-[680px] p-0 gap-0"
+              >
+                <div className="flex items-center justify-between px-5 py-3 border-b border-[#6b8f4e] bg-[#f5f5f5] rounded-t-xl">
+                  <DialogTitle className="text-[16px] font-semibold text-[#1f1f1f]">
+                    Service Order Summary
+                  </DialogTitle>
+                  <DialogClose className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-200 transition-colors cursor-pointer">
+                    <X size={16} className="text-gray-600" />
+                  </DialogClose>
+                </div>
 
-                <div className="overflow-auto max-h-[60vh] p-4">
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-[#D3D3D3] font-semibold">
-                        <th className="border px-3 py-2 text-left">Category</th>
-                        <th className="border px-3 py-2 text-right">Order Placed</th>
-                        <th className="border px-3 py-2 text-right">Bill Booked</th>
-                        <th className="border px-3 py-2 text-right">Un-Billed</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {summaryData.rows.map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-[#f2f2f2]" : "bg-white"}>
-                          <td className="border px-3 py-1">{row.category}</td>
-                          <td className="border px-3 py-1 text-right">{formatAmount(row.orderPlaced)}</td>
-                          <td className="border px-3 py-1 text-right">{formatAmount(row.billBooked)}</td>
-                          <td className="border px-3 py-1 text-right">{formatAmount(row.unBilled)}</td>
+                <div className="overflow-x-auto px-4 pt-4 pb-5">
+                  <div className="rounded-[10px] border border-[#6b8f4e]">
+                    <table className="min-w-[480px] w-full border-collapse text-[13px]">
+                      <thead>
+                        <tr className="bg-[#efd98d]">
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-left font-semibold text-[#1f1f1f] whitespace-nowrap">Category</th>
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">Order Placed</th>
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">Bill Booked</th>
+                          <th className="px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">Un-Billed</th>
                         </tr>
-                      ))}
-                      <tr className="bg-[#D3D3D3] font-semibold">
-                        <td className="border px-3 py-1">Total</td>
-                        <td className="border px-3 py-1 text-right">{formatAmount(summaryData.total.orderPlaced)}</td>
-                        <td className="border px-3 py-1 text-right">{formatAmount(summaryData.total.billBooked)}</td>
-                        <td className="border px-3 py-1 text-right">{formatAmount(summaryData.total.unBilled)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {summaryData.rows.map((row, i) => (
+                          <tr key={i} className="border-t border-[#6b8f4e]">
+                            <td className="bg-[#b7b5f2] border-r border-[#6b8f4e] px-4 py-2.5 font-medium text-[#1f1f1f] whitespace-nowrap">{row.category}</td>
+                            <td className="bg-[#ececec] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(row.orderPlaced)}</td>
+                            <td className="bg-[#ececec] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(row.billBooked)}</td>
+                            <td className="bg-[#ececec] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(row.unBilled)}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t-2 border-[#6b8f4e]">
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 font-semibold text-[#1f1f1f] whitespace-nowrap">Total Order</td>
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(summaryData.total.orderPlaced)}</td>
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(summaryData.total.billBooked)}</td>
+                          <td className="bg-[#b7b7b7] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">{formatAmount(summaryData.total.unBilled)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
