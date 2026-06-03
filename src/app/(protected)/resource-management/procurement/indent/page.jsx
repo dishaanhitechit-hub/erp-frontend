@@ -34,7 +34,7 @@ export default function Page() {
 
   //  INITIAL LOAD
   useEffect(() => {
-    if (!projectCode) {
+    if (!projectCode || !access.allowed) {
       return;
     };
     const fetchIndents = async () => {

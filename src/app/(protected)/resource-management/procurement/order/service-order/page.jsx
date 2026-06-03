@@ -45,7 +45,7 @@ export default function Page() {
 
   // INITIAL LOAD — uses PW list API
   useEffect(() => {
-    if (!projectCode) return;
+    if (!projectCode || !access.allowed) return;
 
     const fetchOrders = async () => {
       try {
