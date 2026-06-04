@@ -152,7 +152,7 @@ export default function UserForm({ mode = "create", data }) {
       if (mode == "create" || mode == "edit") {
         setTimeout(() => {
           router.push("/settings/user-id-password/");
-        }, 500);
+        }, 400);
       }
     } catch (err) {
       toast.error(err.message || "Failed", { id: toastId });

@@ -265,7 +265,7 @@ export default function OrderForm({ mode = "create", orderId }) {
         router.push(
           `/resource-management/procurement/order/material-order/${res.data.orderId}`,
         );
-      }, 500);
+      }, 400);
       }
       
     } catch (err) {

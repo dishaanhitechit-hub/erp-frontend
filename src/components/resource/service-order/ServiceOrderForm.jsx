@@ -226,7 +226,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
         router.push(
           `/resource-management/procurement/order/service-order/${res.data.orderId}`,
         );
-      }, 500);
+      }, 400);
       }
     } catch (err) {
       toast.error(err.message || "Failed to save draft", { id: toastId });

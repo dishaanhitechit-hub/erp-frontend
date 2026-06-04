@@ -369,7 +369,7 @@ export default function IndentForm({
         router.push(
           `/resource-management/procurement/indent/${res.data.indentId}`,
         );
-      }, 500);
+      }, 400);
       }
 
       // router.push("/resource-management/procurement/indent")
