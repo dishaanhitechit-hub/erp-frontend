@@ -223,7 +223,7 @@ export default function AppNavbar() {
                   //   }
                   // }}
                   onClick={() => {
-                  if (role?.toLowerCase() === ROLE.USER) {
+                  if (role === roleMap.user) {
                     router.push("/");
                   }
                 }}

@@ -16,10 +16,11 @@ import PageNotAvailable from "@/components/common/PageNotAvailable";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
+  DialogClose,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { getLocalStorage } from "@/lib/localStorage";
 
 export default function Page() {
@@ -41,7 +42,7 @@ export default function Page() {
 
   //  INITIAL LOAD
   useEffect(() => {
-    if (!projectCode) {
+    if (!projectCode || !access.allowed) {
       return;
     };
     const fetchOrders = async () => {
@@ -153,9 +154,9 @@ export default function Page() {
     });
   };
 
-  // SUMMARY DATA //need to change here category changed 
+  // SUMMARY — updated to match new category names
   const summaryData = useMemo(() => {
-    const categoryList = ["Purchase Order", "Work Order", "Service Order"];
+    const categoryList = ["Purchases Order", "Customer Supply Order", "Site Transfer Order"];
 
     const summary = categoryList.map((categoryName) => {
       const categoryRows = filteredData.filter(
@@ -294,76 +295,74 @@ export default function Page() {
                 </button>
               </DialogTrigger>
 
-              <DialogContent className="max-w-[820px] overflow-hidden border-[#6b8f4e] p-0">
-                <DialogHeader className="border-b border-[#6b8f4e] bg-[#f5f5f5] px-6 py-4">
-                  <DialogTitle className="text-[18px] font-semibold text-[#1f1f1f]">
+              {/* showCloseButton=false — we render our own in the header row for full layout control */}
+              <DialogContent
+                showCloseButton={false}
+                className="w-[95vw] sm:w-auto sm:min-w-[560px] sm:max-w-[680px] p-0 gap-0"
+              >
+                {/* TITLE ROW with custom close button */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-[#6b8f4e] bg-[#f5f5f5] rounded-t-xl">
+                  <DialogTitle className="text-[16px] font-semibold text-[#1f1f1f]">
                     Order Summary
                   </DialogTitle>
-                </DialogHeader>
+                  <DialogClose className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-200 transition-colors cursor-pointer">
+                    <X size={16} className="text-gray-600" />
+                  </DialogClose>
+                </div>
 
-                <div className="p-5">
-                  <div className="overflow-hidden rounded-[12px] border border-[#6b8f4e]">
-                    {/* HEADER */}
-                    <div className="grid grid-cols-[2.2fr_1fr_1fr_1fr] bg-[#efd98d]">
-                      <div className="border-r border-[#6b8f4e] px-[18px] py-[11px] text-[15px] font-semibold text-[#1f1f1f]">
-                        Category
-                      </div>
-
-                      <div className="border-r border-[#6b8f4e] px-[14px] py-[11px] text-center text-[15px] font-semibold text-[#1f1f1f]">
-                        Order Placed
-                      </div>
-
-                      <div className="border-r border-[#6b8f4e] px-[14px] py-[11px] text-center text-[15px] font-semibold text-[#1f1f1f]">
-                        Bill Booked
-                      </div>
-
-                      <div className="px-[14px] py-[11px] text-center text-[15px] font-semibold text-[#1f1f1f]">
-                        Un-Billed
-                      </div>
-                    </div>
-
-                    {/* BODY */}
-                    {summaryData.rows.map((item, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-[2.2fr_1fr_1fr_1fr] border-t border-[#6b8f4e]"
-                      >
-                        <div className="bg-[#b7b5f2] border-r border-[#6b8f4e] px-[18px] py-[9px] text-[15px] font-medium text-[#1f1f1f]">
-                          {item.category}
-                        </div>
-
-                        <div className="bg-[#ececec] border-r border-[#6b8f4e] px-[16px] py-[9px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                          {formatAmount(item.orderPlaced)}
-                        </div>
-
-                        <div className="bg-[#ececec] border-r border-[#6b8f4e] px-[16px] py-[9px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                          {formatAmount(item.billBooked)}
-                        </div>
-
-                        <div className="bg-[#ececec] px-[16px] py-[9px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                          {formatAmount(item.unBilled)}
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* TOTAL */}
-                    <div className="grid grid-cols-[2.2fr_1fr_1fr_1fr] border-t border-[#6b8f4e]">
-                      <div className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-[18px] py-[11px] text-[15px] font-semibold text-[#1f1f1f]">
-                        Total Order
-                      </div>
-
-                      <div className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-[16px] py-[11px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                        {formatAmount(summaryData.total.orderPlaced)}
-                      </div>
-
-                      <div className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-[16px] py-[11px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                        {formatAmount(summaryData.total.billBooked)}
-                      </div>
-
-                      <div className="bg-[#b7b7b7] px-[16px] py-[11px] text-right text-[15px] font-semibold text-[#1f1f1f]">
-                        {formatAmount(summaryData.total.unBilled)}
-                      </div>
-                    </div>
+                {/* TABLE */}
+                <div className="overflow-x-auto px-4 pt-4 pb-5">
+                  <div className="rounded-[10px] border border-[#6b8f4e]">
+                    <table className="min-w-[480px] w-full border-collapse text-[13px]">
+                      <thead>
+                        <tr className="bg-[#efd98d]">
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-left font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            Category
+                          </th>
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            Order Placed
+                          </th>
+                          <th className="border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            Bill Booked
+                          </th>
+                          <th className="px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            Un-Billed
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {summaryData.rows.map((item, index) => (
+                          <tr key={index} className="border-t border-[#6b8f4e]">
+                            <td className="bg-[#b7b5f2] border-r border-[#6b8f4e] px-4 py-2.5 font-medium text-[#1f1f1f] whitespace-nowrap">
+                              {item.category}
+                            </td>
+                            <td className="bg-[#ececec] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                              {formatAmount(item.orderPlaced)}
+                            </td>
+                            <td className="bg-[#ececec] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                              {formatAmount(item.billBooked)}
+                            </td>
+                            <td className="bg-[#ececec] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                              {formatAmount(item.unBilled)}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="border-t-2 border-[#6b8f4e]">
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            Total Order
+                          </td>
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            {formatAmount(summaryData.total.orderPlaced)}
+                          </td>
+                          <td className="bg-[#b7b7b7] border-r border-[#6b8f4e] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            {formatAmount(summaryData.total.billBooked)}
+                          </td>
+                          <td className="bg-[#b7b7b7] px-4 py-2.5 text-right font-semibold text-[#1f1f1f] whitespace-nowrap">
+                            {formatAmount(summaryData.total.unBilled)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </DialogContent>

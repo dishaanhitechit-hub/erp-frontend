@@ -156,4 +156,17 @@ export const routeMetaConfig = [
     basePath: "/resource-management/procurement/order/service-order/[id]",
     breadcrumbs: ["Resource Management", "Procurement","Order","Service Order","Edit"],
   },
+  //project management
+  {
+    basePath: "/project-management/register/concrete",
+    breadcrumbs: ["Project Management", "Register","Concrete","List"],
+  },
+  {
+    basePath: "/project-management/register/concrete/new",
+    breadcrumbs: ["Project Management", "Register","Concrete","New"],
+  },
+  {
+    basePath: "/project-management/register/concrete/[id]",
+    breadcrumbs: ["Project Management", "Register","Concrete","Edit"],
+  },
 ];

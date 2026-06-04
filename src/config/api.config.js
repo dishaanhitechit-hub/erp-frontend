@@ -109,6 +109,17 @@ export const API_ENDPOINTS = {
             }
         },
 
+    },
+    //project-management/register/concrete
+    PROJECT :{
+        REGISTER:{
+            CONCRETE :{
+                CREATE:"/concrete-registry/create",//post
+                GET_ALL_CONCRETE:"/concrete-registry/list",//get
+                GET_DETAILS_BY_ID:"/concrete-registry/list",//reg_id
+                UPDATE:"/concrete-registry/update",//registry_id
+            }
+        }
     }
     
 };
