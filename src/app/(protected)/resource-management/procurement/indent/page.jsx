@@ -14,6 +14,7 @@ import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { getPageAccess } from "@/helper/getPageAccess";
 import PageNotAvailable from "@/components/common/PageNotAvailable";
 import { getLocalStorage } from "@/lib/localStorage";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 
 export default function Page() {
   const router = useRouter();
@@ -31,6 +32,14 @@ export default function Page() {
     const projectInfo = getLocalStorage("projectInfo") || {};
     setProjectCode(projectInfo?.projectCode || "");
   }, []);
+
+  const itemCategoryMap = CATEGORY_OPTIONS.itemCategory.reduce(
+  (acc, item) => {
+    acc[item.value] = item.label;
+    return acc;
+  },
+  {},
+);
 
   //  INITIAL LOAD
   useEffect(() => {
@@ -51,7 +60,7 @@ export default function Page() {
           sl: index + 1,
           indentNo: p.indentNo,
           date: p.createdAt,
-          categoryCode: p.categoryCode,
+          categoryCode: itemCategoryMap[p.categoryCode] || p.categoryCode,
           priority: p.priority,
           indentStatus: p.indentStatus,
           orderStatus:
