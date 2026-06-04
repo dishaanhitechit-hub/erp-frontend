@@ -54,7 +54,7 @@ export default function ServiceOrderItemSelectionModal({ open, onClose, form }) 
         const assetOnly = costHead === "Fixed Asset";
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK.GET_ITEM_LIST}?projectCode=${projectCode}&subCodes=${subCodesParam}&assetOnly=${assetOnly}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK.GET_ITEM_LIST}?projectCode=${projectCode}&subCodes=${subCodesParam}&assetOnly=${assetOnly}`,
           method: "GET",
         });
 

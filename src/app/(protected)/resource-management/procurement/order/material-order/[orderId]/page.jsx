@@ -37,9 +37,9 @@ export default function Page() {
         onClose={() => setOpenApproval(false)}
         payload={{ id: orderId }}
         actions={[
-          { type: "approve", api: API_ENDPOINTS.RESOURCE.ORDER.APPROVE },
-          { type: "reback", api: API_ENDPOINTS.RESOURCE.ORDER.REBACK },
-          { type: "reject", api: API_ENDPOINTS.RESOURCE.ORDER.REJECT },
+          { type: "approve", api: API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.APPROVE },
+          { type: "reback", api: API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.REBACK },
+          { type: "reject", api: API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.REJECT },
         ]}
         onSuccess={() => { setOpenApproval(false); router.refresh(); }}
       />
@@ -48,7 +48,7 @@ export default function Page() {
         open={openTimeline}
         onClose={() => setOpenTimeline(false)}
         title="Order History"
-        api={API_ENDPOINTS.RESOURCE.ORDER.HISTORY}
+        api={API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.HISTORY}
         entityId={orderId}
       />
     </HeaderWrapper>

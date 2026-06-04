@@ -132,7 +132,7 @@ export default function IndentForm({
 
     try {
       const res = await apiRequest({
-        url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=${category}`,
+        url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=${category}`,
         method: "GET",
       });
 
@@ -166,7 +166,7 @@ export default function IndentForm({
         setIsLoading(true);
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.INDENT.GET_INDENT_BY_ID}${indentId}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_INDENT_BY_ID}${indentId}`,
           method: "GET",
         });
 
@@ -335,8 +335,8 @@ export default function IndentForm({
       const res = await apiRequest({
         url:
           mode === "create"
-            ? API_ENDPOINTS.RESOURCE.INDENT.CREATE_INDENT
-            : `${API_ENDPOINTS.RESOURCE.INDENT.UPDATE_INDENT_BY_ID}${indentId}`,
+            ? API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.CREATE_INDENT
+            : `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.UPDATE_INDENT_BY_ID}${indentId}`,
 
         method: mode === "create" ? "POST" : "PUT",
 
@@ -392,7 +392,7 @@ export default function IndentForm({
       toastId = toast.loading("Submitting indent...");
 
       const res = await apiRequest({
-        url: `${API_ENDPOINTS.RESOURCE.INDENT.SUBMIT_INDENT_BY_ID}${indentId}`,
+        url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.SUBMIT_INDENT_BY_ID}${indentId}`,
         method: "POST",
       });
 

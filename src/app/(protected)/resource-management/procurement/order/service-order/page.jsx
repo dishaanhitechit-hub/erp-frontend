@@ -19,7 +19,7 @@ import {
 import { X } from "lucide-react";
 import { getLocalStorage } from "@/lib/localStorage";
 
-const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
+const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 
 const formatAmount = (value) =>
   Number(value || 0).toLocaleString("en-IN", {

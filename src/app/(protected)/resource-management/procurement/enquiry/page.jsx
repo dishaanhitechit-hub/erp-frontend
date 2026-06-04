@@ -30,7 +30,7 @@ export default function Page() {
     const fetchIndents = async () => {
       try {
         const res = await apiRequest({
-          url: API_ENDPOINTS.RESOURCE.INDENT.GET_ALL_INDENT,
+          url: API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ALL_INDENT,
           method: "GET",
         });
 

@@ -48,7 +48,7 @@ export default function Page() {
     const fetchOrders = async () => {
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ALL_ORDER}?projectCode=${projectCode}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.GET_ALL_ORDER}?projectCode=${projectCode}`,
           method: "GET",
         });
 

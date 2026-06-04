@@ -53,17 +53,17 @@ export default function Page() {
         actions={[
           {
             type: "approve",
-            api: API_ENDPOINTS.RESOURCE.INDENT.APPROVE,
+            api: API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.APPROVE,
           },
 
           {
             type: "reback",
-            api: API_ENDPOINTS.RESOURCE.INDENT.REBACK,
+            api: API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.REBACK,
           },
 
           {
             type: "reject",
-            api: API_ENDPOINTS.RESOURCE.INDENT.REJECT,
+            api: API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.REJECT,
           },
         ]}
         onSuccess={() => {
@@ -75,7 +75,7 @@ export default function Page() {
         open={openTimeline}
         onClose={() => setOpenTimeline(false)}
         title="Indent History"
-        api={API_ENDPOINTS.RESOURCE.INDENT.HISTORY}
+        api={API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.HISTORY}
         entityId={indentId}
       />
     </HeaderWrapper>

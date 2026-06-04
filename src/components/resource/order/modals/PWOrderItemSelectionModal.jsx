@@ -48,7 +48,7 @@ export default function PWOrderItemSelectionModal({ open, onClose, form }) {
         const subCodesParam = subCategoryCodes.join(",");
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK.GET_ITEM_LIST}?projectCode=${projectCode}&subCodes=${subCodesParam}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK.GET_ITEM_LIST}?projectCode=${projectCode}&subCodes=${subCodesParam}`,
           method: "GET",
         });
 

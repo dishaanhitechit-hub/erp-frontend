@@ -19,7 +19,7 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 import { useRouter } from "next/navigation";
 
-const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
+const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 
 const defaultValues = {
   categoryCode: "Work Order",

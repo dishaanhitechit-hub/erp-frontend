@@ -100,7 +100,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       try {
         setLoading(true);
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_ORDER_BY_ID}/${orderId}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.GET_ORDER_BY_ID}/${orderId}`,
           method: "GET",
         });
         const data = res.data;
@@ -239,8 +239,8 @@ export default function OrderForm({ mode = "create", orderId }) {
       const res = await apiRequest({
         url:
           mode === "create"
-            ? API_ENDPOINTS.RESOURCE.ORDER.CREATE_ORDER
-            : `${API_ENDPOINTS.RESOURCE.ORDER.UPDATE_ORDER_BY_ID}${orderId}`,
+            ? API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.CREATE_ORDER
+            : `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.UPDATE_ORDER_BY_ID}${orderId}`,
         method: mode === "create" ? "POST" : "PUT",
         data: buildFormData(),
       });
@@ -289,7 +289,7 @@ export default function OrderForm({ mode = "create", orderId }) {
     try {
       toastId = toast.loading("Submitting order...");
       await apiRequest({
-        url: `${API_ENDPOINTS.RESOURCE.ORDER.SUBMIT_ORDER_BY_ID}${orderId}`,
+        url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.SUBMIT_ORDER_BY_ID}${orderId}`,
         method: "POST",
       });
       toast.success("Order submitted successfully", { id: toastId });

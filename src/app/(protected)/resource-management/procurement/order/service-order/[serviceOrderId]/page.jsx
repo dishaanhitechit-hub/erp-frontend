@@ -12,7 +12,7 @@ import HistoryTimelineSheet from "@/components/common/HistoryTimelineSheet";
 import { API_ENDPOINTS } from "@/config/api.config";
 import ServiceOrderForm from "@/components/resource/service-order/ServiceOrderForm";
 
-const PW = API_ENDPOINTS.RESOURCE.ORDER.PROJECT_WORK;
+const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 
 export default function Page() {
   const router = useRouter();

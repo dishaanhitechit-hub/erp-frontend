@@ -73,7 +73,7 @@ export default function OrderItemSelectionModal({
         const assetOnly = costHead === "Fixed Asset";
 
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.ORDER.GET_INDENT_LIST}?projectCode=${projectCode}&subCategoryCode=MAT_001&assetOnly=${assetOnly}`,
+          url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.GET_INDENT_LIST}?projectCode=${projectCode}&subCategoryCode=MAT_001&assetOnly=${assetOnly}`,
           method: "GET",
         });
 
