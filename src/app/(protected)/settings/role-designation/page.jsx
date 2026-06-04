@@ -52,6 +52,8 @@ export default function ProjectRolePage() {
 
   const [openLocationModal, setOpenLocationModal] = useState(false);
 
+  const [backupData, setBackupData] = useState(null);
+
   const inputClass =
       "h-[30px] border border-[#8f8f8f] text-sm bg-white rounded-sm";
 
@@ -616,7 +618,31 @@ export default function ProjectRolePage() {
             />
 
             <EditButton
-                onClick={() => setIsEditing((p) => !p)}
+                onClick={() => {
+                  if (!projectData) {
+                    toast.warning("Search project first");
+                    return;
+                  }
+
+                  // EDIT START
+                  if (!isEditing) {
+                    setBackupData({
+                      siteTeam: structuredClone(siteTeam),
+                      hoTeam: structuredClone(hoTeam),
+                      tempPermissions: structuredClone(tempPermissions),
+                    });
+
+                    setIsEditing(true);
+                    return;
+                  }
+
+                  // CANCEL
+                  setSiteTeam(backupData?.siteTeam || []);
+                  setHoTeam(backupData?.hoTeam || []);
+                  setTempPermissions(backupData?.tempPermissions || {});
+                  setBackupData(null);
+                  setIsEditing(false);
+                }}
                 disabled={loading}
             >
               {isEditing ? "Cancel" : "Edit"}
