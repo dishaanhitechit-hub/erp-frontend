@@ -118,7 +118,7 @@ export const API_ENDPOINTS = {
         CREATE_GRN: "/resource/grn/create", // POST multipart/form-data
         GET_ALL_GRN: "/resource/grn/list", // GET
         GET_GRN_BY_ID: "/resource/grn/details", // /:grnId GET
-        UPDATE_GRN_BY_ID:"/resource/grn/update", // /:grnId PUT
+        UPDATE_GRN_BY_ID:"/resource/grn/edit", // /:grnId PUT
         SUBMIT_GRN_BY_ID: "/resource/grn/submit", // /:grnId POST
         APPROVE: "/resource/grn/approve", // /:grnId POST
         REBACK: "/resource/grn/reback", // /:grnId POST

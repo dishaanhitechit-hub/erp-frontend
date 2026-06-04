@@ -134,12 +134,12 @@ export const sidebarConfig = [
           {
             title: "Goods Received Note",
             path: "/resource-management/material/grn",
-            permissionKey: "grn",
+            permissionKey: "goods_received_note",
           },
           {
             title: "Goods Issue Note",
             path: "/resource-management/material/gin",
-            permissionKey: "gin",
+            permissionKey: "goods_issue_note",
           },
           {
             title: "Stock Report",
