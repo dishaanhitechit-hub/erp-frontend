@@ -114,16 +114,16 @@ export const API_ENDPOINTS = {
       // resource/gin
       GIN: {
         GET_VENDOR_ORDERS: "/resource/gin/vendor-orders", // vendorId projectCode filters GET
-        GET_ORDER_ITEMS:   "/resource/gin/order-items",   // /:orderId GET
-        CREATE_GIN:        "/resource/gin/create",        // POST multipart/form-data
-        GET_ALL_GIN:       "/resource/gin/list",          // GET
-        GET_GIN_BY_ID:     "/resource/gin/details",       // /:ginId GET
-        UPDATE_GIN_BY_ID:  "/resource/gin/edit",          // /:ginId PUT
-        SUBMIT_GIN_BY_ID:  "/resource/gin/submit",        // /:ginId POST
-        APPROVE:           "/resource/gin/approve",       // /:ginId POST
-        REBACK:            "/resource/gin/reback",        // /:ginId POST
-        REJECT:            "/resource/gin/reject",        // /:ginId POST
-        HISTORY:           "/resource/gin/history",       // /:ginId GET
+        GET_ORDER_ITEMS: "/resource/gin/order-items", // /:orderId GET
+        CREATE_GIN: "/resource/gin/create", // POST multipart/form-data
+        GET_ALL_GIN: "/resource/gin/list", // GET
+        GET_GIN_BY_ID: "/resource/gin/details", // /:ginId GET
+        UPDATE_GIN_BY_ID: "/resource/gin/edit", // /:ginId PUT
+        SUBMIT_GIN_BY_ID: "/resource/gin/submit", // /:ginId POST
+        APPROVE: "/resource/gin/approve", // /:ginId POST
+        REBACK: "/resource/gin/reback", // /:ginId POST
+        REJECT: "/resource/gin/reject", // /:ginId POST
+        HISTORY: "/resource/gin/history", // /:ginId GET
       },
       //resource/grn
       GRN: {
@@ -154,6 +154,21 @@ export const API_ENDPOINTS = {
         REJECT: "/concrete-registry/reject", //indenId POST
         DELETE: "/concrete-registry/delete", //indentId DELETE
         HISTORY: "/concrete-registry/history", //indentId GET
+      },
+      DRAWING_REGISTER: {
+        CREATE: "/project-mgmt/register/drawing-register/create", // POST multipart/form-data
+        GET_ALL_DRAWING_REGISTER:
+          "/project-mgmt/register/drawing-register/list", // GET
+        GET_DRAWING_REGISTER_BY_ID:
+          "/project-mgmt/register/drawing-register/details", // /:drId GET
+        UPDATE_DRAWING_REGISTER_BY_ID:
+          "/project-mgmt/register/drawing-register/edit", // /:drId PUT
+        SUBMIT_DRAWING_REGISTER_BY_ID:
+          "/project-mgmt/register/drawing-register/submit", // /:drId POST
+        APPROVE: "/project-mgmt/register/drawing-register/approve", // /:drId POST
+        REBACK: "/project-mgmt/register/drawing-register/reback", // /:drId POST
+        REJECT: "/project-mgmt/register/drawing-register/reject", // /:drId POST
+        HISTORY: "/project-mgmt/register/drawing-register/history", // /:drId GET
       },
     },
   },
