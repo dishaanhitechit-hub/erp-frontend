@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Paperclip, Download } from "lucide-react";
@@ -71,6 +71,9 @@ export default function GINLeftPanel({
   const issueCategory   = watch("issueCategory");
   const costHead        = watch("costHead");
   const itemCategory    = watch("itemCategory");
+
+  // true only when the user explicitly changed vendor/category (not on initial data load)
+  const userChangedRef = useRef(false);
 
   const [ledgerList,      setLedgerList]      = useState([]);
   const [despatchOptions, setDespatchOptions] = useState([]);
@@ -146,9 +149,10 @@ export default function GINLeftPanel({
         const res = await apiRequest({ url });
         const orders = res.data || [];
         setVendorOrders(orders);
-        if (orders.length === 0) {
+        if (orders.length === 0 && userChangedRef.current) {
           toast.info("No approved orders found for the selected party / category filters");
         }
+        userChangedRef.current = false;
       } catch {
         setVendorOrders([]);
       } finally {
@@ -160,6 +164,7 @@ export default function GINLeftPanel({
 
   // ── HANDLE VENDOR CHANGE ──────────────────────────────────────────────────
   const handleVendorChange = (val) => {
+    userChangedRef.current = true;
     setValue("vendorId", val);
     if (mode === "create") {
       setValue("orderId",   "");
@@ -170,6 +175,7 @@ export default function GINLeftPanel({
 
   // ── HANDLE ISSUE CATEGORY CHANGE ─────────────────────────────────────────
   const handleIssueCategoryChange = (val) => {
+    userChangedRef.current = true;
     setValue("issueCategory", val);
     setValue("itemCategory",  ITEM_CATEGORY);
     const newOpts = COST_HEAD_MAP[val] || [];
@@ -231,9 +237,9 @@ export default function GINLeftPanel({
             className={`${getInputClass(!!errors.ginDate, disabled)} w-[220px] h-[30px]`}
           />
         </div>
-        {errors.ginDate && (
+        {/* {errors.ginDate && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.ginDate.message}</p>
-        )}
+        )} */}
       </div>
 
       {/* ── GROUP 2: CATEGORY ────────────────────────────────────────────── */}
@@ -285,7 +291,7 @@ export default function GINLeftPanel({
               render={({ field }) => (
                 <Select
                   value={field.value || ""}
-                  onValueChange={field.onChange}
+                  onValueChange={(v) => { userChangedRef.current = true; field.onChange(v); }}
                   disabled={disabled || costHeadOptions.length === 0}
                 >
                   <SelectTrigger className={`${getInputClass(false, disabled)} w-full h-[30px]`}>
@@ -360,9 +366,9 @@ export default function GINLeftPanel({
             />
           </div>
         </div>
-        {errors.vendorId && (
+        {/* {errors.vendorId && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.vendorId.message}</p>
-        )}
+        )} */}
 
         {/* Party Address — auto */}
         <div className="flex items-center">
@@ -437,9 +443,9 @@ export default function GINLeftPanel({
             />
           </div>
         </div>
-        {errors.orderId && (
+        {/* {errors.orderId && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.orderId.message}</p>
-        )}
+        )} */}
 
         {/* Order Date — auto */}
         <div className="flex items-center">

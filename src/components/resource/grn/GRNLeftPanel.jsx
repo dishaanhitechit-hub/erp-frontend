@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Paperclip, Download } from "lucide-react";
@@ -69,6 +69,9 @@ export default function GRNLeftPanel({
   const receivedCategory = watch("receivedCategory");
   const costHead         = watch("costHead");
   const itemCategory     = watch("itemCategory");
+
+  // true only when the user explicitly changed vendor/category (not on initial data load)
+  const userChangedRef = useRef(false);
 
   const [ledgerList,      setLedgerList]      = useState([]);
   const [billingOptions,  setBillingOptions]  = useState([]);
@@ -144,9 +147,10 @@ export default function GRNLeftPanel({
         const res = await apiRequest({ url });
         const orders = res.data || [];
         setVendorOrders(orders);
-        if (orders.length === 0) {
+        if (orders.length === 0 && userChangedRef.current) {
           toast.info("No approved orders found for the selected vendor / category filters");
         }
+        userChangedRef.current = false;
       } catch {
         setVendorOrders([]);
       } finally {
@@ -158,6 +162,7 @@ export default function GRNLeftPanel({
 
   // ── HANDLE VENDOR CHANGE (user action — clears order + items in create) ────
   const handleVendorChange = (val) => {
+    userChangedRef.current = true;
     setValue("vendorId", val);
     if (mode === "create") {
       setValue("orderId",    "");
@@ -166,8 +171,9 @@ export default function GRNLeftPanel({
     }
   };
 
-  // ── HANDLE RECEIVED CATEGORY CHANGE 
+  // ── HANDLE RECEIVED CATEGORY CHANGE
   const handleReceivedCategoryChange = (val) => {
+    userChangedRef.current = true;
     setValue("receivedCategory", val);
     setValue("itemCategory",     ITEM_CATEGORY);
     // if costHead no longer valid for new category, clear it
@@ -259,7 +265,7 @@ export default function GRNLeftPanel({
               render={({ field }) => (
                 <Select
                   value={field.value || ""}
-                  onValueChange={field.onChange}
+                  onValueChange={(v) => { userChangedRef.current = true; field.onChange(v); }}
                   disabled={disabled || !receivedCategory}
                 >
                   <SelectTrigger className={`${getInputClass(errors.costHead, disabled)} w-full h-[30px]`}>
