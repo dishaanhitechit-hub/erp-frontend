@@ -156,6 +156,31 @@ export const routeMetaConfig = [
     basePath: "/resource-management/procurement/order/service-order/[id]",
     breadcrumbs: ["Resource Management", "Procurement","Order","Service Order","Edit"],
   },
+  //Material management
+  {
+    basePath: "/resource-management/material/grn",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Received Note","List"],
+  },
+  {
+    basePath: "/resource-management/material/grn/new",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Received Note","New"],
+  },
+  {
+    basePath: "/resource-management/material/grn/[id]",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Received Note","Edit"],
+  },
+  {
+    basePath: "/resource-management/material/gin",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","List"],
+  },
+  {
+    basePath: "/resource-management/material/gin/new",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","New"],
+  },
+  {
+    basePath: "/resource-management/material/gin/[id]",
+    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","Edit"],
+  },
   //project management
   {
     basePath: "/project-management/register/concrete",
@@ -169,4 +194,5 @@ export const routeMetaConfig = [
     basePath: "/project-management/register/concrete/[id]",
     breadcrumbs: ["Project Management", "Register","Concrete","Edit"],
   },
+  
 ];

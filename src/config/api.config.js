@@ -111,6 +111,20 @@ export const API_ENDPOINTS = {
       },
     },
     MATERIAL_MANAGEMENT: {
+      // resource/gin
+      GIN: {
+        GET_VENDOR_ORDERS: "/resource/gin/vendor-orders", // vendorId projectCode filters GET
+        GET_ORDER_ITEMS:   "/resource/gin/order-items",   // /:orderId GET
+        CREATE_GIN:        "/resource/gin/create",        // POST multipart/form-data
+        GET_ALL_GIN:       "/resource/gin/list",          // GET
+        GET_GIN_BY_ID:     "/resource/gin/details",       // /:ginId GET
+        UPDATE_GIN_BY_ID:  "/resource/gin/edit",          // /:ginId PUT
+        SUBMIT_GIN_BY_ID:  "/resource/gin/submit",        // /:ginId POST
+        APPROVE:           "/resource/gin/approve",       // /:ginId POST
+        REBACK:            "/resource/gin/reback",        // /:ginId POST
+        REJECT:            "/resource/gin/reject",        // /:ginId POST
+        HISTORY:           "/resource/gin/history",       // /:ginId GET
+      },
       //resource/grn
       GRN: {
         GET_VENDOR_ORDERS: "/resource/grn/vendor-orders", // vendorId projectCode filters GET
@@ -118,7 +132,7 @@ export const API_ENDPOINTS = {
         CREATE_GRN: "/resource/grn/create", // POST multipart/form-data
         GET_ALL_GRN: "/resource/grn/list", // GET
         GET_GRN_BY_ID: "/resource/grn/details", // /:grnId GET
-        UPDATE_GRN_BY_ID:"/resource/grn/edit", // /:grnId PUT
+        UPDATE_GRN_BY_ID: "/resource/grn/edit", // /:grnId PUT
         SUBMIT_GRN_BY_ID: "/resource/grn/submit", // /:grnId POST
         APPROVE: "/resource/grn/approve", // /:grnId POST
         REBACK: "/resource/grn/reback", // /:grnId POST
