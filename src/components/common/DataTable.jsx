@@ -249,7 +249,7 @@ export default function DataTable({
   // ─── RENDER 
   return (
     <div className="border border-[#9e9e9e] overflow-x-auto">
-      <div className="max-h-80 overflow-y-auto">
+      <div className="max-h-[608px] overflow-y-auto">
 
         <table className="w-full min-w-max table-fixed border-collapse text-sm">
 

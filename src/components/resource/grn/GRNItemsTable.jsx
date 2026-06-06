@@ -92,7 +92,7 @@ export default function GRNItemsTable({
         className="
           overflow-x-auto
           overflow-y-auto
-          max-h-[420px]
+          max-h-[840px]
           w-full
         "
       >
