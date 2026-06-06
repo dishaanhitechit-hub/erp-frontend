@@ -121,7 +121,7 @@ export default function IndentItemsTable({
           <div
             className={`
               overflow-auto
-              ${fields.length > 7 ? "max-h-[320px]" : ""}
+              ${fields.length > 20 ? "max-h-[680px]" : ""}
             `}
           >
             <table className="min-w-[1010px] w-full border-collapse text-sm">

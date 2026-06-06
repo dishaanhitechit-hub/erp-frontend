@@ -39,7 +39,7 @@ export default function ServiceOrderItemsTab({ form, disabled, openItemModal, se
         )}
 
         {!!fields.length && (
-          <div className="overflow-auto max-h-[430px]">
+          <div className="overflow-auto max-h-[680px]">
             <table className="w-full border-collapse">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-[#D3D3D3]">

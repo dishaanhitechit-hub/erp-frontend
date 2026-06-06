@@ -127,7 +127,7 @@ export default function OrderItemsTab({
             className="
               overflow-auto
 
-              max-h-[430px]
+              max-h-[680px]
             "
           >
             <table

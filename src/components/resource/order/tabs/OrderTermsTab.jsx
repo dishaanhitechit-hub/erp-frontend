@@ -101,7 +101,7 @@ export default function OrderTermsTab({
           className="
             overflow-auto
 
-            max-h-[420px]
+            max-h-[680px]
           "
         >
 
