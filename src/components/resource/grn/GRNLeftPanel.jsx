@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
-// import { ChevronDown, ChevronUp } from "lucide-react";
+import { Paperclip, Download } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -46,13 +46,18 @@ const fmt = (d) => {
 
 const LABEL = `${labelClass} w-[180px] min-w-[180px] max-w-[180px]`;
 
-// ── COMPONENT ─────────────────────────────────────────────────────────────────
+// ── COMPONENT 
 export default function GRNLeftPanel({
   form,
   disabled,
   mode,
   onOrderItemsFetched, // (orderData | null) => void
   onVendorClear,       // () => void  — called when vendor changes in create mode
+  // file props (doc attachment)
+  fileRef,
+  newFileName,
+  existingFileUrl,
+  onFileChange,
 }) {
   const { register, control, setValue, watch, formState: { errors } } = form;
 
@@ -73,10 +78,10 @@ export default function GRNLeftPanel({
   const [loadingItems,    setLoadingItems]    = useState(false);
   // const [showMore,        setShowMore]        = useState(false);
 
-  // ── COST HEAD OPTIONS based on selected receivedCategory ──────────────────
+  // ── COST HEAD OPTIONS based on selected receivedCategory 
   const costHeadOptions = COST_HEAD_MAP[receivedCategory] || [];
 
-  // ── LOAD LEDGER LIST (vendors) ────────────────────────────────────────────
+  // ── LOAD LEDGER LIST (vendors) 
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -89,7 +94,7 @@ export default function GRNLeftPanel({
     fetch();
   }, []);
 
-  // ── LOAD PROJECT ADDRESSES ────────────────────────────────────────────────
+  // ── LOAD PROJECT ADDRESSES 
   useEffect(() => {
     if (!projectId) return;
     const fetch = async () => {
@@ -110,7 +115,7 @@ export default function GRNLeftPanel({
     fetch();
   }, [projectId]);
 
-  // ── AUTO-FILL PARTY INFO when vendorId changes ────────────────────────────
+  // ── AUTO-FILL PARTY INFO when vendorId changes 
   useEffect(() => {
     if (!vendorId) {
       setValue("partyAddress", "");
@@ -123,7 +128,7 @@ export default function GRNLeftPanel({
     setValue("partyGstn",    v.gstin            || "");
   }, [vendorId, ledgerList]);
 
-  // ── FETCH VENDOR ORDERS when vendor or category changes ───────────────────
+  // ── FETCH VENDOR ORDERS when vendor or category changes 
   useEffect(() => {
     if (!vendorId || !projectCode) {
       setVendorOrders([]);
@@ -137,7 +142,11 @@ export default function GRNLeftPanel({
         if (itemCategory)     url += `&itemCategory=${encodeURIComponent(itemCategory)}`;
         if (costHead)         url += `&costHead=${encodeURIComponent(costHead)}`;
         const res = await apiRequest({ url });
-        setVendorOrders(res.data || []);
+        const orders = res.data || [];
+        setVendorOrders(orders);
+        if (orders.length === 0) {
+          toast.info("No approved orders found for the selected vendor / category filters");
+        }
       } catch {
         setVendorOrders([]);
       } finally {
@@ -157,7 +166,7 @@ export default function GRNLeftPanel({
     }
   };
 
-  // ── HANDLE RECEIVED CATEGORY CHANGE ──────────────────────────────────────
+  // ── HANDLE RECEIVED CATEGORY CHANGE 
   const handleReceivedCategoryChange = (val) => {
     setValue("receivedCategory", val);
     setValue("itemCategory",     ITEM_CATEGORY);
@@ -172,7 +181,7 @@ export default function GRNLeftPanel({
     }
   };
 
-  // ── HANDLE ORDER SELECT ───────────────────────────────────────────────────
+  // ── HANDLE ORDER SELECT 
   const handleOrderSelect = async (val) => {
     setValue("orderId", val);
     const order = vendorOrders.find((o) => String(o.id) === String(val));
@@ -185,6 +194,7 @@ export default function GRNLeftPanel({
       const res = await apiRequest({
         url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.GET_ORDER_ITEMS}/${val}`,
       });
+      
       onOrderItemsFetched(res.data || null);
     } catch (err) {
       toast.error(err.message || "Failed to load order items");
@@ -196,7 +206,7 @@ export default function GRNLeftPanel({
 
   // ── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0">
+    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 overflow-y-auto max-h-[calc(100vh-110px)] pr-1">
 
       {/* ── GROUP 1: CATEGORY ────────────────────────────────────────────── */}
       <div className="flex flex-col gap-[2px]">
@@ -214,7 +224,7 @@ export default function GRNLeftPanel({
                   disabled={disabled}
                 >
                   <SelectTrigger className={`${getInputClass(errors.receivedCategory, disabled)} w-full h-[30px]`}>
-                    <SelectValue placeholder="As per List" />
+                    <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
                     {RECEIVED_CATEGORY_OPTIONS.map((o) => (
@@ -279,9 +289,9 @@ export default function GRNLeftPanel({
           <Input type="date" {...register("grnDate")} disabled={disabled}
             className={`${getInputClass(!!errors.grnDate, disabled)} w-[220px] h-[30px]`} />
         </div>
-        {errors.grnDate && (
+        {/* {errors.grnDate && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.grnDate.message}</p>
-        )}
+        )} */}
       </div>
 
       {/* ── GROUP 3: PARTY ────────────────────────────────────────────────── */}
@@ -314,9 +324,9 @@ export default function GRNLeftPanel({
             />
           </div>
         </div>
-        {errors.vendorId && (
+        {/* {errors.vendorId && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.vendorId.message}</p>
-        )}
+        )} */}
 
         {/* Party Address */}
         <div className="flex items-center">
@@ -380,9 +390,9 @@ export default function GRNLeftPanel({
             />
           </div>
         </div>
-        {errors.orderId && (
+        {/* {errors.orderId && (
           <p className="text-red-500 text-[11px] ml-[184px]">{errors.orderId.message}</p>
-        )}
+        )} */}
 
         {/* Order Date — auto */}
         <div className="flex items-center">
@@ -478,6 +488,104 @@ export default function GRNLeftPanel({
           </div>
         {/* )}
       </div> */}
+
+      {/* ── GROUP 7: DELIVERY & VERIFICATION ─────────────────────────────── */}
+      <div className="flex flex-col gap-[2px]">
+        {/* Deliver Vehicle No */}
+        <div className="flex items-center">
+          <div className={LABEL}>Deliver Vehicle No</div>
+          <Input
+            {...register("deliverVehicleNo")}
+            disabled={disabled}
+            placeholder="Text"
+            className={`${getInputClass(false, disabled)} w-[220px] h-[30px]`}
+          />
+        </div>
+
+        {/* Delivered Concern */}
+        <div className="flex items-center">
+          <div className={LABEL}>Delivered Concern</div>
+          <Input
+            {...register("deliveredConcern")}
+            disabled={disabled}
+            placeholder="Text"
+            className={`${getInputClass(false, disabled)} w-[220px] h-[30px]`}
+          />
+        </div>
+
+        {/* Unloading Date & Time */}
+        <div className="flex items-center">
+          <div className={LABEL}>Unloading Date & Time</div>
+          <Input
+            type="datetime-local"
+            {...register("unloadingDatetime")}
+            disabled={disabled}
+            className={`${getInputClass(false, disabled)} w-[220px] h-[30px]`}
+          />
+        </div>
+
+        {/* Physically Verified By */}
+        <div className="flex items-center">
+          <div className={LABEL}>Physically Verified By</div>
+          <Input
+            {...register("physicallyVerifiedBy")}
+            disabled={disabled}
+            placeholder="Text"
+            className={`${getInputClass(false, disabled)} w-[220px] h-[30px]`}
+          />
+        </div>
+      </div>
+
+      {/* ── DOCUMENT ATTACHMENT ───────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-3 pb-2">
+        <button
+          type="button"
+          onClick={() => !disabled && fileRef?.current?.click()}
+          className={`h-[32px] px-4 rounded-md border border-[#c96b2c] text-sm font-medium flex items-center gap-1.5 transition
+            ${disabled
+              ? "bg-[#e9a06d] opacity-60 cursor-not-allowed"
+              : "bg-[#e9a06d] hover:bg-[#d88b5a] cursor-pointer"
+            }`}
+        >
+          <Paperclip className="w-4 h-4" />
+          Attached Doc @
+        </button>
+
+        <input
+          ref={fileRef}
+          type="file"
+          hidden
+          accept=".pdf,.xls,.xlsx,.jpg,.jpeg,.png"
+          onChange={onFileChange}
+        />
+
+        {newFileName && (
+          <span className="flex items-center gap-1 text-[12px] text-gray-700">
+            <Paperclip className="w-3 h-3 text-orange-500" />
+            {newFileName}
+          </span>
+        )}
+
+        {!newFileName && existingFileUrl && (
+          <a
+            href={existingFileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-[12px] text-blue-600 hover:underline"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download Attached Doc
+          </a>
+        )}
+
+        {!newFileName && !existingFileUrl && disabled && (
+          <span className="text-[12px] italic text-gray-400">No document attached</span>
+        )}
+
+        {mode === "create" && (
+          <span className="text-[11px] text-red-500">* required</span>
+        )}
+      </div>
 
     </div>
   );

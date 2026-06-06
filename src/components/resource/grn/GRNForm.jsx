@@ -5,19 +5,15 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2, Paperclip, Download } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Controller } from "react-hook-form";
 
-import { Input } from "@/components/ui/input";
 import SaveButton from "@/components/common/SaveButton";
 import SaveDraftButton from "@/components/common/SaveDraftButton";
 import EditButton from "@/components/common/EditButton";
-import ExpandableTextField from "@/components/common/ExpandableTextField";
 
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
-import { getInputClass, labelClass } from "@/lib/formStyles";
 import { getLocalStorage } from "@/lib/localStorage";
 
 import GRNLeftPanel from "./GRNLeftPanel";
@@ -68,8 +64,6 @@ const defaultValues = {
   physicallyVerifiedBy: "",
 };
 
-const LABEL = `${labelClass} w-[180px] min-w-[180px] max-w-[180px]`;
-
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
 export default function GRNForm({ mode = "create", grnId }) {
   const isViewMode = mode === "view" || mode === "approver";
@@ -99,13 +93,10 @@ export default function GRNForm({ mode = "create", grnId }) {
     mode: "onChange",
   });
   const {
-    register,
-    control,
     reset,
     getValues,
-    watch,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = form;
 
   const disabled = isViewMode || !isEditing || isSubmitting || isSubmitted;
@@ -445,6 +436,10 @@ export default function GRNForm({ mode = "create", grnId }) {
             setItems([]);
             setInitialItems([]);
           }}
+          fileRef={fileRef}
+          newFileName={newFileName}
+          existingFileUrl={existingFileUrl}
+          onFileChange={handleFileChange}
         />
 
         {/* VERTICAL DIVIDER */}
@@ -471,111 +466,6 @@ export default function GRNForm({ mode = "create", grnId }) {
             />
           </div>
 
-          {/* BELOW-TABLE FIELDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-[2px]">
-            {/* Deliver Vehicle No */}
-            <div className="flex items-center gap-[2px]">
-              <div className={`${LABEL}`}>Deliver Vehicle No</div>
-              <Input
-                {...register("deliverVehicleNo")}
-                disabled={disabled}
-                placeholder="Text"
-                className={`${getInputClass(false, disabled)} flex-1 h-[30px] -ml-px`}
-              />
-            </div>
-
-            {/* Delivered Concern */}
-            <div className="flex items-center gap-[2px]">
-              <div className={`${LABEL}`}>Delivered Concern</div>
-              <Input
-                {...register("deliveredConcern")}
-                disabled={disabled}
-                placeholder="Text"
-                className={`${getInputClass(false, disabled)} flex-1 h-[30px] -ml-px`}
-              />
-            </div>
-
-            {/* Unloading Date & Time */}
-            <div className="flex items-center gap-[2px]">
-              <div className={`${LABEL}`}>Unloading Date & Time</div>
-              <Input
-                type="datetime-local"
-                {...register("unloadingDatetime")}
-                disabled={disabled}
-                className={`${getInputClass(false, disabled)} flex-1 h-[30px] -ml-px`}
-              />
-            </div>
-
-            {/* Physically Verified By */}
-            <div className="flex items-center gap-[2px]">
-              <div className={`${LABEL}`}>Physically Verified By</div>
-              <Input
-                {...register("physicallyVerifiedBy")}
-                disabled={disabled}
-                placeholder="Text"
-                className={`${getInputClass(false, disabled)} flex-1 h-[30px] -ml-px`}
-              />
-            </div>
-          </div>
-
-          {/* DOCUMENT ATTACHMENT ─────────────────────────────────────── */}
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            {/* Attach button */}
-            <button
-              type="button"
-              onClick={() => !disabled && fileRef.current?.click()}
-              className={`h-[32px] px-4 rounded-md border border-[#c96b2c] text-sm font-medium flex items-center gap-1.5 transition
-                ${
-                  disabled
-                    ? "bg-[#e9a06d] opacity-60 cursor-not-allowed"
-                    : "bg-[#e9a06d] hover:bg-[#d88b5a] cursor-pointer"
-                }
-              `}
-            >
-              <Paperclip className="w-4 h-4" />
-              Attached Doc 
-            </button>
-
-            <input
-              ref={fileRef}
-              type="file"
-              hidden
-              accept=".pdf,.xls,.xlsx,.jpg,.jpeg,.png"
-              onChange={handleFileChange}
-            />
-
-            {/* New file selected */}
-            {newFileName && (
-              <span className="flex items-center gap-1 text-[12px] text-gray-700">
-                <Paperclip className="w-3 h-3 text-orange-500" />
-                {newFileName}
-              </span>
-            )}
-
-            {/* Existing file download */}
-            {!newFileName && existingFileUrl && (
-              <a
-                href={existingFileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[12px] text-blue-600 hover:underline"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Download Attached Doc
-              </a>
-            )}
-
-            {/* No file in locked state */}
-            {!newFileName && !existingFileUrl && disabled && (
-              <span className="text-[12px] italic text-gray-400">
-                No document attached
-              </span>
-            )}
-
-            {mode === "create" && (
-              <span className="text-[11px] text-red-500">* required</span>
-            )}
-          </div>
         </div>
         {/* end right panel */}
       </div>
