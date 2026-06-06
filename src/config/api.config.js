@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://web-production-f0050.up.railway.app/"; //change here later
+const API_BASE_URL = "http://167.233.41.101"; //change here later
 
 export const API_ENDPOINTS = {
   LOGIN: "/auth/login",
@@ -145,15 +145,15 @@ export const API_ENDPOINTS = {
   PROJECT: {
     REGISTER: {
       CONCRETE: {
-        CREATE: "/concrete-registry/create", //post
-        GET_ALL_CONCRETE: "/concrete-registry/list", //get
-        GET_DETAILS_BY_ID: "/concrete-registry/list", //reg_id
-        UPDATE: "/concrete-registry/update", //registry_id
-        APPROVE: "/concrete-registry/approve", //indenId POST
-        REBACK: "/concrete-registry/reback", //indenId POST
-        REJECT: "/concrete-registry/reject", //indenId POST
-        DELETE: "/concrete-registry/delete", //indentId DELETE
-        HISTORY: "/concrete-registry/history", //indentId GET
+        CREATE: "/project-mgmt/register/concrete-registry/create", //post
+        GET_ALL_CONCRETE: "/project-mgmt/register/concrete-registry/list", //get
+        GET_DETAILS_BY_ID: "/project-mgmt/register/concrete-registry/list", //reg_id
+        UPDATE: "/project-mgmt/register/concrete-registry/update", //registry_id
+        APPROVE: "/project-mgmt/register/concrete-registry/approve", //indenId POST
+        REBACK: "/project-mgmt/register/concrete-registry/reback", //indenId POST
+        REJECT: "/project-mgmt/register/concrete-registry/reject", //indenId POST
+        DELETE: "/project-mgmt/register/concrete-registry/delete", //indentId DELETE
+        HISTORY: "/project-mgmt/register/concrete-registry/history", //indentId GET
       },
       DRAWING_REGISTER: {
         CREATE: "/project-mgmt/register/drawing-register/create", // POST multipart/form-data

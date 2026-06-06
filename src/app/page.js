@@ -93,7 +93,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ececec]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0d1b4b] via-[#0c3472] to-[#1564b3]">
 
       <ProjectSelectPopup
         open={true}

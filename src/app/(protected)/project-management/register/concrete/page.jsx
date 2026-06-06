@@ -15,6 +15,7 @@ import { getPageAccess } from "@/helper/getPageAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
+import { getfmtDisplaydate } from "@/helper/getfmtDisplayDate";
 
 export default function Page() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function Page() {
           referenceOrderNo: r.referenceOrderNo || "",
           projectSubLocation: r.projectSubLocation || "",
           segment: r.segment || "",
-          pouringDate: r.pouringDate || "",
+          pouringDate:getfmtDisplaydate( r.pouringDate) || "",
           gradeConcrete: r.gradeConcrete || "",
           concreteVolume: r.concreteVolume != null ? String(r.concreteVolume) : "",
           requisitionNo: r.requisitionNo || "",
