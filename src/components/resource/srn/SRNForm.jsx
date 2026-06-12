@@ -26,7 +26,7 @@ const grnSchema = z.object({
   orderId: z.string().min(1, "Order No is required"),
   srnNo: z.string().optional(),
   receivedCategory: z.string().optional(),
-  itemCategory: z.string().optional(),
+  itemCategory: z.array(z.string()).optional(),
   costHead: z.string().optional(),
   partyAddress: z.string().optional(),
   partyGstn: z.string().optional(),
@@ -48,7 +48,7 @@ const defaultValues = {
   vendorId: "",
   orderId: "",
   receivedCategory: "",
-  itemCategory: "",
+  itemCategory: [],
   costHead: "",
   partyAddress: "",
   partyGstn: "",
@@ -119,7 +119,9 @@ export default function SRNForm({ mode = "create", srnId }) {
           vendorId: String(d.vendorId || ""),
           orderId: String(d.orderId || ""),
           receivedCategory: d.receivedCategory || "",
-          itemCategory: d.itemCategory || "",
+          itemCategory: d.itemCategory
+            ? (Array.isArray(d.itemCategory) ? d.itemCategory : JSON.parse(d.itemCategory))
+            : [],
           costHead: d.costHead || "",
           partyAddress: d.partyAddress || "",
           partyGstn: d.partyGstn || "",
@@ -254,7 +256,7 @@ export default function SRNForm({ mode = "create", srnId }) {
     fd.append("orderId", v.orderId);
     fd.append("vendorId", v.vendorId);
     if (v.receivedCategory) fd.append("receivedCategory", v.receivedCategory);
-    if (v.itemCategory) fd.append("itemCategory", v.itemCategory);
+    if (v.itemCategory?.length) fd.append("itemCategory", JSON.stringify(v.itemCategory));
     if (v.costHead) fd.append("costHead", v.costHead);
     if (v.billingAddress) fd.append("billingAddress", v.billingAddress);
     if (v.shippingAddress) fd.append("shippingAddress", v.shippingAddress);

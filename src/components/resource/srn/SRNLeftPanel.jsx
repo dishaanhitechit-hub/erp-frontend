@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { Paperclip, Download } from "lucide-react";
+import { Paperclip, Download, ChevronDown } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -14,27 +14,29 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass, labelClass } from "@/lib/formStyles";
 import { getLocalStorage } from "@/lib/localStorage";
 
-// ── SRN CATEGORY MAPPING ─────────────────────────────────────────────────────
-export const RECEIVED_CATEGORY_OPTIONS = [
-  { label: "Purchases Order",      value: "Purchases Order"      },
-  { label: "Local Purchases",       value: "Local Purchases"       },
-  { label: "Returnable Inventory",     value: "Returnable Inventory"     },
-  { label: "Site Transfer Order",      value: "Site Transfer Order"      },
-  { label: "With Out Purchases Order", value: "With Out Purchases Order" },
-  { label: "Customer Supply Order",          value: "Customer Supply Order"          },
-];
-
-// Item category is always "Material" for SRN
-const ITEM_CATEGORY = "Material";
-
-const COST_HEAD_MAP = {
-  "Purchases Order":       ["Project Work", "Fixed Asset"],
-  "Local Purchases":       ["Project Work", "Fixed Asset"],
-  "Returnable Inventory":     ["Fixed Asset"],
-  "Site Transfer Order":      ["Project Work", "Fixed Asset"],
-  "With Out Purchases Order": ["Project Work", "Fixed Asset"],
-  "Customer Supply Order":          ["Project Work"],
+// ── CATEGORY CONFIG — identical to ServiceOrderBasicSection ─────────────────
+const CATEGORY_CONFIG = {
+  "Work Order": {
+    subCategories: [
+      { label: "Service",   value: "SER_001" },
+      { label: "Composite", value: "COM_001" },
+    ],
+    costHeads:   [{ label: "Project Work", value: "Project_Work" }],
+    multiSelect: true,
+  },
+  "Hire Order": {
+    subCategories: [{ label: "Service", value: "SER_001" }],
+    costHeads:     [{ label: "Project Work", value: "Project_Work" }],
+    multiSelect:   false,
+  },
+  "Job Contract Order": {
+    subCategories: [{ label: "Expenses", value: "EXP_001" }],
+    costHeads:     [{ label: "Project Work", value: "Project_Work" }],
+    multiSelect:   false,
+  },
 };
+
+export const RECEIVED_CATEGORY_OPTIONS = Object.keys(CATEGORY_CONFIG);
 
 // Convert YYYYMMDD → YYYY-MM-DD for date inputs
 const fmt = (d) => {
@@ -71,7 +73,8 @@ export default function SRNLeftPanel({
   const itemCategory     = watch("itemCategory");
 
   // true only when the user explicitly changed vendor/category (not on initial data load)
-  const userChangedRef = useRef(false);
+  const userChangedRef   = useRef(false);
+  const subDropdownRef   = useRef(null);
 
   const [ledgerList,      setLedgerList]      = useState([]);
   const [billingOptions,  setBillingOptions]  = useState([]);
@@ -79,10 +82,19 @@ export default function SRNLeftPanel({
   const [vendorOrders,    setVendorOrders]    = useState([]);
   const [loadingOrders,   setLoadingOrders]   = useState(false);
   const [loadingItems,    setLoadingItems]    = useState(false);
-  // const [showMore,        setShowMore]        = useState(false);
+  const [subDropdownOpen, setSubDropdownOpen] = useState(false);
 
-  // ── COST HEAD OPTIONS based on selected receivedCategory 
-  const costHeadOptions = COST_HEAD_MAP[receivedCategory] || [];
+  // ── CATEGORY CONFIG + derived options (identical to ServiceOrderBasicSection)
+  const categoryConfig  = CATEGORY_CONFIG[receivedCategory] || { subCategories: [], costHeads: [], multiSelect: false };
+  const costHeadOptions = categoryConfig.costHeads;
+  const itemCategoryCodes = watch("itemCategory") || [];
+
+  const subLabel = itemCategoryCodes.length > 0
+    ? categoryConfig.subCategories
+        .filter((o) => itemCategoryCodes.includes(o.value))
+        .map((o) => o.label)
+        .join(", ")
+    : "Select";
 
   // ── LOAD LEDGER LIST (vendors) 
   useEffect(() => {
@@ -141,8 +153,8 @@ export default function SRNLeftPanel({
       setLoadingOrders(true);
       try {
         let url = `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.GET_VENDOR_ORDERS}?vendorId=${vendorId}&projectCode=${projectCode}`;
-        if (receivedCategory) url += `&receivedCategory=${encodeURIComponent(receivedCategory)}`;
-        if (itemCategory)     url += `&itemCategory=${encodeURIComponent(itemCategory)}`;
+        if (receivedCategory) url += `&categoryCode=${encodeURIComponent(receivedCategory)}`;
+        if (itemCategory)     url += `&subCategoryCode=${encodeURIComponent(itemCategory)}`;
         if (costHead)         url += `&costHead=${encodeURIComponent(costHead)}`;
         const res = await apiRequest({ url });
         const orders = res.data || [];
@@ -160,6 +172,26 @@ export default function SRNLeftPanel({
     fetch();
   }, [vendorId, receivedCategory, itemCategory, costHead, projectCode]);
 
+  // ── CLOSE SUB-CATEGORY DROPDOWN ON OUTSIDE CLICK ─────────────────────────
+  useEffect(() => {
+    if (!subDropdownOpen) return;
+    const handleOutside = (e) => {
+      if (subDropdownRef.current && !subDropdownRef.current.contains(e.target))
+        setSubDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [subDropdownOpen]);
+
+  // ── MULTI-SELECT TOGGLE (item category) ──────────────────────────────────
+  const toggleItemCategory = (value) => {
+    const current = watch("itemCategory") || [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    setValue("itemCategory", updated, { shouldValidate: true });
+  };
+
   // ── HANDLE VENDOR CHANGE (user action — clears order + items in create) ────
   const handleVendorChange = (val) => {
     userChangedRef.current = true;
@@ -171,15 +203,23 @@ export default function SRNLeftPanel({
     }
   };
 
-  // ── HANDLE RECEIVED CATEGORY CHANGE
+  // ── HANDLE RECEIVED CATEGORY CHANGE (mirrors ServiceOrderBasicSection handleCategoryChange)
   const handleReceivedCategoryChange = (val) => {
     userChangedRef.current = true;
     setValue("receivedCategory", val);
-    setValue("itemCategory",     ITEM_CATEGORY);
-    // if costHead no longer valid for new category, clear it
-    const newOpts = COST_HEAD_MAP[val] || [];
-    const cur     = watch("costHead");
-    if (cur && !newOpts.includes(cur)) setValue("costHead", "");
+    const config = CATEGORY_CONFIG[val];
+    // auto-set itemCategory: single for non-multiSelect, empty array for multiSelect
+    if (config && !config.multiSelect) {
+      setValue("itemCategory", [config.subCategories[0].value]);
+    } else {
+      setValue("itemCategory", []);
+    }
+    // auto-set costHead if only one option
+    if (config?.costHeads.length === 1) {
+      setValue("costHead", config.costHeads[0].value);
+    } else {
+      setValue("costHead", "");
+    }
     if (mode === "create") {
       setValue("orderId",   "");
       setValue("orderDate", "");
@@ -236,8 +276,8 @@ export default function SRNLeftPanel({
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {RECEIVED_CATEGORY_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    {RECEIVED_CATEGORY_OPTIONS.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -246,16 +286,64 @@ export default function SRNLeftPanel({
           </div>
         </div>
 
-        {/* Item Category — always Material (auto) */}
+        {/* Item Category — multi-select for Work Order, single select for others (mirrors ServiceOrderBasicSection) */}
         <div className="flex items-center">
           <div className={LABEL}>Item Category</div>
-          <Input
-            value={receivedCategory ? ITEM_CATEGORY : ""}
-            readOnly
-            disabled
-            placeholder="Material"
-            className={`${getInputClass(false, true)} w-[220px] h-[30px]`}
-          />
+          <div className="w-[220px]">
+            {categoryConfig.multiSelect ? (
+              <div ref={subDropdownRef} className="relative">
+                <button
+                  type="button"
+                  disabled={disabled || !receivedCategory}
+                  onClick={() => !disabled && receivedCategory && setSubDropdownOpen((p) => !p)}
+                  className={`${getInputClass(false, disabled || !receivedCategory)} w-full h-[30px] px-3 flex items-center justify-between text-sm`}
+                >
+                  <span className={`truncate ${!itemCategoryCodes.length ? "text-gray-400" : ""}`}>
+                    {itemCategoryCodes.length ? subLabel : "Select"}
+                  </span>
+                  <ChevronDown size={14} className="shrink-0 ml-1 text-gray-500" />
+                </button>
+                {subDropdownOpen && (
+                  <div className="absolute top-full left-0 z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
+                    {categoryConfig.subCategories.map((opt) => {
+                      const checked = itemCategoryCodes.includes(opt.value);
+                      return (
+                        <div
+                          key={opt.value}
+                          onClick={() => toggleItemCategory(opt.value)}
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                        >
+                          <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer" />
+                          <span className="text-sm text-gray-700">{opt.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Controller
+                control={control}
+                name="itemCategory"
+                render={({ field }) => (
+                  <Select
+                    value={field.value?.[0] || ""}
+                    onValueChange={(v) => field.onChange([v])}
+                    disabled={disabled || !receivedCategory}
+                  >
+                    <SelectTrigger className={`${getInputClass(false, disabled || !receivedCategory)} w-full h-[30px]`}>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryConfig.subCategories.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            )}
+          </div>
         </div>
 
         {/* Cost Head */}
@@ -276,7 +364,7 @@ export default function SRNLeftPanel({
                   </SelectTrigger>
                   <SelectContent>
                     {costHeadOptions.map((o) => (
-                      <SelectItem key={o} value={o}>{o}</SelectItem>
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
