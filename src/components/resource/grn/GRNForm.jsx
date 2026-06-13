@@ -153,6 +153,7 @@ export default function GRNForm({ mode = "create", grnId }) {
           preReceivedQty: it.preReceivedQty,
           balanceQty: it.balanceQty,
           currentReceivedQty: it.currentReceivedQty ?? 0,
+          effectiveMax: Number(it.balanceQty ?? 0) + Number(it.currentReceivedQty ?? 0),
           useLocation: it.useLocation || "",
           storeLocation: it.storeLocation || "",
         }));
@@ -207,6 +208,7 @@ export default function GRNForm({ mode = "create", grnId }) {
       preReceivedQty: it.preReceivedQty,
       balanceQty: it.balanceQty,
       currentReceivedQty: 0,
+      effectiveMax: Number(it.balanceQty ?? 0),
       useLocation: "",
       storeLocation: "",
     }));
@@ -235,7 +237,7 @@ export default function GRNForm({ mode = "create", grnId }) {
       return false;
     }
     const exceeded = items.some(
-      (it) => Number(it.currentReceivedQty) > Number(it.balanceQty),
+      (it) => Number(it.currentReceivedQty) > Number(it.effectiveMax ?? it.balanceQty),
     );
     if (exceeded) {
       toast.error("One or more items exceed the balance quantity");

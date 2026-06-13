@@ -172,6 +172,9 @@ export default function SRNItemsTable({
               const balQty =
                 Number(item.balanceQty ?? 0);
 
+              const effectiveMax =
+                Number(item.effectiveMax ?? item.balanceQty ?? 0);
+
               const currQty =
                 item.currentReceivedQty;
 
@@ -182,7 +185,7 @@ export default function SRNItemsTable({
                   : Number(currQty);
 
               const qtyError =
-                currNum > balQty &&
+                currNum > effectiveMax &&
                 currNum > 0;
 
               return (
@@ -271,7 +274,7 @@ export default function SRNItemsTable({
 
                       {qtyError && (
                         <p className="text-red-500 text-[10px] mt-1">
-                          Max {balQty}
+                          Max {effectiveMax}
                         </p>
                       )}
                     </div>
