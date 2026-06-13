@@ -15,6 +15,7 @@ import { getPageAccess } from "@/helper/getPageAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
+import { getFormatCategoryName } from "@/helper/getFormatCategoryName";
 
 export default function Page() {
   const router = useRouter();
@@ -49,8 +50,8 @@ export default function Page() {
           ginDate:        r.ginDate        || "",
           orderNo:        r.orderNo        || "",
           partyName:      r.partyName      || "",
-          issueCategory:  r.issueCategory  || "",
-          costHead:       r.costHead       || "",
+          issueCategory:  getFormatCategoryName( r.issueCategory ) || "",
+          costHead:      getFormatCategoryName(  r.costHead    )   || "",
           costFactor:     r.costFactor     || "",
           workflowStatus: r.workflowStatus || "",
         }));

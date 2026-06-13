@@ -19,6 +19,7 @@ import {
 import { X } from "lucide-react";
 import { getLocalStorage } from "@/lib/localStorage";
 import { getfmtDisplaydate } from "@/helper/getfmtDisplayDate";
+import { getFormatCategoryName } from "@/helper/getFormatCategoryName";
 
 const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 
@@ -66,7 +67,7 @@ export default function Page() {
             orderNo: p.orderNo,
             orderDate:getfmtDisplaydate( p.orderDate),
             partyName: p.partyName || "",
-            category: p.categoryCode || "",
+            category: getFormatCategoryName( p.categoryCode )|| "",
             basicAmount: formatAmount(p.basicAmount || 0),
             gstAmount: formatAmount(p.gstAmount || 0),
             totalAmount: formatAmount(totalAmount),

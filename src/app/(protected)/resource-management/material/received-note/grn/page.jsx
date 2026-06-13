@@ -16,6 +16,7 @@ import { apiRequest }      from "@/lib/apiClient";
 import { API_ENDPOINTS }   from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 import { getfmtDisplaydate } from "@/helper/getfmtDisplayDate";
+import { getFormatCategoryName } from "@/helper/getFormatCategoryName";
 
 
 export default function Page() {
@@ -48,8 +49,8 @@ export default function Page() {
           _rawDate:         r.grnDate          || "",
           partyName:        r.partyName        || "",
           orderNo:          r.orderNo          || "",
-          receivedCategory: r.receivedCategory || "",
-          costHead:         r.costHead         || "",
+          receivedCategory:getFormatCategoryName( r.receivedCategory )|| "",
+          costHead:         getFormatCategoryName( r.costHead   )      || "",
           workflowStatus:   r.workflowStatus   || "",
         }));
         setData(formatted);
