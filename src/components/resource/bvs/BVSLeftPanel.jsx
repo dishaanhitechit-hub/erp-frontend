@@ -33,7 +33,7 @@ const COST_HEAD_OPTIONS = {
   ],
 };
 
-export default function BVSLeftPanel({ form, disabled }) {
+export default function BVSLeftPanel({ form, disabled, mode }) {
   const [ledgerList, setLedgerList] = useState([]);
   const [billingOptions, setBillingOptions] = useState([]);
   const [shippingOptions, setShippingOptions] = useState([]);
@@ -119,7 +119,12 @@ export default function BVSLeftPanel({ form, disabled }) {
           url: `${API_ENDPOINTS.RESOURCE.VENDOR_BILLING.BVS.GET_VENDOR_ORDERS}?vendorId=${vendorId}&projectCode=${projectCode}&receivedCategory=${categoryCode}&itemCategory=${"MAT_001"}&costHead=${costHead}`,
           method: "GET",
         });
-        setVendorOrders(Array.isArray(res.data) ? res.data : (res.data?.orders || res.data?.data || []));
+        const orders = Array.isArray(res.data) ? res.data : (res.data?.orders || res.data?.data || []);
+        setVendorOrders(orders);
+        if (mode === "create" && orders.length === 0) {
+          toast.info("No orders available for the selected category and cost head");
+        }
+        
       } catch {
         toast.error("Failed to load vendor orders");
       }

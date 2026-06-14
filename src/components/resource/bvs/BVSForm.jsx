@@ -278,7 +278,7 @@ export default function BVSForm({ mode = "create", bvsId }) {
       <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
         {/* LEFT SECTION */}
         <div className="w-full xl:w-auto shrink-0">
-          <BVSLeftPanel form={form} disabled={disabled} />
+          <BVSLeftPanel form={form} disabled={disabled} mode={mode} />
         </div>
 
         <div className="hidden xl:block w-px self-stretch bg-sky-300" />
