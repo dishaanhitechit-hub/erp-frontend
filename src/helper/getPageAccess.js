@@ -29,7 +29,7 @@ export const getPageAccess = ({
     permissions?.[
       `${pageCode}.APPROVER`
     ];
-
+    
   const hasAccess =
     canView ||
     canEdit ||

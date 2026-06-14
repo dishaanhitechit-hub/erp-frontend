@@ -110,6 +110,21 @@ export const API_ENDPOINTS = {
         },
       },
     },
+    VENDOR_BILLING: {
+      BVS: {
+        GET_VENDOR_ORDERS: "/resource/bvs/vendor-orders", // vendorId projectCode categoryCode costHead GET
+        GET_GRNS_BY_ORDER: "/resource/bvs/grns-by-order", // /:orderId GET
+        CREATE_BVS: "/resource/bvs/create", // POST JSON
+        GET_ALL_BVS: "/resource/bvs/list", // GET
+        GET_BVS_BY_ID: "/resource/bvs/details", // /:bvsId GET
+        UPDATE_BVS_BY_ID: "/resource/bvs/edit", // /:bvsId PUT JSON
+        SUBMIT_BVS_BY_ID: "/resource/bvs/submit", // /:bvsId POST
+        APPROVE: "/resource/bvs/approve", // /:bvsId POST
+        REBACK: "/resource/bvs/reback", // /:bvsId POST
+        REJECT: "/resource/bvs/reject", // /:bvsId POST
+        HISTORY: "/resource/bvs/history", // /:bvsId GET
+      },
+    },
     MATERIAL_MANAGEMENT: {
       // resource/gin
       GIN: {

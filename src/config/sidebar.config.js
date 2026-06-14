@@ -213,12 +213,12 @@ export const sidebarConfig = [
           {
             title: "Billing by GRN",
             path: "/resource-management/vendor-billing/grn",
-            permissionKey: "vendor_billing_grn",
+            permissionKey: "billing_by_grn",
           },
           {
             title: "Billing by SRN",
             path: "/resource-management/vendor-billing/srn",
-            permissionKey: "vendor_billing_srn",
+            permissionKey: "billing_by_srn",
           },
         ],
       },
