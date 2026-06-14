@@ -50,6 +50,7 @@ const defaultValues = {
   partyBillNo: "",
   partyDate: "",
   orderId: "",
+  orderNo: "",
   billingAddress: "",
   shippingAddress: "",
   partyAddress: "",
@@ -109,18 +110,20 @@ export default function BVSForm({ mode = "create", bvsId }) {
         }));
 
         const formattedData = {
-          categoryCode: d.receivedCategory || "Purchases_Order",
+          categoryCode: d.receivedCategory  || "Purchases_Order",
           costHead: d.costHead || "",
+          itemCategory: "MAT_001",
           vendorId: String(d.vendorId || ""),
           bvsNo: d.bvsNo || "",
           bvsDate: d.bvsDate || "",
           partyBillNo: d.partyBillNo || "",
           partyDate: d.partyDate || "",
           orderId: String(d.orderId || ""),
+          orderNo: d.orderNo || "",
           billingAddress: d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
           partyAddress: d.partyAddress || "",
-          gstn: d.gstn || "",
+          gstn: d.partyGstn || d.gstn || "",
           gstType: d.gstType || "",
           items,
           ccSummary: d.ccSummary || [],
@@ -132,12 +135,14 @@ export default function BVSForm({ mode = "create", bvsId }) {
         reset(formattedData);
         setInitialData(formattedData);
 
-        const isEditableStatus = ["draft", "reback"].includes(
-          (d.workflowStatus || "").toLowerCase(),
-        );
+        const st = (d.workflowStatus || "").toLowerCase();
+        const isEditableStatus = ["draft", "reback"].includes(st);
         if (mode === "edit" && !isEditableStatus) {
           setIsSubmitted(true);
           setIsEditing(false);
+          if (st === "approved") toast.info("BVS already Approved");
+          else if (st === "rejected" || st === "reject") toast.info("BVS already Rejected");
+          else toast.info("BVS already Submitted");
         } else {
           setIsEditing(false);
           setAllowSubmit(true);

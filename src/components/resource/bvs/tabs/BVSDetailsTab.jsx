@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { getInputClass } from "@/lib/formStyles";
 import BVSGRNItemSelectionModal from "../modals/BVSGRNItemSelectionModal";
+import { getfmtDisplaydate } from "@/helper/getfmtDisplayDate";
 
 const TH = ({ children, w = "auto", center = false }) => (
   <th
@@ -110,7 +111,7 @@ export default function BVSDetailsTab({
                   <tr key={item.grnItemId ?? index}>
                     <TD center>{index + 1}</TD>
                     <TD><ReadCell value={item.grnNo} /></TD>
-                    <TD><ReadCell value={item.grnDate} /></TD>
+                    <TD><ReadCell value={getfmtDisplaydate(item.grnDate)} /></TD>
                     <TD><ReadCell value={item.grnl} /></TD>
                     <TD><ReadCell value={item.itemCode} /></TD>
                     <TD>

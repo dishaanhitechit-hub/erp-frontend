@@ -47,6 +47,8 @@ export default function BVSLeftPanel({ form, disabled }) {
 
   const categoryCode = watch("categoryCode");
   const costHead = watch("costHead");
+  const orderId = watch("orderId");
+  const orderNo = watch("orderNo");
   const vendorId = watch("vendorId");
 
   // SET itemCategory = MAT_001 always
@@ -93,7 +95,7 @@ export default function BVSLeftPanel({ form, disabled }) {
     fetchProject();
   }, [projectId]);
 
-  // VENDOR AUTO-FILL
+  // VENDOR AUTO-FILL — only fill if fields are currently empty (avoids overwriting API-loaded data)
   useEffect(() => {
     if (!vendorId) {
       setValue("partyAddress", "");
@@ -102,9 +104,11 @@ export default function BVSLeftPanel({ form, disabled }) {
     }
     const vendor = ledgerList.find((v) => String(v.ledgerId) === String(vendorId));
     if (!vendor) return;
-    setValue("partyAddress", vendor.corporateAddress || "");
-    setValue("gstn", vendor.gstin || "");
-  }, [vendorId, ledgerList, setValue]);
+    // Only set if not already populated (edit mode loads these from API)
+    const { partyAddress, gstn } = form.getValues();
+    if (!partyAddress) setValue("partyAddress", vendor.corporateAddress || "");
+    if (!gstn) setValue("gstn", vendor.gstin || "");
+  }, [vendorId, ledgerList, setValue, form]);
 
   // FETCH VENDOR ORDERS when vendor + category + costHead all set
   useEffect(() => {
@@ -115,7 +119,7 @@ export default function BVSLeftPanel({ form, disabled }) {
           url: `${API_ENDPOINTS.RESOURCE.VENDOR_BILLING.BVS.GET_VENDOR_ORDERS}?vendorId=${vendorId}&projectCode=${projectCode}&receivedCategory=${categoryCode}&itemCategory=${"MAT_001"}&costHead=${costHead}`,
           method: "GET",
         });
-        setVendorOrders(res.data || []);
+        setVendorOrders(Array.isArray(res.data) ? res.data : (res.data?.orders || res.data?.data || []));
       } catch {
         toast.error("Failed to load vendor orders");
       }
@@ -276,6 +280,14 @@ export default function BVSLeftPanel({ form, disabled }) {
         <div className="flex items-center">
           <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order No</div>
           <div className="w-[220px]">
+            {/* If orderId already set but vendorOrders not loaded (edit/view mode), show read-only */}
+            {orderId && !vendorOrders.length ? (
+              <Input
+                value={orderNo || orderId}
+                disabled
+                className={`${getInputClass(false, true)} w-full h-[34px]`}
+              />
+            ) : (
             <Controller
               control={control}
               name="orderId"
@@ -302,6 +314,7 @@ export default function BVSLeftPanel({ form, disabled }) {
                 </Select>
               )}
             />
+            )}
           </div>
         </div>
       </div>

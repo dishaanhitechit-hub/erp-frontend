@@ -196,6 +196,19 @@ export const routeMetaConfig = [
     basePath: "/resource-management/material/gin/[id]",
     breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","Edit"],
   },
+  //billing by grn
+  {
+    basePath: "/resource-management/vendor-billing/grn",
+    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","List"],
+  },
+  {
+    basePath: "/resource-management/vendor-billing/grn/new",
+    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","New"],
+  },
+  {
+    basePath: "/resource-management/vendor-billing/grn/[id]",
+    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","Edit"],
+  },
   //project management
   {
     basePath: "/project-management/register/concrete",
