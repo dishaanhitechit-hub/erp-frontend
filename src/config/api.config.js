@@ -111,6 +111,19 @@ export const API_ENDPOINTS = {
       },
     },
     VENDOR_BILLING: {
+      BSS: {
+        GET_VENDOR_ORDERS: "/resource/bss/vendor-orders", // vendorId projectCode receivedCategory itemCategory costHead GET
+        GET_SRNS_BY_ORDER: "/resource/bss/srns-by-order", // /:orderId GET
+        CREATE_BSS: "/resource/bss/create", // POST JSON
+        GET_ALL_BSS: "/resource/bss/list", // GET
+        GET_BSS_BY_ID: "/resource/bss/details", // /:bssId GET
+        UPDATE_BSS_BY_ID: "/resource/bss/edit", // /:bssId PUT JSON
+        SUBMIT_BSS_BY_ID: "/resource/bss/submit", // /:bssId POST
+        APPROVE: "/resource/bss/approve", // /:bssId POST
+        REBACK: "/resource/bss/reback", // /:bssId POST
+        REJECT: "/resource/bss/reject", // /:bssId POST
+        HISTORY: "/resource/bss/history", // /:bssId GET
+      },
       BVS: {
         GET_VENDOR_ORDERS: "/resource/bvs/vendor-orders", // vendorId projectCode categoryCode costHead GET
         GET_GRNS_BY_ORDER: "/resource/bvs/grns-by-order", // /:orderId GET
