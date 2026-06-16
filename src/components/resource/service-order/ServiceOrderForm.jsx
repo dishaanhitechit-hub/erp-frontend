@@ -286,26 +286,25 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
     <>
       <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
         {/* LEFT SECTION */}
-        <div className="w-full xl:w-auto shrink-0">
-          <ServiceOrderBasicSection
-            form={form}
-            disabled={disabled}
-            fileName={fileName}
-            setFileName={setFileName}
-            fileUrl={fileUrl}
-            setFileUrl={setFileUrl}
-            attachedFile={attachedFile}
-            setAttachedFile={setAttachedFile}
-            fileRef={fileRef}
-          />
-        </div>
+        <ServiceOrderBasicSection
+          form={form}
+          disabled={disabled}
+          fileName={fileName}
+          setFileName={setFileName}
+          fileUrl={fileUrl}
+          setFileUrl={setFileUrl}
+          attachedFile={attachedFile}
+          setAttachedFile={setAttachedFile}
+          fileRef={fileRef}
+        />
 
         <div className="hidden xl:block w-px self-stretch bg-sky-300" />
 
         {/* RIGHT SECTION */}
-        <div className="w-full min-w-0 overflow-x-auto">
+        <div className="w-full flex-1 min-w-0 overflow-x-auto">
+          <div className="min-w-[900px]">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px] min-w-[900px]">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px]">
               <TabsList className="h-auto bg-transparent p-0 gap-[2px] rounded-none border-0 shadow-none flex flex-wrap">
                 <TabsTrigger value="summary" className="relative h-[40px] min-w-[125px] rounded-none border border-[#5B6B8C] border-b-0 bg-[#E5E5E5] px-5 text-[15px] font-semibold text-black data-[state=active]:bg-[#F4C400] data-[state=active]:shadow-none transition-none" style={{ clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)" }}>
                   Summary
@@ -332,8 +331,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
               </div>
             </div>
 
-            {/* FIXED: position-relative creates a new stacking context so sticky thead works correctly */}
-            <div className="border border-[#CFCFCF] bg-white min-w-[900px] relative">
+            <div className="border border-[#CFCFCF] bg-white relative">
               <TabsContent value="items" className="m-0">
                 <ServiceOrderItemsTab form={form} disabled={disabled} openItemModal={openItemModal} setOpenItemModal={setOpenItemModal} />
               </TabsContent>
@@ -345,6 +343,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
               </TabsContent>
             </div>
           </Tabs>
+          </div>
         </div>
       </div>
 

@@ -111,9 +111,9 @@ export default function BSSForm({ mode = "create", bssId }) {
 
         const formattedData = {
           categoryCode: d.receivedCategory || "Work_Order",
-          subCategory: d.itemCategory
-            ? (Array.isArray(d.itemCategory) ? d.itemCategory : [d.itemCategory])
-            : ["SER_001"],
+          subCategory:d.itemCategory
+            ? (Array.isArray(d.itemCategory) ? d.itemCategory : JSON.parse(d.itemCategory))
+            : [],
           costHead: d.costHead || "Project_Work",
           vendorId: String(d.vendorId || ""),
           bssNo: d.bssNo || "",

@@ -341,26 +341,25 @@ export default function OrderForm({ mode = "create", orderId }) {
     <>
       <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
         {/* LEFT SECTION */}
-        <div className="w-full xl:w-auto shrink-0">
-          <OrderBasicSection
-            form={form}
-            disabled={disabled}
-            fileName={fileName}
-            setFileName={setFileName}
-            fileUrl={fileUrl}
-            setFileUrl={setFileUrl}
-            attachedFile={attachedFile}
-            setAttachedFile={setAttachedFile}
-            fileRef={fileRef}
-          />
-        </div>
+        <OrderBasicSection
+          form={form}
+          disabled={disabled}
+          fileName={fileName}
+          setFileName={setFileName}
+          fileUrl={fileUrl}
+          setFileUrl={setFileUrl}
+          attachedFile={attachedFile}
+          setAttachedFile={setAttachedFile}
+          fileRef={fileRef}
+        />
 
         <div className="hidden xl:block w-px self-stretch bg-sky-300" />
 
         {/* RIGHT SECTION */}
-        <div className="w-full min-w-0 overflow-x-auto">
+        <div className="w-full flex-1 min-w-0 overflow-x-auto">
+          <div className="min-w-[900px]">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px] min-w-[900px]">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px]">
               <TabsList className="h-auto bg-transparent p-0 gap-[2px] rounded-none border-0 shadow-none flex flex-wrap">
                 <TabsTrigger
                   value="summary"
@@ -413,7 +412,7 @@ export default function OrderForm({ mode = "create", orderId }) {
               </div>
             </div>
 
-            <div className="border border-[#CFCFCF] bg-white min-w-[900px]">
+            <div className="border border-[#CFCFCF] bg-white">
               <TabsContent value="items" className="m-0">
                 {/* CHANGED: always OrderItemsTab; assetOnly handled in modal via costHead */}
                 <OrderItemsTab
@@ -436,6 +435,7 @@ export default function OrderForm({ mode = "create", orderId }) {
               </TabsContent>
             </div>
           </Tabs>
+          </div>
         </div>
       </div>
 
