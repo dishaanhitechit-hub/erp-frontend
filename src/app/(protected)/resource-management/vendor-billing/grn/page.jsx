@@ -55,6 +55,7 @@ export default function Page() {
           bvsNo: item.bvsNo,
           bvsDate: getfmtDisplaydate(item.bvsDate),
           partyName: item.partyName || "",
+          categoryCode: item.receivedCategory || "",
           category: getFormatCategoryName(item.receivedCategory) || "",
           basicAmount: formatAmount(item.basicAmount || 0),
           gstAmount: formatAmount(Number(item.totalAmount) - Number(item.basicAmount)),
@@ -111,11 +112,15 @@ export default function Page() {
   };
 
   const summaryData = useMemo(() => {
-    const categoryList = ["PurchasesOrder", "Customer Supply Order", "Site Transfer Order"];
-    const rows = categoryList.map((categoryName) => {
-      const categoryRows = filteredData.filter((item) => item.category === categoryName);
+    const categoryList = [
+      { code: "Purchases_Order", label: "Purchases Order" },
+      { code: "Customer_Supply_Order", label: "Customer Supply Order" },
+      { code: "Site_Transfer_Order", label: "Site Transfer Order" },
+    ];
+    const rows = categoryList.map(({ code, label }) => {
+      const categoryRows = filteredData.filter((item) => item.categoryCode === code);
       return {
-        category: categoryName,
+        category: label,
         basicAmount: categoryRows.reduce((s, i) => s + i.basicAmountRaw, 0),
         gstAmount: categoryRows.reduce((s, i) => s + i.gstAmountRaw, 0),
         totalAmount: categoryRows.reduce((s, i) => s + i.totalAmountRaw, 0),
@@ -157,7 +162,7 @@ export default function Page() {
 
   return (
     <HeaderWrapper header={<PageHeader actions={actions} />}>
-      <div className="relative min-h-[calc(100vh-220px)] p-3 overflow-hidden">
+      <div className="relative h-[calc(100vh-180px)] p-3 flex flex-col overflow-hidden">
         <SearchSection
           onSearch={handleSearch}
           showDateRange={true}
@@ -173,13 +178,15 @@ export default function Page() {
           }
         />
 
-        <DataTable
-          columns={columns}
-          data={filteredData}
-          onRowClick={(row) => {
-            router.push(`/resource-management/vendor-billing/grn/${row.id}`);
-          }}
-        />
+        <div className="flex-1 overflow-y-auto pb-12">
+          <DataTable
+            columns={columns}
+            data={filteredData}
+            onRowClick={(row) => {
+              router.push(`/resource-management/vendor-billing/grn/${row.id}`);
+            }}
+          />
+        </div>
 
         {/* SUMMARY MODAL */}
         <div className="absolute bottom-[18px] left-[18px] z-30">
