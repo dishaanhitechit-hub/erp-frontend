@@ -213,7 +213,7 @@ useEffect(()=>{
           </div>
 
           <p className="text-center mt-6 text-[18px] font-medium">
-            Developed by : Inmedia Technology Pvt. Ltd.
+            Developed by : Ankan Das & Saoumaji Maity.
           </p>
         </div>
       </div>
