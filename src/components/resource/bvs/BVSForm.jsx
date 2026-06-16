@@ -277,60 +277,60 @@ export default function BVSForm({ mode = "create", bvsId }) {
     <>
       <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
         {/* LEFT SECTION */}
-        <div className="w-full xl:w-auto shrink-0">
-          <BVSLeftPanel form={form} disabled={disabled} mode={mode} />
-        </div>
+        <BVSLeftPanel form={form} disabled={disabled} mode={mode} />
 
         <div className="hidden xl:block w-px self-stretch bg-sky-300" />
 
         {/* RIGHT SECTION */}
-        <div className="w-full flex-1 min-w-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px] min-w-[900px]">
-              <TabsList className="h-auto bg-transparent p-0 gap-[2px] rounded-none border-0 shadow-none flex flex-wrap">
-                <TabsTrigger
-                  value="summary"
-                  className="relative h-[40px] min-w-[125px] rounded-none border border-[#5B6B8C] border-b-0 bg-[#E5E5E5] px-5 text-[15px] font-semibold text-black data-[state=active]:bg-[#F4C400] data-[state=active]:shadow-none transition-none"
-                  style={{ clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)" }}
-                >
-                  Summary
-                </TabsTrigger>
-                <TabsTrigger
-                  value="details"
-                  className="relative h-[40px] min-w-[125px] rounded-none border border-[#5B6B8C] border-b-0 bg-[#E5E5E5] px-5 text-[15px] font-semibold text-black data-[state=active]:bg-[#F4C400] data-[state=active]:shadow-none transition-none"
-                  style={{ clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)" }}
-                >
-                  Details
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="flex items-center gap-2 lg:justify-end">
-                {activeTab === "details" && !disabled && (
-                  <button
-                    type="button"
-                    onClick={() => setOpenItemModal(true)}
-                    className="h-[34px] min-w-[170px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition"
+        <div className="w-full flex-1 min-w-0 overflow-x-auto">
+          <div className="min-w-[900px]">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-[2px]">
+                <TabsList className="h-auto bg-transparent p-0 gap-[2px] rounded-none border-0 shadow-none flex flex-wrap">
+                  <TabsTrigger
+                    value="summary"
+                    className="relative h-[40px] min-w-[125px] rounded-none border border-[#5B6B8C] border-b-0 bg-[#E5E5E5] px-5 text-[15px] font-semibold text-black data-[state=active]:bg-[#F4C400] data-[state=active]:shadow-none transition-none"
+                    style={{ clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)" }}
                   >
-                    + Add GRN Items
-                  </button>
-                )}
-              </div>
-            </div>
+                    Summary
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="details"
+                    className="relative h-[40px] min-w-[125px] rounded-none border border-[#5B6B8C] border-b-0 bg-[#E5E5E5] px-5 text-[15px] font-semibold text-black data-[state=active]:bg-[#F4C400] data-[state=active]:shadow-none transition-none"
+                    style={{ clipPath: "polygon(0 0, 84% 0, 100% 100%, 0% 100%)" }}
+                  >
+                    Details
+                  </TabsTrigger>
+                </TabsList>
 
-            <div className="border border-[#CFCFCF] bg-white min-w-[900px]">
-              <TabsContent value="details" className="m-0">
-                <BVSDetailsTab
-                  form={form}
-                  disabled={disabled}
-                  openItemModal={openItemModal}
-                  setOpenItemModal={setOpenItemModal}
-                />
-              </TabsContent>
-              <TabsContent value="summary" className="m-0">
-                <BVSSummaryTab form={form} disabled={disabled} />
-              </TabsContent>
-            </div>
-          </Tabs>
+                <div className="flex items-center gap-2 lg:justify-end">
+                  {activeTab === "details" && !disabled && (
+                    <button
+                      type="button"
+                      onClick={() => setOpenItemModal(true)}
+                      className="h-[34px] min-w-[170px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition"
+                    >
+                      + Add GRN Items
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="border border-[#CFCFCF] bg-white">
+                <TabsContent value="details" className="m-0">
+                  <BVSDetailsTab
+                    form={form}
+                    disabled={disabled}
+                    openItemModal={openItemModal}
+                    setOpenItemModal={setOpenItemModal}
+                  />
+                </TabsContent>
+                <TabsContent value="summary" className="m-0">
+                  <BVSSummaryTab form={form} disabled={disabled} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </div>
       </div>
 

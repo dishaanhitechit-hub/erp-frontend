@@ -199,7 +199,8 @@ export default function BSSLeftPanel({ form, disabled, mode }) {
   };
 
   return (
-    <div className="xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-x-6 gap-y-5">
+    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-4">
 
       {/* CATEGORY GROUP */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
@@ -461,6 +462,7 @@ export default function BSSLeftPanel({ form, disabled, mode }) {
             )} />
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

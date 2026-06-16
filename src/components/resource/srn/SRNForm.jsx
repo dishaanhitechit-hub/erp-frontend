@@ -453,13 +453,8 @@ export default function SRNForm({ mode = "create", srnId }) {
         <div className="w-full flex-1 min-w-0 flex flex-col gap-4">
           <div>
             {/* BASIC SECTION HEADER */}
-            <div className="bg-[#d8e0d1] border border-[#c7cfbf] px-3 py-1  text-[#1a3a5c] ">
-              <h2
-                className="text-[15px]
-              font-semibold"
-              >
-                BASIC
-              </h2>
+            <div className="bg-[#d8e0d1] border border-[#c7cfbf] px-3 py-1 text-[#1a3a5c]">
+              <h2 className="text-[15px] font-semibold">BASIC</h2>
             </div>
 
             {/* ITEMS TABLE */}
@@ -469,7 +464,6 @@ export default function SRNForm({ mode = "create", srnId }) {
               disabled={disabled}
             />
           </div>
-
         </div>
         {/* end right panel */}
       </div>
