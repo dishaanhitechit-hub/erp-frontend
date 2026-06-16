@@ -105,7 +105,7 @@ export default function SRNForm({ mode = "create", srnId }) {
   useEffect(() => {
     if (mode === "create" || !srnId) return;
 
-    const fetchGRN = async () => {
+    const fetchSRN = async () => {
       setIsLoading(true);
       try {
         const res = await apiRequest({
@@ -144,7 +144,7 @@ export default function SRNForm({ mode = "create", srnId }) {
 
         // Populate items from details
         const mappedItems = (d.items || []).map((it) => ({
-          orderItemId: it.orderItemId,
+          orderItemId: it.pwOrderItemId ?? it.orderItemId,
           srnl: it.srnl || "",
           // indentNo: it.indentNo || "",
           itemCode: it.itemCode || "",
@@ -188,7 +188,7 @@ export default function SRNForm({ mode = "create", srnId }) {
       }
     };
 
-    fetchGRN();
+    fetchSRN();
   }, [srnId, mode]);
 
   // ── ORDER ITEMS CALLBACK (from SRNLeftPanel when user picks an order) ──────
@@ -199,7 +199,7 @@ export default function SRNForm({ mode = "create", srnId }) {
       return;
     }
     const mapped = (orderData.items || []).map((it) => ({
-      orderItemId: it.orderItemId,
+      orderItemId: it.pwOrderItemId ?? it.orderItemId,
       srnl: "",
       // indentNo: it.indentNo || "",
       itemCode: it.itemCode || "",
@@ -276,7 +276,7 @@ export default function SRNForm({ mode = "create", srnId }) {
     const itemsPayload = items
       .filter((it) => Number(it.currentReceivedQty) > 0)
       .map((it) => ({
-        orderItemId: it.orderItemId,
+        pwOrderItemId: it.orderItemId,
         currentReceivedQty: Number(it.currentReceivedQty),
         useLocation: it.useLocation || "",
         storeLocation: it.storeLocation || "",

@@ -10,7 +10,7 @@ import { getPageActions }       from "@/components/common/PageActionButtons";
 import { getPageAccess }        from "@/helper/getPageAccess";
 import ApprovalActionModal      from "@/components/common/ApprovalActionModal";
 import HistoryTimelineSheet     from "@/components/common/HistoryTimelineSheet";
-import GRNForm from "@/components/resource/grn/GRNForm";
+import GRNForm from "@/components/resource/srn/SRNForm";
 import { API_ENDPOINTS } from "@/config/api.config";
 
 export default function Page() {
@@ -39,9 +39,9 @@ export default function Page() {
         onClose={() => setOpenApproval(false)}
         payload={{ id }}
         actions={[
-          { type: "approve", api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.APPROVE  },
-          { type: "reback",  api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.REBACK   },
-          { type: "reject",  api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.REJECT   },
+          { type: "approve", api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.APPROVE  },
+          { type: "reback",  api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.REBACK   },
+          { type: "reject",  api: API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.REJECT   },
         ]}
         onSuccess={() => { setOpenApproval(false); router.refresh(); }}
       />
@@ -49,8 +49,8 @@ export default function Page() {
       <HistoryTimelineSheet
         open={openTimeline}
         onClose={() => setOpenTimeline(false)}
-        title="GRN History"
-        api={API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.HISTORY}
+        title="SRN History"
+        api={API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.HISTORY}
         entityId={id}
       />
     </HeaderWrapper>

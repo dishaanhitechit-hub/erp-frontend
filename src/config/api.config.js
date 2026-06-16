@@ -173,7 +173,7 @@ export const API_ENDPOINTS = {
         CREATE_SRN: "/resource/srn/create", // POST multipart/form-data
         GET_ALL_SRN: "/resource/srn/list", // GET
         GET_SRN_BY_ID: "/resource/srn/details", // /:srnId GET
-        UPDATE_SRN_BY_ID: "/resource/grn/edit", // /:srnId PUT
+        UPDATE_SRN_BY_ID: "/resource/srn/edit", // /:srnId PUT
         SUBMIT_SRN_BY_ID: "/resource/srn/submit", // /:srnId POST
         APPROVE: "/resource/srn/approve", // /:srnId POST
         REBACK: "/resource/srn/reback", // /:srnId POST
