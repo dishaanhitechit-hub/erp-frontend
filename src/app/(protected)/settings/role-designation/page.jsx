@@ -13,7 +13,7 @@ import {
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
-import { Search, Trash2, Link2 } from "lucide-react";
+import { Search, Trash2, Link2, Loader2 } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
 import { useRouter } from "next/navigation";
 import { getPageActions } from "@/components/common/PageActionButtons";
@@ -49,6 +49,7 @@ export default function ProjectRolePage() {
   const [deleteItem, setDeleteItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [searchSuccess, setSearchSuccess] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   const [openLocationModal, setOpenLocationModal] = useState(false);
 
@@ -80,12 +81,21 @@ export default function ProjectRolePage() {
     }
 
     try {
-      // setLoading(true);
+      setSearching(true);
 
       const res = await apiRequest({
         url: `${API_ENDPOINTS.SETTINGS.UPDATE_PROJECT_ROLES}/${projectCode}`,
         method: "GET",
       });
+
+      if (!res.data?.length) {
+        setProjectData(null);
+        setSiteTeam([]);
+        setHoTeam([]);
+        setSearchSuccess(false);
+        toast.error("Project not found");
+        return;
+      }
 
       const data = res.data[0];
 
@@ -124,9 +134,13 @@ export default function ProjectRolePage() {
       setHoTeam(grouped[1]?.list || []);
       setSiteTeam(grouped[2]?.list || []);
     } catch (err) {
+      setProjectData(null);
+      setSiteTeam([]);
+      setHoTeam([]);
+      setSearchSuccess(false);
       toast.error("Project not found");
     } finally {
-      // setLoading(false);
+      setSearching(false);
     }
   };
 
@@ -531,12 +545,12 @@ export default function ProjectRolePage() {
               <Input
                   value={projectCode}
                   onChange={(e) => setProjectCode(e.target.value)}
-                  disabled={isEditing}
+                  disabled={isEditing || searching}
                   className={`w-[200px] ${inputClass}`}
               />
 
-              <button onClick={handleSearch}>
-                <Search size={18} />
+              <button onClick={handleSearch} disabled={searching} className="disabled:opacity-50">
+                {searching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
               </button>
             </div>
 
@@ -573,39 +587,43 @@ export default function ProjectRolePage() {
 
           </div>
 
-          {/* AUTO FIELDS */}
-          <div className="md:flex gap-2 md:items-center">
-            <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
-              Project Name
-            </div>
-            <Input
-                value={projectData?.projectName || "[Auto]"}
-                disabled
-                className={`w-[50%] ${inputClass}`}
-            />
-          </div>
+          {/* RESULTS — fade + slide in when data arrives */}
+          <div className={`space-y-2 transition-all duration-500 ease-out ${projectData ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}>
 
-          <div className="md:flex gap-2 md:items-center">
-            <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
-              Client Name
-            </div>
-            <Input
-                value={projectData?.clientName || "[Auto]"}
-                disabled
-                className={`w-[50%] ${inputClass}`}
-            />
-          </div>
-
-          {/* TEAMS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-4 ">
-            <div>
-              <div className="font-semibold text-blue-600 mb-2">* Site Team</div>
-              {renderTeam(siteTeam, setSiteTeam)}
+            {/* AUTO FIELDS */}
+            <div className="md:flex gap-2 md:items-center">
+              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
+                Project Name
+              </div>
+              <Input
+                  value={projectData?.projectName || "[Auto]"}
+                  disabled
+                  className={`w-[50%] ${inputClass}`}
+              />
             </div>
 
-            <div>
-              <div className="font-semibold text-blue-600 mb-2">* HO Team</div>
-              {renderTeam(hoTeam, setHoTeam)}
+            <div className="md:flex gap-2 md:items-center">
+              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
+                Client Name
+              </div>
+              <Input
+                  value={projectData?.clientName || "[Auto]"}
+                  disabled
+                  className={`w-[50%] ${inputClass}`}
+              />
+            </div>
+
+            {/* TEAMS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-4">
+              <div>
+                <div className="font-semibold text-blue-600 mb-2">* Site Team</div>
+                {renderTeam(siteTeam, setSiteTeam)}
+              </div>
+
+              <div>
+                <div className="font-semibold text-blue-600 mb-2">* HO Team</div>
+                {renderTeam(hoTeam, setHoTeam)}
+              </div>
             </div>
           </div>
 
