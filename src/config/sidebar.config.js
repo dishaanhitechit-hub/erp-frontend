@@ -324,7 +324,7 @@ export const sidebarConfig = [
           {
             title: "BBS Register",
             path: "/project-management/register/bbs",
-            permissionKey: "bbs",
+            permissionKey: "bbs_register",
           },
           {
             title: "Concrete Register",
