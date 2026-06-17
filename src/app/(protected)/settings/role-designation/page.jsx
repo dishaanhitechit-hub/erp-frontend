@@ -312,6 +312,10 @@ export default function ProjectRolePage() {
               sub.children?.length > 0 &&
               sub.showChildrenInPermission === false
           ) {
+            // Effective key used for the parent row (same logic as renderPermissionTree)
+            const parentKey =
+                sub.permissionKey ||
+                sub.children?.find((c) => c.permissionKey)?.permissionKey;
 
             sub.children.forEach((inner) => {
 
@@ -319,7 +323,8 @@ export default function ProjectRolePage() {
                   inner.permissionAccessKey ||
                   inner.permissionKey;
 
-              if (childAccessKey) {
+              // Only delete if child key is different from the parent row key
+              if (childAccessKey && childAccessKey !== parentKey) {
                 delete updated[childAccessKey];
               }
             });

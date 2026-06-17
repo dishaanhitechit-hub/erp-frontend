@@ -150,14 +150,14 @@ export const sidebarConfig = [
             title: "Goods Received Note",
             path: "/resource-management/material/received-note/grn",
             permissionKey: "goods_received_note",
-            permissionAccessKey: "goods_received_note",
+            permissionAccessKey: "goods_received_note_by_grn",
           },
           {
             title: "Service Received Note",
             path: "/resource-management/material/received-note/srn",
             permissionKey: "goods_received_note",
 
-            permissionAccessKey: "goods_received_note",
+            permissionAccessKey: "goods_received_note_by_srn",
           },
             ]
           },
