@@ -479,9 +479,9 @@ export default function ProjectRolePage() {
   const renderTeam = (team, setTeam) => (
       <div className="space-y-2">
         {team.map((item, index) => (
-            <div key={item.id} className="md:flex md:items-center md:gap-2">
+            <div key={item.id} className="flex flex-wrap items-center gap-2">
               {/* DESIGNATION */}
-              <div className="px-3 py-1 bg-[#e6d2c1] border text-sm min-w-62.5 rounded-sm">
+              <div className="px-3 py-1 bg-[#e6d2c1] border text-sm rounded-sm w-[180px] shrink-0">
                 {item.designationName}
               </div>
 
@@ -492,7 +492,7 @@ export default function ProjectRolePage() {
                   onChange={(e) =>
                       handleUserChange(setTeam, team, index, e.target.value)
                   }
-                  className="border h-7.5 px-2 min-w-45 rounded-sm"
+                  className="border h-[30px] px-2 rounded-sm flex-1 min-w-[160px] max-w-[220px] text-sm"
               >
                 <option value="">Select User</option>
 
@@ -505,7 +505,7 @@ export default function ProjectRolePage() {
 
               {/* ACTION BUTTONS */}
               {isEditing && (
-                  <div className="flex gap-2 mt-1 md:mt-0">
+                  <div className="flex gap-2">
                     {/* MAP BUTTON */}
                     <button
                         type="button"
@@ -518,7 +518,6 @@ export default function ProjectRolePage() {
                     {/* DELETE BUTTON */}
                     <button
                         type="button"
-                        // onClick={() => handleDeleteDesignation(item)}
                         onClick={() => setDeleteItem(item)}
                         className="border rounded-sm p-1 hover:bg-red-100 transition"
                     >
@@ -541,9 +540,9 @@ export default function ProjectRolePage() {
 
         <div className="p-4 space-y-2">
           {/* TOP ROW */}
-          <div className="md:flex md:justify-between">
-            <div className="md:flex gap-2 md:items-center">
-              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
+          <div className="flex flex-wrap justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm w-[180px] shrink-0">
                 Project Code
               </div>
 
@@ -554,7 +553,7 @@ export default function ProjectRolePage() {
                     if (e.key === "Enter" && !isEditing && !searching) handleSearch();
                   }}
                   disabled={isEditing || searching}
-                  className={`w-[200px] ${inputClass}`}
+                  className={`w-[180px] ${inputClass}`}
               />
 
               <button onClick={handleSearch} disabled={searching} className="disabled:opacity-50">
@@ -562,7 +561,7 @@ export default function ProjectRolePage() {
               </button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                   onClick={() => {
                     if (!projectData) {
@@ -571,7 +570,7 @@ export default function ProjectRolePage() {
                     }
                     setOpenModal(true);
                   }}
-                  className={`px-5 py-1 rounded-md text-black ${
+                  className={`px-4 py-1 rounded-md text-sm text-black ${
                       searchSuccess
                           ? "bg-[#8ed1fc] hover:bg-[#74c4f5]"
                           : "bg-gray-400 cursor-not-allowed"
@@ -579,11 +578,10 @@ export default function ProjectRolePage() {
               >
                 + Add Designation
               </button>
-              {/* ADD LOCATION */}
               <button
                   disabled={!searchSuccess}
                   onClick={() => setOpenLocationModal(true)}
-                  className={`px-5 py-1 rounded-md text-black ${
+                  className={`px-4 py-1 rounded-md text-sm text-black ${
                       searchSuccess
                           ? "bg-green-500 hover:bg-green-600"
                           : "bg-gray-400 cursor-not-allowed"
@@ -592,32 +590,31 @@ export default function ProjectRolePage() {
                 + Add Location
               </button>
             </div>
-
           </div>
 
           {/* RESULTS — fade + slide in when data arrives */}
           <div className={`space-y-2 transition-all duration-500 ease-out ${projectData ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}>
 
             {/* AUTO FIELDS */}
-            <div className="md:flex gap-2 md:items-center">
-              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm w-[180px] shrink-0">
                 Project Name
               </div>
               <Input
                   value={projectData?.projectName || "[Auto]"}
                   disabled
-                  className={`w-[50%] ${inputClass}`}
+                  className={`flex-1 min-w-[180px] max-w-[400px] ${inputClass}`}
               />
             </div>
 
-            <div className="md:flex gap-2 md:items-center">
-              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm md:min-w-[250px]">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm w-[180px] shrink-0">
                 Client Name
               </div>
               <Input
                   value={projectData?.clientName || "[Auto]"}
                   disabled
-                  className={`w-[50%] ${inputClass}`}
+                  className={`flex-1 min-w-[180px] max-w-[400px] ${inputClass}`}
               />
             </div>
 
