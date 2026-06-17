@@ -35,12 +35,12 @@ export const sidebarConfig = [
       {
         title: "Roles & User Assignment",
         path: "/settings/role-designation",
-        permissionKey: "role_designation",
+        permissionKey: "roles_and_user_assignment",
       },
       {
         title: "Approval Path Line & User",
         path: "/settings/approval-path",
-        permissionKey: "approval_path",
+        permissionKey: "approval_path_line_user",
       },
     ],
   },
@@ -71,7 +71,7 @@ export const sidebarConfig = [
       {
         title: "Cost Center Code",
         path: "/master/cc-code",
-        permissionKey: "cc_code",
+        permissionKey: "cost_center_code",
       },
       {
         title: "Category & Group",
@@ -200,12 +200,12 @@ export const sidebarConfig = [
           {
             title: "Machinery Stock Summary",
             path: "/resource-management/machinery/stock",
-            permissionKey: "machinery_stock",
+            permissionKey: "machinery_stock_summary",
           },
           {
             title: "Monthly Rent Calculation",
             path: "/resource-management/machinery/rent",
-            permissionKey: "machinery_rent",
+            permissionKey: "monthly_rent_calculation",
           },
         ],
       },
@@ -246,7 +246,7 @@ export const sidebarConfig = [
       {
         title: "Asset ID Creation",
         path: "/asset-management/asset-id",
-        permissionKey: "asset_id",
+        permissionKey: "asset_id_creation",
       },
       {
         title: "Asset Stock Report",
@@ -284,7 +284,7 @@ export const sidebarConfig = [
           {
             title: "Daily Progress Report",
             path: "/project-management/planning/dpr",
-            permissionKey: "dpr",
+            permissionKey: "daily_progress_report",
           },
           {
             title: "Reconciliation",
@@ -305,12 +305,12 @@ export const sidebarConfig = [
           {
             title: "Hold / Amend Pending",
             path: "/project-management/customer-billing/pending",
-            permissionKey: "hold_pending",
+            permissionKey: "hold_amend_pending",
           },
           {
             title: "Work In Progress",
             path: "/project-management/customer-billing/wip",
-            permissionKey: "wip",
+            permissionKey: "work_in_progress",
           },
         ],
       },
@@ -422,7 +422,7 @@ export const sidebarConfig = [
           {
             title: "Profit & Loss",
             path: "/finance-management/report/pnl",
-            permissionKey: "pnl",
+            permissionKey: "profit_loss",
           },
           {
             title: "Balance Sheet",
@@ -502,7 +502,7 @@ export const sidebarConfig = [
       {
         title: "To Do List",
         path: "/task-management/todo",
-        permissionKey: "todo_list",
+        permissionKey: "to_do_list",
       },
     ],
   },

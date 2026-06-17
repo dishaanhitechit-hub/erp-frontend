@@ -545,6 +545,9 @@ export default function ProjectRolePage() {
               <Input
                   value={projectCode}
                   onChange={(e) => setProjectCode(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isEditing && !searching) handleSearch();
+                  }}
                   disabled={isEditing || searching}
                   className={`w-[200px] ${inputClass}`}
               />
