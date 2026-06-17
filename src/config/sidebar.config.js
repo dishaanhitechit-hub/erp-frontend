@@ -15,6 +15,7 @@ export const sidebarConfig = [
     key: "settings",
     icon: Settings,
     basePath: "/settings",
+    hideInPermissions: true,
     children: [
       {
         title: "Company Details",
@@ -48,6 +49,7 @@ export const sidebarConfig = [
     title: "Master",
     key: "master",
     icon: Database,
+    hideInPermissions: true,
     basePath: "/master",
     children: [
       {

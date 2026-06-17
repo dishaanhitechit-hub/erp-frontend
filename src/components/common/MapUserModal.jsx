@@ -240,7 +240,7 @@ export default function MapUserModal({
                     </div>
 
                     <div className="border border-t-0 border-[#cfcfcf] bg-white">
-                        {sidebarConfig.map((module, moduleIndex) => (
+                        {sidebarConfig.filter((module) => !module.hideInPermissions).map((module, moduleIndex) => (
                             <div key={module.title}>
                                 <div className="border-b border-[#cfcfcf] bg-[#c8e3ef] px-2 py-1 text-[12px] font-bold">
                                     {moduleIndex + 1}. {module.title}
