@@ -239,8 +239,8 @@ export default function ProjectSelectPopup({
                         <span className="text-white text-[9px] font-bold tracking-[0.2em] opacity-70 pr-4">
                           PROJ
                         </span>
-                        <span className="text-white text-[22px] font-extrabold leading-none pr-4">
-                          {String(index + 1).padStart(2, "0")}
+                        <span className="text-white text-[13px] font-extrabold leading-none pr-4 tracking-wide">
+                          {project.projectCode}
                         </span>
                       </>
                     )}
@@ -261,7 +261,7 @@ export default function ProjectSelectPopup({
                     <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0c3472] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded">
                         <Hash className="w-3 h-3" />
-                        {project.projectCode}
+                        {String(index + 1).padStart(2, "0")}
                       </span>
                       {project.clientName && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
