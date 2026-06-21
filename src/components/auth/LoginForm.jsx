@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ const LoginForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -34,6 +36,10 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
+  const isTokenPresent = getCookie("token");
+  if(isTokenPresent)return;
+
+
 
   if (!formData.loginId || !formData.password) {
     setErrorMessage("Login ID and Password are required.");
@@ -160,14 +166,24 @@ useEffect(()=>{
 
               <div className="grid grid-cols-[170px_1fr] items-center gap-4">
                 <Label className="text-[22px] font-normal">Password</Label>
-                <Input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  disabled={loading}
-                  className="h-10 bg-white border-gray-400 text-[20px] font-medium"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="h-10 bg-white border-gray-400 text-[20px] font-medium pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
             </div>
 
