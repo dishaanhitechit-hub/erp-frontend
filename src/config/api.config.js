@@ -205,6 +205,22 @@ export const API_ENDPOINTS = {
         REJECT: "/resource/srn/reject", // /:srnId POST
         HISTORY: "/resource/srn/history", // /:srnId GET
       },
+      LOGISTICS: {
+        DC: {
+          GET_APPROVED_ORDERS: "/resource/dc/approved-orders", // GET ?projectCode&orderType
+          GET_ORDER_ITEMS:     "/resource/dc/order-items",     // /:orderId GET
+          GET_FROM_DETAILS:    "/resource/dc/from-details",    // /:orderId GET ?currentProjectCode
+          CREATE:              "/resource/dc/create",          // POST multipart/form-data
+          LIST:                "/resource/dc/list",            // GET ?projectCode&orderType&workflowStatus&search
+          GET_BY_ID:           "/resource/dc/detail",          // /:dcId GET
+          UPDATE:              "/resource/dc/edit",            // /:dcId PUT
+          SUBMIT:              "/resource/dc/submit",          // /:dcId POST
+          APPROVE:             "/resource/dc/approve",         // /:dcId POST
+          REBACK:              "/resource/dc/reback",          // /:dcId POST
+          REJECT:              "/resource/dc/reject",          // /:dcId POST
+          HISTORY:             "/resource/dc/history",         // /:dcId GET
+        },
+      },
     },
   },
   //project-management/register/concrete

@@ -172,6 +172,18 @@ export const sidebarConfig = [
             path: "/resource-management/material/stock-report",
             permissionKey: "stock_report",
           },
+          {
+            title:"Logistics",
+            // showChildrenInPermission: false,
+            children :[
+              {
+            title: "Delivery Challan",
+            path: "/resource-management/material/logistics/delivery-challan",
+            permissionKey: "delivery_challan",
+          },
+            ]
+          },
+
         ],
       },
       {

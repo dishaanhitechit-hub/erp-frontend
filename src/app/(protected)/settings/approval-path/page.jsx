@@ -56,6 +56,14 @@ const approvalModules = [
         children: [
           { title: "Goods Received Note", moduleCode: "goods_received_note" },
           { title: "Goods Issue Note", moduleCode: "goods_issue_note" },
+          //new added
+          {
+        title: "Logistics",
+        moduleCode: "logistics",
+        children: [
+          { title: "Delivery Challan", moduleCode: "delivery_challan" },
+        ],
+      },
         ],
       },
       {

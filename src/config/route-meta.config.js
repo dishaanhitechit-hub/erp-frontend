@@ -196,6 +196,19 @@ export const routeMetaConfig = [
     basePath: "/resource-management/material/gin/[id]",
     breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","Edit"],
   },
+  //resource-management/material/logistics/delivery-challan
+  {
+    basePath: "/resource-management/material/logistics/delivery-challan",
+    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","List"],
+  },
+  {
+    basePath: "/resource-management/material/logistics/delivery-challan/new",
+    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","New"],
+  },
+  {
+    basePath: "/resource-management/material/logistics/delivery-challan/[id]",
+    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","Edit"],
+  },
   //machinery/log-sheet
   {
     basePath: "/resource-management/machinery/log-sheet",
