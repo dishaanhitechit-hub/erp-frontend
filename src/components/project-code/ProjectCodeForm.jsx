@@ -52,6 +52,7 @@ const projectSchema = z.object({
   extendedCompleteDate: z.string().optional(),
 
   billingAddress: z.string().min(1, "Required"),
+  companyBillingAddress: z.string().optional(),
   shippingAddress: z.string().optional(),
   shippingAddress2: z.string().optional(),
   shippingAddress3: z.string().optional(),
@@ -93,6 +94,7 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
       originalStartDate: "",
       extendedCompleteDate: "",
       billingAddress: "",
+      companyBillingAddress: "",
       shippingAddress: "",
       shippingAddress2: "",
       shippingAddress3: "",
@@ -105,7 +107,13 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
     if (data) {
       reset({
         ...data,
-        stateCode: getStateCodeByName(data.state || ""),
+        stateCode:         getStateCodeByName(data.state || ""),
+        initialOrderValue: data.initialOrderValue
+          ? String(Number(data.initialOrderValue) / 1e7)
+          : "",
+        revisedOrderValue: data.revisedOrderValue
+          ? String(Number(data.revisedOrderValue) / 1e7)
+          : "",
       });
     }
   }, [data]);
@@ -115,9 +123,16 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
     let toastId;
 
     try {
+      const raw = getValues();
       const values = {
-        ...getValues(),
-        stateCode: getStateCodeByName(getValues().state || ""),
+        ...raw,
+        stateCode:         getStateCodeByName(raw.state || ""),
+        initialOrderValue: raw.initialOrderValue
+          ? String(Number(raw.initialOrderValue) * 1e7)
+          : "",
+        revisedOrderValue: raw.revisedOrderValue
+          ? String(Number(raw.revisedOrderValue) * 1e7)
+          : "",
       };
 
       toastId = toast.loading(
@@ -149,7 +164,13 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
     if (isEditing && mode === "edit") {
       reset({
         ...data,
-        stateCode: getStateCodeByName(data.state || ""),
+        stateCode:         getStateCodeByName(data.state || ""),
+        initialOrderValue: data.initialOrderValue
+          ? String(Number(data.initialOrderValue) / 1e7)
+          : "",
+        revisedOrderValue: data.revisedOrderValue
+          ? String(Number(data.revisedOrderValue) / 1e7)
+          : "",
       });
     }
     setIsEditing((prev) => !prev);
@@ -581,6 +602,7 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
         {/* ADDRESS BLOCK */}
         {[
           ["BADD", "Billing Address", "billingAddress"],
+          ["CBADD", "Company Billing Address", "companyBillingAddress"],
           ["SHP1", "Shipping Address 1", "shippingAddress"],
           ["SHP2", "Shipping Address 2", "shippingAddress2"],
           ["SHP3", "Shipping Address 3", "shippingAddress3"],
