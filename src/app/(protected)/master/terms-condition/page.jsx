@@ -240,7 +240,6 @@ export default function TermsConditionPage() {
   const actions = getPageActions({
     router,
 
-
     onPrint: () => window.print(),
 
     onDownload: () => {
@@ -282,6 +281,30 @@ export default function TermsConditionPage() {
         <div className="mb-6 space-y-1">
           <div className="grid grid-cols-[270px_305px]">
             <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
+              Module <span className="ml-1 text-red-600">*</span>
+            </label>
+
+            <select
+              disabled={isViewMode || !formEnabled}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`
+      h-8 rounded-r-sm border border-gray-500 bg-white px-2 text-sm
+      disabled:bg-gray-100 disabled:cursor-not-allowed
+    `}
+            >
+              <option value="">Select Module</option>
+
+              {CATEGORY_OPTIONS.termsCategory.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-[270px_305px]">
+            <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
               Header <span className="ml-1 text-red-600">*</span>
             </label>
 
@@ -306,30 +329,6 @@ export default function TermsConditionPage() {
               placeholder="Text"
               className={inputClass(false)}
             />
-          </div>
-
-          <div className="grid grid-cols-[270px_305px]">
-            <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
-              Module <span className="ml-1 text-red-600">*</span>
-            </label>
-
-            <select
-              disabled={isViewMode || !formEnabled}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className={`
-      h-8 rounded-r-sm border border-gray-500 bg-white px-2 text-sm
-      disabled:bg-gray-100 disabled:cursor-not-allowed
-    `}
-            >
-              <option value="">Select Module</option>
-
-              {CATEGORY_OPTIONS.termsCategory.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="grid grid-cols-[270px_1fr]">
