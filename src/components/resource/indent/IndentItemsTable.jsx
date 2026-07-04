@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 
@@ -43,6 +43,7 @@ export default function IndentItemsTable({
 
   const [activeModal, setActiveModal] = useState(null);
   const [tempValue, setTempValue] = useState("");
+  const scrollRef = useRef(null);
 
   const totalQty = watch("items")?.reduce(
     (sum, item) => sum + Number(item.qty || 0),
@@ -110,21 +111,18 @@ export default function IndentItemsTable({
 
   return (
     <div className="flex-1 min-w-0">
-      <div className="border border-[#b5b5b5] overflow-hidden">
+      <div className="border border-[#b5b5b5]">
         {/* HEADER */}
         <div className="bg-[#e8f0df] px-2 py-1 border-b border-[#b5b5b5] font-bold text-[18px]">
           BASIC
         </div>
 
         {/* TABLE */}
-        <div className="w-full overflow-x-auto">
-          <div
-            className={`
-              overflow-auto
-              ${fields.length > 20 ? "max-h-[680px]" : ""}
-            `}
-          >
-            <table className="min-w-[1010px] w-full border-collapse text-sm">
+        <div
+          ref={scrollRef}
+          className="overflow-auto max-h-[calc(100vh-300px)]"
+        >
+            <table className="min-w-[1120px] w-full border-collapse text-sm table-fixed">
               {/* HEADER */}
               <thead className="sticky top-0 z-20 bg-[#d9d9d9]">
                 <tr>
@@ -136,27 +134,27 @@ export default function IndentItemsTable({
                     Item Code
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[180px] text-left px-2">
+                  <th className="border border-[#b5b5b5] w-[190px] text-left px-2">
                     Item Name
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[220px] text-left px-2">
+                  <th className="border border-[#b5b5b5] w-[200px] text-left px-2">
                     Note
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                  <th className="border border-[#b5b5b5] w-[80px] text-center">
                     Unit
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[90px] text-center">
+                  <th className="border border-[#b5b5b5] w-[100px] text-center">
                     Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[100px] text-center">
+                  <th className="border border-[#b5b5b5] w-[110px] text-center">
                     Ammenmend Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[220px] text-left px-2">
+                  <th className="border border-[#b5b5b5] w-[200px] text-left px-2">
                     Location
                   </th>
 
@@ -404,16 +402,22 @@ export default function IndentItemsTable({
                 </tr>
               </tfoot>
             </table>
-          </div>
         </div>
       </div>
 
       {/* ADD ROW */}
       {isEditing && (
-        <div className="mt-3 flex justify-end">
+        <div className="mt-5 flex justify-end">
           <button
             type="button"
-            onClick={() => append(defaultItemRow)}
+            onClick={() => {
+              append(defaultItemRow);
+              setTimeout(() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }
+              }, 50);
+            }}
             className="
               px-4
               py-1

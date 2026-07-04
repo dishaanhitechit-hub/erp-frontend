@@ -82,15 +82,14 @@ export default function SearchableSelect({
           const rect = e.currentTarget.getBoundingClientRect();
 
           const DROPDOWN_HEIGHT = 260;
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const goUp = dropdownPosition === "up" || spaceBelow < DROPDOWN_HEIGHT + 8;
 
           setDropdownStyle({
             position: "fixed",
-            top:
-              dropdownPosition === "up"
-                ? rect.top - DROPDOWN_HEIGHT - 4
-                : rect.bottom + 4,
+            top: goUp ? rect.top - DROPDOWN_HEIGHT - 4 : rect.bottom + 4,
             left: rect.left,
-            width: rect.width,
+            width: Math.max(rect.width, 200),
             zIndex: 999999,
           });
 
