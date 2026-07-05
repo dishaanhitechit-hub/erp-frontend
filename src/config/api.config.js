@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://167.233.108.123:8000"; //change here later
+const API_BASE_URL = "http://132.154.156.82/api"; //change here later
 
 export const API_ENDPOINTS = {
   LOGIN: "/auth/login",
