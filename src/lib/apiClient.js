@@ -6,7 +6,7 @@ import { getLocalStorage } from "./localStorage";
 const getAuth = () => {
   if (typeof window === "undefined") return {};
   return {
-    token: getLocalStorage("token") ,
+    token: getLocalStorage("token"),
   };
 };
 
@@ -50,7 +50,8 @@ export const apiRequest = async ({
   }
 
   if (!res.ok) {
-    if (res.status === 401 && typeof window !== "undefined") {
+    // Fixed - only redirect on 401 if this is an authenticated request
+    if (res.status === 401 && requireAuth && typeof window !== "undefined") {
       clearAuthCookies();
       window.location.href = "/login";
     }
