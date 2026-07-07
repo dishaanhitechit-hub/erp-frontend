@@ -33,6 +33,13 @@ export default function TermsConditionPage() {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("");
+  const [termType, setTermType] = useState("general");
+
+  const isSpecialHeader = (h) =>
+    typeof h === "string" && h.startsWith("SP_") && h.endsWith("_SP");
+
+  const cleanHeader = (h) =>
+    isSpecialHeader(h) ? h.slice(3, -3) : h;
 
   const router = useRouter();
   const canEdit = isMasterEditable();
@@ -79,6 +86,7 @@ export default function TermsConditionPage() {
     setTermDescription("");
     setSelectedTermId(null);
     setCategory("");
+    setTermType("general");
     setErrors({
       header: false,
       termDescription: false,
@@ -105,10 +113,11 @@ export default function TermsConditionPage() {
     if (!editMode || !term) return;
 
     setSelectedTermId(term.termId);
-    setHeader(term.header || "");
+    setHeader(cleanHeader(term.header || ""));
     setSubHeader(term.sub_header || "");
     setTermDescription(term.term_description || "");
     setCategory(term.category || "");
+    setTermType(isSpecialHeader(term.header) ? "special" : "general");
     setFormEnabled(true);
   };
 
@@ -148,6 +157,11 @@ export default function TermsConditionPage() {
       return;
     }
 
+    const finalHeader =
+      category === "Order" && termType === "special"
+        ? `SP_${header.trim()}_SP`
+        : header.trim();
+
     try {
       setLoading(true);
 
@@ -157,7 +171,7 @@ export default function TermsConditionPage() {
           method: "PUT",
           data: {
             category,
-            header: header.trim(),
+            header: finalHeader,
             sub_header: subHeader.trim(),
             term_description: termDescription.trim(),
           },
@@ -170,7 +184,7 @@ export default function TermsConditionPage() {
           method: "POST",
           data: {
             category,
-            header: header.trim(),
+            header: finalHeader,
             sub_header: subHeader.trim(),
             termDescription: termDescription.trim(),
           },
@@ -253,7 +267,7 @@ export default function TermsConditionPage() {
         head: [["Sl. No", "Header", "Sub Header", "Description"]],
         body: terms.map((term, index) => [
           index + 1,
-          term.header || "",
+          cleanHeader(term.header || ""),
           term.sub_header || "",
           term.term_description || "",
         ]),
@@ -302,6 +316,30 @@ export default function TermsConditionPage() {
               ))}
             </select>
           </div>
+
+          {category === "Order" && (
+            <div className="grid grid-cols-[270px_305px]">
+              <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
+                Terms Type
+              </label>
+              <div className="flex h-8 items-center gap-6 rounded-r-sm border border-gray-500 bg-white px-3">
+                {["general", "special"].map((type) => (
+                  <label key={type} className="flex cursor-pointer items-center gap-1 text-sm capitalize">
+                    <input
+                      type="radio"
+                      name="termType"
+                      value={type}
+                      checked={termType === type}
+                      disabled={isViewMode || !formEnabled}
+                      onChange={() => setTermType(type)}
+                      className="accent-sky-500"
+                    />
+                    {type}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-[270px_305px]">
             <label className="flex h-8 items-center rounded-l-sm border border-gray-500 bg-[#dceaf6] px-3 font-semibold">
@@ -353,14 +391,14 @@ export default function TermsConditionPage() {
                 <th className="w-[90px] border border-gray-300 py-1 font-bold">
                   Sl. no
                 </th>
+                <th className="w-[180px] border border-gray-300 py-1 font-bold">
+                  Module
+                </th>
                 <th className="w-[230px] border border-gray-300 py-1 font-bold">
                   Header
                 </th>
                 <th className="w-[230px] border border-gray-300 py-1 font-bold">
                   Sub Header
-                </th>
-                <th className="w-[180px] border border-gray-300 py-1 font-bold">
-                  Module
                 </th>
                 <th className="border border-gray-300 py-1 font-bold">
                   Description
@@ -392,15 +430,15 @@ export default function TermsConditionPage() {
                   </td>
 
                   <td className="truncate border border-gray-300 px-2">
-                    {term?.header || ""}
+                    {term?.category || ""}
+                  </td>
+
+                  <td className="truncate border border-gray-300 px-2">
+                    {cleanHeader(term?.header || "")}
                   </td>
 
                   <td className="truncate border border-gray-300 px-2">
                     {term?.sub_header || ""}
-                  </td>
-
-                  <td className="truncate border border-gray-300 px-2">
-                    {term?.category || ""}
                   </td>
 
                   <td
