@@ -33,28 +33,6 @@ function downloadExcel(rows, item) {
   });
 }
 
-// TODO: remove this dummy function once API returns real GRN/GIN entries
-const DUMMY_DETAIL = (item_code, item_name, unit) => ({
-  summary: {
-    item_code,
-    item_name: item_name || item_code,
-    unit: unit || "NOS",
-    total_received_qty: 1000,
-    total_received_amount: 30000,
-    total_issued_qty: 250,
-    total_issued_amount: 7500,
-    stock_qty: 750,
-    stock_amount: 22500,
-  },
-  grn_entries: [
-    { grn_no: "GRN/2026/001", grn_date: "2026-01-10", received_qty: 600, rate: 30, amount: 18000 },
-    { grn_no: "GRN/2026/002", grn_date: "2026-02-05", received_qty: 400, rate: 30, amount: 12000 },
-  ],
-  gin_entries: [
-    { gin_no: "GIN/2026/001", gin_date: "2026-03-01", issued_qty: 150, rate: 30, amount: 4500 },
-    { gin_no: "GIN/2026/002", gin_date: "2026-04-15", issued_qty: 100, rate: 30, amount: 3000 },
-  ],
-});
 
 export default function StockItemDetailModal({ item, projectCode, onClose }) {
   const [detail, setDetail] = useState(null);
@@ -69,11 +47,7 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
           url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.ITEM_DETAIL}?project_code=${projectCode}&item_code=${item.item_code}`,
           method: "GET",
         });
-        const d = res.data;
-        const isEmpty = !d?.grn_entries?.length && !d?.gin_entries?.length;
-
-        // TODO: remove this dummy fallback once API returns real data
-        setDetail(isEmpty ? DUMMY_DETAIL(item.item_code, item.item_name, item.unit) : d);
+        setDetail(res.data);
       } catch {
         toast.error("Failed to fetch item detail");
       } finally {

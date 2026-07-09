@@ -16,34 +16,6 @@ import StockItemDetailModal from "@/components/resource/stock/StockItemDetailMod
 import PageNotAvailable from "@/components/common/PageNotAvailable";
 import { getPageAccess } from "@/helper/getPageAccess";
 
-const DUMMY_STOCK_DATA = [
-  {
-    sl_no: 1,
-    cc_code: "DRMC",
-    cc_name: "Consumable Materials",
-    total_stock_amount: 161000.00,
-    items: [
-      { sl_no: "1.1", item_code: "DRMC001", item_name: "Cement 53 Grade", unit: "BAG", received_qty: 1000, issued_qty: 250, stock_qty: 750, stock_amount: 22500 },
-      { sl_no: "1.2", item_code: "DRMC002", item_name: "TMT -550Fe", unit: "MT", received_qty: 1.50, issued_qty: 1.20, stock_qty: 0.30, stock_amount: 24000 },
-      { sl_no: "1.3", item_code: "DRMC003", item_name: "Sand-Fine", unit: "Cft", received_qty: 2600, issued_qty: 2100, stock_qty: 500, stock_amount: 40000 },
-      { sl_no: "1.4", item_code: "DRMC004", item_name: "Stone-20mm", unit: "Cft", received_qty: 1250, issued_qty: 1000, stock_qty: 250, stock_amount: 25000 },
-      { sl_no: "1.5", item_code: "DRMC005", item_name: "Bricks 250x125x75", unit: "PCs", received_qty: 15000, issued_qty: 10000, stock_qty: 5000, stock_amount: 50000 },
-    ],
-  },
-  {
-    sl_no: 2,
-    cc_code: "DREL",
-    cc_name: "Electrical Materials",
-    total_stock_amount: 87500.00,
-    items: [
-      { sl_no: "2.1", item_code: "DREL001", item_name: "Copper Wire 2.5mm", unit: "MTR", received_qty: 5000, issued_qty: 3200, stock_qty: 1800, stock_amount: 36000 },
-      { sl_no: "2.2", item_code: "DREL002", item_name: "MCB 32A", unit: "NOS", received_qty: 200, issued_qty: 150, stock_qty: 50, stock_amount: 12500 },
-      { sl_no: "2.3", item_code: "DREL003", item_name: "PVC Conduit 25mm", unit: "MTR", received_qty: 1000, issued_qty: 600, stock_qty: 400, stock_amount: 8000 },
-      { sl_no: "2.4", item_code: "DREL004", item_name: "Distribution Board", unit: "NOS", received_qty: 10, issued_qty: 7, stock_qty: 3, stock_amount: 31000 },
-    ],
-  },
-];
-
 export default function StockReportPage() {
   const router = useRouter();
   const access = getPageAccess({ pageCode: "stock_report", pageType: "LIST" });
@@ -69,8 +41,7 @@ export default function StockReportPage() {
           url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.LIST}?project_code=${projectCode}&item_category=MAT_001`,
           method: "GET",
         });
-        const apiData = res.data || [];
-        setRawData(apiData.length > 0 ? apiData : DUMMY_STOCK_DATA);
+        setRawData(res.data || []);
       } catch {
         toast.error("Failed to fetch stock data");
       } finally {
