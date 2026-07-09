@@ -270,6 +270,11 @@ export const routeMetaConfig = [
     basePath: "/resource-management/vendor-billing/srn/[id]",
     breadcrumbs: ["Resource Management", "Vendor Billing","By SRN","Edit"],
   },
+  //stock report
+  {
+    basePath: "/resource-management/material/stock-report",
+    breadcrumbs: ["Resource Management", "Material Management", "Stock Report"],
+  },
   //project management
   {
     basePath: "/project-management/register/concrete",

@@ -228,6 +228,10 @@ export const API_ENDPOINTS = {
           HISTORY:             "/resource/dc/history",         // /:dcId GET
         },
       },
+      STOCK: {
+        LIST:        "/resource/stock/list",        // GET ?project_code&item_category
+        ITEM_DETAIL: "/resource/stock/item-detail", // GET ?project_code&item_code
+      },
     },
   },
   //project-management/register/concrete
