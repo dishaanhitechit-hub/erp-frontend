@@ -117,6 +117,14 @@ export default function StockReportPage() {
 
   if (!access.allowed) return <PageNotAvailable />;
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[300px]">
+        <Loader2 className="animate-spin w-6 h-6" />
+      </div>
+    );
+  }
+
   const headerActions = getPageActions({ router });
 
   const pageActions = [
@@ -130,38 +138,26 @@ export default function StockReportPage() {
     },
   ];
 
-  const body = (
-    <div className="px-3 py-3">
-      <SearchSection
-        onSearch={handleSearch}
-        showDateRange
-        actions={pageActions}
-      />
-
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="animate-spin text-[#4d8ea3]" size={32} />
-        </div>
-      ) : (
+  return (
+    <HeaderWrapper header={<PageHeader actions={headerActions} />}>
+      <div className="px-3 py-3">
+        <SearchSection
+          onSearch={handleSearch}
+          showDateRange
+          actions={pageActions}
+        />
         <StockTable
           data={filteredData}
           onItemClick={(item) => setSelectedItem(item)}
         />
-      )}
-
-      {selectedItem && (
-        <StockItemDetailModal
-          item={selectedItem}
-          projectCode={projectCode}
-          onClose={() => setSelectedItem(null)}
-        />
-      )}
-    </div>
-  );
-
-  return (
-    <HeaderWrapper header={<PageHeader actions={headerActions} />}>
-      {body}
+        {selectedItem && (
+          <StockItemDetailModal
+            item={selectedItem}
+            projectCode={projectCode}
+            onClose={() => setSelectedItem(null)}
+          />
+        )}
+      </div>
     </HeaderWrapper>
   );
 }

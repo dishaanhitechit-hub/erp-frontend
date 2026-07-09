@@ -465,7 +465,7 @@ export default function StockTable({ data = [], onItemClick }) {
   const totalStockValue = sorted.reduce((sum, r) => sum + Number(r.total_stock_amount || 0), 0);
 
   return (
-    <div className="border border-[#9e9e9e] overflow-x-auto">
+    <div className="xl:max-w-5xl xl:mx-auto border border-[#9e9e9e] overflow-x-auto">
       <div className="max-h-[608px] overflow-y-auto">
         <table className="w-full min-w-max border-collapse text-sm">
           <thead className="bg-[#b7cfa5] sticky top-0 z-10">

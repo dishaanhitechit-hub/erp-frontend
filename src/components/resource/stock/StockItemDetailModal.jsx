@@ -1,11 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Package, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { X, Package, ArrowDownCircle, ArrowUpCircle, FileDown } from "lucide-react";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
+function downloadExcel(rows, item) {
+  import("xlsx").then((XLSX) => {
+    const sheetData = [
+      ["#", "Date", "Type", "Reference No", "Rate (₹)", "GRN Qty", "GIN Qty", "Bal Qty", "Amount (₹)", "Bal Amt (₹)", "Store Location", "Used To"],
+      ...rows.map((r, i) => [
+        i + 1,
+        r.date,
+        r.type,
+        r.no,
+        r.rate,
+        r.qty_in > 0 ? r.qty_in : "",
+        r.qty_out > 0 ? r.qty_out : "",
+        r.balQty,
+        r.type === "GRN" ? r.amount : -r.amount,
+        r.balAmt,
+        r.storeLocation ?? "",
+        r.useLocation ?? "",
+      ]),
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Stock Ledger");
+    XLSX.writeFile(wb, `Stock_Ledger_${item?.item_code || "export"}.xlsx`);
+  });
+}
 
 // TODO: remove this dummy function once API returns real GRN/GIN entries
 const DUMMY_DETAIL = (item_code, item_name, unit) => ({
@@ -120,10 +146,12 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
               const grns = (detail.grn_entries || []).map((g) => ({
                 date: g.grn_date, no: g.grn_no, type: "GRN",
                 qty_in: g.received_qty, qty_out: 0, rate: g.rate, amount: g.amount,
+                storeLocation: g.storeLocation ?? null, useLocation: g.useLocation ?? null,
               }));
               const gins = (detail.gin_entries || []).map((g) => ({
                 date: g.gin_date, no: g.gin_no, type: "GIN",
                 qty_in: 0, qty_out: g.issued_qty, rate: g.rate, amount: g.amount,
+                storeLocation: g.storeLocation ?? null, useLocation: g.useLocation ?? null,
               }));
               const ledger = [...grns, ...gins].sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -165,11 +193,11 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                       className="h-6.5 w-34 border border-[#8f8f8f] px-2 text-xs rounded-sm outline-none" />
                   </div>
 
-                  {/* Type toggle */}
+                  {/* Type toggle + Excel download */}
                   <div className="flex items-center rounded-sm border border-[#8f8f8f] overflow-hidden text-xs">
                     {["ALL", "GRN", "GIN"].map((t) => (
                       <button key={t} onClick={() => setTypeFilter(t)}
-                        className={`px-3 py-0.5 transition ${
+                        className={`px-3 py-0.5 transition cursor-pointer ${
                           typeFilter === t
                             ? t === "GRN" ? "bg-green-600 text-white" : t === "GIN" ? "bg-red-500 text-white" : "bg-[#7fc3d4] text-black font-semibold"
                             : "bg-white text-gray-600 hover:bg-gray-100"
@@ -178,6 +206,15 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                       </button>
                     ))}
                   </div>
+
+                  <button
+                    onClick={() => downloadExcel(rows, item)}
+                    title="Download visible rows as Excel"
+                    className="flex items-center gap-1 px-2 py-0.5 border border-[#4d8ea3] rounded-sm bg-white hover:bg-[#eef6fa] text-[#4d8ea3] transition text-xs cursor-pointer"
+                  >
+                    <FileDown size={13} />
+                    Excel
+                  </button>
 
                   {/* Clear */}
                   {hasActiveFilter && (
@@ -199,13 +236,15 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold w-[40px]">#</th>
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold">Date</th>
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-center font-semibold w-[50px]">Type</th>
-                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold">Voucher No</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold">Reference No</th>
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold">Rate (₹)</th>
-                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-green-700">In Qty</th>
-                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-red-600">Out Qty</th>
-                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold">Amount (₹)</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-green-700">GRN Qty</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-red-600">GIN Qty</th>
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-blue-700">Bal Qty</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold">Amount (₹)</th>
                         <th className="border border-[#9e9e9e] px-2 py-1.5 text-right font-semibold text-blue-700">Bal Amt (₹)</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold">Store Location</th>
+                        <th className="border border-[#9e9e9e] px-2 py-1.5 text-left font-semibold">Used To</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -231,11 +270,13 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-medium text-red-600">
                               {r.qty_out > 0 ? fmtNum(r.qty_out) : "-"}
                             </td>
+                            <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-semibold text-blue-700">{fmtNum(r.balQty)}</td>
                             <td className={`border border-[#e6e4e4] px-2 py-1.5 text-right font-medium ${isGRN ? "text-green-700" : "text-red-600"}`}>
                               {isGRN ? "" : "−"}{fmtNum(r.amount)}
                             </td>
-                            <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-semibold text-blue-700">{fmtNum(r.balQty)}</td>
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-semibold text-blue-700">{fmtNum(r.balAmt)}</td>
+                            <td className="border border-[#e6e4e4] px-2 py-1.5 text-gray-600">{r.storeLocation ?? "-"}</td>
+                            <td className="border border-[#e6e4e4] px-2 py-1.5 text-gray-600">{r.useLocation ?? "-"}</td>
                           </tr>
                         );
                       })}
