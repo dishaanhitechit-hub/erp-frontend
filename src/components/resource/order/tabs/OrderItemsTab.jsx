@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import OrderItemSelectionModal from "../modals/OrderItemSelectionModal";
+import WithoutIndentItemsTable from "./WithoutIndentItemsTable";
 
 import { Controller, useFieldArray } from "react-hook-form";
 
@@ -16,12 +17,11 @@ import { getInputClass } from "@/lib/formStyles";
 
 export default function OrderItemsTab({
   form,
-
   disabled,
-
   openItemModal,
-
   setOpenItemModal,
+  withIndent,
+  itemOptions,
 }) {
   const {
     control,
@@ -59,6 +59,10 @@ export default function OrderItemsTab({
 
     0,
   );
+
+  if (!withIndent) {
+    return <WithoutIndentItemsTable form={form} disabled={disabled} itemOptions={itemOptions} />;
+  }
 
   return (
     <div

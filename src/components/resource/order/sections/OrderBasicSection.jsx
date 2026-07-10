@@ -40,6 +40,8 @@ export default function OrderBasicSection({
   attachedFile,
   setAttachedFile,
   fileRef,
+  withIndent,
+  setWithIndent,
 }) {
   const [ledgerList,          setLedgerList]          = useState([]);
   const [currentProjectData,  setCurrentProjectData]  = useState(null);
@@ -164,6 +166,35 @@ export default function OrderBasicSection({
   return (
     <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1">
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-4">
+
+        {/* ── WITH / WITHOUT INDENT TOGGLE */}
+        <div className="flex items-center break-inside-avoid">
+          <div className={LABEL}>Indent Type</div>
+          <div className="flex rounded-sm border border-[#8f8f8f] overflow-hidden text-sm shrink-0">
+            {[
+              { label: "With Indent", value: true },
+              { label: "Without Indent", value: false },
+            ].map(({ label, value }) => (
+              <button
+                key={label}
+                type="button"
+                disabled={mode !== "create"}
+                onClick={() => {
+                  if (mode !== "create") return;
+                  setWithIndent(value);
+                  setValue("items", []);
+                }}
+                className={`px-3 py-1 whitespace-nowrap transition cursor-pointer disabled:cursor-default ${
+                  withIndent === value
+                    ? "bg-[#7fc3d4] text-black font-semibold"
+                    : "bg-white text-gray-600 hover:bg-gray-100 disabled:hover:bg-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* ── CATEGORY SECTION */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">

@@ -63,6 +63,8 @@ export default function OrderForm({ mode = "create", orderId }) {
   });
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openItemModal, setOpenItemModal] = useState(false);
+  const [withIndent, setWithIndent] = useState(true);
+  const [withoutIndentItemOptions, setWithoutIndentItemOptions] = useState([]);
   const router = useRouter();
 
   const fileRef = useRef(null);
@@ -92,6 +94,17 @@ export default function OrderForm({ mode = "create", orderId }) {
     !isEditing ||
     isSubmitted ||
     isSubmitting;
+
+  // ─── LOAD WITHOUT-INDENT ITEM OPTIONS — only when first switched to without-indent
+  useEffect(() => {
+    if (withIndent || withoutIndentItemOptions.length > 0) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=MAT_001`,
+      method: "GET",
+    })
+      .then((res) => setWithoutIndentItemOptions(res.data || []))
+      .catch(() => {});
+  }, [withIndent]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── LOAD ORDER
   useEffect(() => {
@@ -232,14 +245,26 @@ export default function OrderForm({ mode = "create", orderId }) {
     formData.append(
       "items",
       JSON.stringify(
-        values.items.map((item) => ({
-          indentItemId: item.indentItemId,
-          qty: Number(item.qty),
-          rate: Number(item.rate),
-          gstPercent: Number(item.gstPercent),
-          note: item.note || "",
-          location: item.location || "",
-        })),
+        values.items.map((item) =>
+          withIndent
+            ? {
+                indentItemId: item.indentItemId,
+                qty: Number(item.qty),
+                rate: Number(item.rate),
+                gstPercent: Number(item.gstPercent),
+                note: item.note || "",
+                location: item.location || "",
+              }
+            : {
+                indentItemId: null,
+                itemCode: item.itemCode,
+                qty: Number(item.qty),
+                rate: Number(item.rate),
+                gstPercent: Number(item.gstPercent),
+                note: item.note || "",
+                location: item.location || "",
+              },
+        ),
       ),
     );
 
@@ -395,6 +420,8 @@ export default function OrderForm({ mode = "create", orderId }) {
           attachedFile={attachedFile}
           setAttachedFile={setAttachedFile}
           fileRef={fileRef}
+          withIndent={withIndent}
+          setWithIndent={setWithIndent}
         />
 
         <div className="hidden xl:block w-px self-stretch bg-sky-300" />
@@ -435,7 +462,7 @@ export default function OrderForm({ mode = "create", orderId }) {
               </TabsList>
 
               <div className="flex items-center gap-2 lg:justify-end">
-                {activeTab === "items" && !disabled && (
+                {activeTab === "items" && !disabled && withIndent && (
                   <button
                     type="button"
                     onClick={() => {
@@ -470,6 +497,8 @@ export default function OrderForm({ mode = "create", orderId }) {
                   disabled={disabled}
                   openItemModal={openItemModal}
                   setOpenItemModal={setOpenItemModal}
+                  withIndent={withIndent}
+                  itemOptions={withoutIndentItemOptions}
                 />
               </TabsContent>
               <TabsContent value="terms" className="m-0">
