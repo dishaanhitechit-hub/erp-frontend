@@ -17,8 +17,8 @@ function downloadExcel(rows, item) {
         r.type,
         r.no,
         r.rate,
-        r.qty_in > 0 ? r.qty_in : "",
-        r.qty_out > 0 ? r.qty_out : "",
+        r.qtyIn > 0 ? r.qtyIn : "",
+        r.qtyOut > 0 ? r.qtyOut : "",
         r.balQty,
         r.type === "GRN" ? r.amount : -r.amount,
         r.balAmt,
@@ -29,7 +29,7 @@ function downloadExcel(rows, item) {
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Stock Ledger");
-    XLSX.writeFile(wb, `Stock_Ledger_${item?.item_code || "export"}.xlsx`);
+    XLSX.writeFile(wb, `Stock_Ledger_${item?.itemCode || "export"}.xlsx`);
   });
 }
 
@@ -44,7 +44,7 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
       setLoading(true);
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.ITEM_DETAIL}?project_code=${projectCode}&item_code=${item.item_code}`,
+          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.ITEM_DETAIL}?project_code=${projectCode}&item_code=${item.itemCode}`,
           method: "GET",
         });
         setDetail(res.data);
@@ -84,7 +84,7 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
           <div>
             <h2 className="text-sm font-semibold text-gray-800">Item Detail</h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              {item?.item_code} — {item?.item_name}
+              {item?.itemCode} — {item?.itemName}
             </p>
           </div>
           <button
@@ -109,30 +109,30 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
             {/* SUMMARY CARDS */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <SummaryCard label="Unit" value={detail.summary.unit || "-"} icon={<Package size={14} />} />
-              <SummaryCard label="Total Received" value={`${fmtNum(detail.summary.total_received_qty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.total_received_amount)}`} color="text-green-700" />
-              <SummaryCard label="Total Issued" value={`${fmtNum(detail.summary.total_issued_qty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.total_issued_amount)}`} color="text-red-600" />
-              <SummaryCard label="Stock" value={`${fmtNum(detail.summary.stock_qty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.stock_amount)}`} color="text-blue-700" highlight />
+              <SummaryCard label="Total Received" value={`${fmtNum(detail.summary.totalReceivedQty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.totalReceivedAmount)}`} color="text-green-700" />
+              <SummaryCard label="Total Issued" value={`${fmtNum(detail.summary.totalIssuedQty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.totalIssuedAmount)}`} color="text-red-600" />
+              <SummaryCard label="Stock" value={`${fmtNum(detail.summary.stockQty)} ${detail.summary.unit || ""}`} sub={`₹ ${fmtNum(detail.summary.stockAmount)}`} color="text-blue-700" highlight />
             </div>
 
             {/* DATE-WISE LEDGER */}
             {(() => {
               // Merge GRN and GIN into a single chronological ledger
-              const grns = (detail.grn_entries || []).map((g) => ({
-                date: g.grn_date, no: g.grn_no, type: "GRN",
-                qty_in: g.received_qty, qty_out: 0, rate: g.rate, amount: g.amount,
-                storeLocation: g.storeLocation ?? null, useLocation: g.useLocation ?? null,
+              const grns = (detail.grnEntries || []).map((g) => ({
+                date: g.grnDate, no: g.grnNo, type: "GRN",
+                qtyIn: g.receivedQty, qtyOut: 0, rate: g.rate, amount: g.amount,
+                storeLocation: g.storeLocation ?? null, useLocation: null,
               }));
-              const gins = (detail.gin_entries || []).map((g) => ({
-                date: g.gin_date, no: g.gin_no, type: "GIN",
-                qty_in: 0, qty_out: g.issued_qty, rate: g.rate, amount: g.amount,
-                storeLocation: g.storeLocation ?? null, useLocation: g.useLocation ?? null,
+              const gins = (detail.ginEntries || []).map((g) => ({
+                date: g.ginDate, no: g.ginNo, type: "GIN",
+                qtyIn: 0, qtyOut: g.issuedQty, rate: g.rate, amount: g.amount,
+                storeLocation: null, useLocation: g.useLocation ?? null,
               }));
               const ledger = [...grns, ...gins].sort((a, b) => new Date(a.date) - new Date(b.date));
 
               // Compute running balance on the FULL ledger first (unfiltered)
               let runQty = 0, runAmt = 0;
               const allRows = ledger.map((e) => {
-                runQty += e.qty_in - e.qty_out;
+                runQty += e.qtyIn - e.qtyOut;
                 runAmt += e.type === "GRN" ? e.amount : -e.amount;
                 return { ...e, balQty: runQty, balAmt: runAmt };
               });
@@ -239,10 +239,10 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                             <td className={`border border-[#e6e4e4] px-2 py-1.5 font-medium ${isGRN ? "text-green-800" : "text-red-700"}`}>{r.no}</td>
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right">{fmtNum(r.rate)}</td>
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-medium text-green-700">
-                              {r.qty_in > 0 ? fmtNum(r.qty_in) : "-"}
+                              {r.qtyIn > 0 ? fmtNum(r.qtyIn) : "-"}
                             </td>
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-medium text-red-600">
-                              {r.qty_out > 0 ? fmtNum(r.qty_out) : "-"}
+                              {r.qtyOut > 0 ? fmtNum(r.qtyOut) : "-"}
                             </td>
                             <td className="border border-[#e6e4e4] px-2 py-1.5 text-right font-semibold text-blue-700">{fmtNum(r.balQty)}</td>
                             <td className={`border border-[#e6e4e4] px-2 py-1.5 text-right font-medium ${isGRN ? "text-green-700" : "text-red-600"}`}>

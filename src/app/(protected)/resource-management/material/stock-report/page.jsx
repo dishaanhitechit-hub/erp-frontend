@@ -71,10 +71,10 @@ export default function StockReportPage() {
           const lower = s.toLowerCase();
           items = items.filter(
             (item) =>
-              item.item_name?.toLowerCase().includes(lower) ||
-              item.item_code?.toLowerCase().includes(lower) ||
-              group.cc_code?.toLowerCase().includes(lower) ||
-              group.cc_name?.toLowerCase().includes(lower)
+              item.itemName?.toLowerCase().includes(lower) ||
+              item.itemCode?.toLowerCase().includes(lower) ||
+              group.ccCode?.toLowerCase().includes(lower) ||
+              group.ccName?.toLowerCase().includes(lower)
           );
         }
 

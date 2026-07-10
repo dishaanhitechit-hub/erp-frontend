@@ -13,13 +13,13 @@ import {
 const PAGE_SIZE = 20;
 
 const CHILD_COLS = [
-  { key: "item_code",    label: "Item Code",    cls: "text-left",   cellCls: "text-blue-600 font-medium", numeric: false },
-  { key: "item_name",    label: "Item Name",    cls: "text-left",   cellCls: "truncate",                  numeric: false },
-  { key: "unit",         label: "Unit",         cls: "text-center", cellCls: "text-center text-gray-600", numeric: false },
-  { key: "received_qty", label: "Received Qty", cls: "text-right",  cellCls: "text-right",                numeric: true  },
-  { key: "issued_qty",   label: "Issued Qty",   cls: "text-right",  cellCls: "text-right",                numeric: true  },
-  { key: "stock_qty",    label: "Stock Qty",    cls: "text-right",  cellCls: "text-right font-medium",    numeric: true  },
-  { key: "stock_amount", label: "Stock Amount", cls: "text-right",  cellCls: "text-right font-medium",    numeric: true  },
+  { key: "itemCode",    label: "Item Code",    cls: "text-left",   cellCls: "text-blue-600 font-medium", numeric: false },
+  { key: "itemName",    label: "Item Name",    cls: "text-left",   cellCls: "truncate",                  numeric: false },
+  { key: "unit",        label: "Unit",         cls: "text-center", cellCls: "text-center text-gray-600", numeric: false },
+  { key: "receivedQty", label: "Received Qty", cls: "text-right",  cellCls: "text-right",                numeric: true  },
+  { key: "issuedQty",   label: "Issued Qty",   cls: "text-right",  cellCls: "text-right",                numeric: true  },
+  { key: "stockQty",    label: "Stock Qty",    cls: "text-right",  cellCls: "text-right font-medium",    numeric: true  },
+  { key: "stockAmount", label: "Stock Amount", cls: "text-right",  cellCls: "text-right font-medium",    numeric: true  },
 ];
 
 function ChildTable({ items = [], onItemClick }) {
@@ -193,10 +193,10 @@ function ChildTable({ items = [], onItemClick }) {
           className={`grid grid-cols-[60px_120px_1fr_90px_110px_100px_100px_120px] border-b border-[#d4e8ef] cursor-pointer text-xs
             ${ci % 2 === 0 ? "bg-[#f0f7fa]" : "bg-white"} hover:bg-[#dff0f7] transition-colors`}
         >
-          <div className="px-2 py-1.5 border-r border-[#d4e8ef] text-center text-gray-500">{item.sl_no}</div>
+          <div className="px-2 py-1.5 border-r border-[#d4e8ef] text-center text-gray-500">{item.slNo}</div>
           {CHILD_COLS.map((col) => (
             <div key={col.key} className={`px-2 py-1.5 border-r border-[#d4e8ef] last:border-r-0 ${col.cellCls}`}
-              title={col.key === "item_name" ? item[col.key] : undefined}>
+              title={col.key === "itemName" ? item[col.key] : undefined}>
               {col.numeric ? fmtNum(item[col.key]) : (item[col.key] ?? "-")}
             </div>
           ))}
@@ -382,9 +382,9 @@ export default function StockTable({ data = [], onItemClick }) {
 
   // columns for filter/sort (exclude sl_no and expand chevron)
   const COLS = [
-    { key: "cc_code", label: "Code" },
-    { key: "cc_name", label: "CC Name" },
-    { key: "total_stock_amount", label: "Stock Amount" },
+    { key: "ccCode", label: "Code" },
+    { key: "ccName", label: "CC Name" },
+    { key: "totalStockAmount", label: "Stock Amount" },
   ];
 
   const renderFilterDropdown = () => {
@@ -462,7 +462,7 @@ export default function StockTable({ data = [], onItemClick }) {
     );
   };
 
-  const totalStockValue = sorted.reduce((sum, r) => sum + Number(r.total_stock_amount || 0), 0);
+  const totalStockValue = sorted.reduce((sum, r) => sum + Number(r.totalStockAmount || 0), 0);
 
   return (
     <div className="xl:max-w-5xl xl:mx-auto border border-[#9e9e9e] overflow-x-auto">
@@ -474,9 +474,9 @@ export default function StockTable({ data = [], onItemClick }) {
               <th className="border border-[#9e9e9e] px-2 py-1 font-semibold whitespace-nowrap w-[65px]">
                 Sl. no
               </th>
-              <SortFilterHeader colKey="cc_code" label="Code" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
-              <SortFilterHeader colKey="cc_name" label="CC Name" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
-              <SortFilterHeader colKey="total_stock_amount" label="Stock Amount" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
+              <SortFilterHeader colKey="ccCode" label="Code" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
+              <SortFilterHeader colKey="ccName" label="CC Name" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
+              <SortFilterHeader colKey="totalStockAmount" label="Stock Amount" sortConfig={sortConfig} onSort={handleSort} filterConfig={filterConfig} onOpenFilter={openFilter} isFilterActive={isFilterActive} />
             </tr>
           </thead>
           <tbody>
@@ -505,17 +505,17 @@ export default function StockTable({ data = [], onItemClick }) {
                           {isExpanded
                             ? <ChevronDown size={14} className="text-gray-500 shrink-0" />
                             : <ChevronRight size={14} className="text-gray-500 shrink-0" />}
-                          <span className="font-semibold">{row.sl_no}</span>
+                          <span className="font-semibold">{row.slNo}</span>
                         </div>
                       </td>
                       <td className="border border-[#e6e4e4] px-2 py-1 font-semibold">
-                        {row.cc_code}
+                        {row.ccCode}
                       </td>
                       <td className="border border-[#e6e4e4] px-2 py-1 font-semibold">
-                        {row.cc_name}
+                        {row.ccName}
                       </td>
                       <td className="border border-[#e6e4e4] px-2 py-1 text-right font-semibold">
-                        {fmtNum(row.total_stock_amount)}
+                        {fmtNum(row.totalStockAmount)}
                       </td>
                     </tr>
 
