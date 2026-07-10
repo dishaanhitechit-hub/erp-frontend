@@ -86,6 +86,9 @@ export default function StockReportPage() {
       .filter((group) => group.items.length > 0);
   }, [rawData, appliedSearch]);
 
+  // Must be called before any early returns — getPageActions uses a hook internally
+  const headerActions = getPageActions({ router });
+
   if (!access.allowed) return <PageNotAvailable />;
 
   if (loading) {
@@ -95,8 +98,6 @@ export default function StockReportPage() {
       </div>
     );
   }
-
-  const headerActions = getPageActions({ router });
 
   const pageActions = [
     {

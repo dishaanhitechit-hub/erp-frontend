@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   ArrowUp,
   ArrowDown,
@@ -493,7 +493,7 @@ export default function StockTable({ data = [], onItemClick }) {
                 const isEven = idx % 2 === 0;
 
                 return (
-                  <>
+                  <React.Fragment key={`group-${globalIdx}`}>
                     {/* PARENT ROW */}
                     <tr
                       key={`parent-${globalIdx}`}
@@ -527,7 +527,7 @@ export default function StockTable({ data = [], onItemClick }) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })
             )}
