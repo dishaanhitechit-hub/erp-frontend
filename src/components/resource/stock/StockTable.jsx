@@ -8,9 +8,9 @@ import {
   ChevronDown,
   ChevronRight,
   Search,
+  Loader2,
 } from "lucide-react";
 
-const PAGE_SIZE = 20;
 
 const CHILD_COLS = [
   { key: "itemCode",    label: "Item Code",    cls: "text-left",   cellCls: "text-blue-600 font-medium", numeric: false },
@@ -178,7 +178,7 @@ function ChildTable({ items = [], onItemClick }) {
   return (
     <div className="ml-6 border-l-4 border-[#7fc3d4] bg-[#f0f7fa]">
       {/* child header */}
-      <div className="grid grid-cols-[60px_120px_1fr_90px_110px_100px_100px_120px] bg-[#c5dde8] border-b border-[#9e9e9e] text-xs">
+      <div className="grid grid-cols-[60px_120px_1fr_110px_110px_100px_100px_110px] bg-[#c5dde8] border-b border-[#9e9e9e] text-xs">
         <div className="px-2 py-1.5 border-r border-[#9e9e9e] text-center font-semibold">Sl. no</div>
         {CHILD_COLS.map((col) => <ColHeader key={col.key} col={col} />)}
       </div>
@@ -190,7 +190,7 @@ function ChildTable({ items = [], onItemClick }) {
         <div
           key={ci}
           onClick={(e) => { e.stopPropagation(); onItemClick && onItemClick(item); }}
-          className={`grid grid-cols-[60px_120px_1fr_90px_110px_100px_100px_120px] border-b border-[#d4e8ef] cursor-pointer text-xs
+          className={`grid grid-cols-[60px_120px_1fr_110px_110px_100px_100px_110px] border-b border-[#d4e8ef] cursor-pointer text-xs
             ${ci % 2 === 0 ? "bg-[#f0f7fa]" : "bg-white"} hover:bg-[#dff0f7] transition-colors`}
         >
           <div className="px-2 py-1.5 border-r border-[#d4e8ef] text-center text-gray-500">{item.slNo}</div>
@@ -245,7 +245,7 @@ function SortFilterHeader({ colKey, label, sortConfig, onSort, filterConfig, onO
   );
 }
 
-export default function StockTable({ data = [], onItemClick }) {
+export default function StockTable({ data = [], onItemClick, pagination, onPageChange, tableLoading }) {
   // ─── SORT (on parent rows only)
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
@@ -331,7 +331,7 @@ export default function StockTable({ data = [], onItemClick }) {
   };
 
   // ─── PIPELINE
-  const filtered = data.filter((row) =>
+  const filtered = (Array.isArray(data) ? data : []).filter((row) =>
     Object.entries(filterConfig).every(([col, sel]) => {
       if (!sel || sel.length === 0) return true;
       const v = row[col];
@@ -353,12 +353,12 @@ export default function StockTable({ data = [], onItemClick }) {
     return 0;
   });
 
-  // ─── PAGINATION (parent rows)
-  const [page, setPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  // Clamp page during render instead of useEffect to avoid cascading renders
-  const safePage = Math.min(page, totalPages);
-  const paginated = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  // ─── PAGINATION — server-driven
+  const currentPage = pagination?.currentPage ?? 1;
+  const totalPages  = pagination?.totalPages  ?? 1;
+  const totalGroups = pagination?.totalGroups ?? sorted.length;
+  const limit       = pagination?.limit       ?? sorted.length;
+  const paginated   = sorted; // already one page from server
 
   // ─── EXPANDED ROWS
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -465,7 +465,13 @@ export default function StockTable({ data = [], onItemClick }) {
   const totalStockValue = sorted.reduce((sum, r) => sum + Number(r.totalStockAmount || 0), 0);
 
   return (
-    <div className="xl:max-w-5xl xl:mx-auto border border-[#9e9e9e] overflow-x-auto">
+    <div className="xl:max-w-5xl xl:mx-auto border border-[#9e9e9e] overflow-x-auto relative">
+      {/* PAGINATION LOADER OVERLAY */}
+      {tableLoading && (
+        <div className="absolute inset-0 z-20 bg-white/60 flex items-center justify-center">
+          <Loader2 className="animate-spin w-6 h-6 text-[#4d8ea3]" />
+        </div>
+      )}
       <div className="max-h-[608px] overflow-y-auto">
         <table className="w-full min-w-max border-collapse text-sm">
           <thead className="bg-[#b7cfa5] sticky top-0 z-10">
@@ -488,7 +494,7 @@ export default function StockTable({ data = [], onItemClick }) {
               </tr>
             ) : (
               paginated.map((row, idx) => {
-                const globalIdx = (safePage - 1) * PAGE_SIZE + idx;
+                const globalIdx = (currentPage - 1) * limit + idx;
                 const isExpanded = expandedRows.has(globalIdx);
                 const isEven = idx % 2 === 0;
 
@@ -549,18 +555,18 @@ export default function StockTable({ data = [], onItemClick }) {
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-3 py-1.5 border-t border-[#9e9e9e] bg-[#f9f9f9] text-xs text-gray-600">
           <span>
-            Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, sorted.length)} of {sorted.length}
+            Page {currentPage} of {totalPages} &nbsp;·&nbsp; {totalGroups} groups
           </span>
           <div className="flex items-center gap-1">
             <button
-              disabled={safePage === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1 || tableLoading}
+              onClick={() => onPageChange?.(currentPage - 1)}
               className="px-2 py-0.5 border border-[#9e9e9e] rounded disabled:opacity-40 hover:bg-[#e6e6e6] transition"
             >
               ‹ Prev
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
               .reduce((acc, p, i, arr) => {
                 if (i > 0 && p - arr[i - 1] > 1) acc.push("...");
                 acc.push(p);
@@ -572,9 +578,10 @@ export default function StockTable({ data = [], onItemClick }) {
                 ) : (
                   <button
                     key={p}
-                    onClick={() => setPage(p)}
+                    disabled={tableLoading}
+                    onClick={() => onPageChange?.(p)}
                     className={`px-2 py-0.5 border rounded transition ${
-                      p === safePage
+                      p === currentPage
                         ? "bg-[#7fc3d4] border-[#4d8ea3] text-black font-semibold"
                         : "border-[#9e9e9e] hover:bg-[#e6e6e6]"
                     }`}
@@ -584,8 +591,8 @@ export default function StockTable({ data = [], onItemClick }) {
                 )
               )}
             <button
-              disabled={safePage === totalPages}
-              onClick={() => setPage((p) => p + 1)}
+              disabled={currentPage === totalPages || tableLoading}
+              onClick={() => onPageChange?.(currentPage + 1)}
               className="px-2 py-0.5 border border-[#9e9e9e] rounded disabled:opacity-40 hover:bg-[#e6e6e6] transition"
             >
               Next ›

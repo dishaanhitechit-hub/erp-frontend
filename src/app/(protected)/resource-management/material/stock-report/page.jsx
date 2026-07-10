@@ -16,6 +16,8 @@ import StockItemDetailModal from "@/components/resource/stock/StockItemDetailMod
 import PageNotAvailable from "@/components/common/PageNotAvailable";
 import { getPageAccess } from "@/helper/getPageAccess";
 
+const PAGE_LIMIT = 10;
+
 export default function StockReportPage() {
   const router = useRouter();
   const access = getPageAccess({ pageCode: "stock_report", pageType: "LIST" });
@@ -23,6 +25,9 @@ export default function StockReportPage() {
   const [projectCode, setProjectCode] = useState("");
   const [rawData, setRawData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
+  const [pagination, setPagination] = useState(null);
+  const [page, setPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const [appliedSearch, setAppliedSearch] = useState({ search: "", from: "", to: "" });
@@ -35,52 +40,47 @@ export default function StockReportPage() {
   useEffect(() => {
     if (!projectCode || !access.allowed) return;
     const fetchStock = async () => {
-      setLoading(true);
+      if (page === 1 && rawData.length === 0) {
+        setLoading(true);
+      } else {
+        setTableLoading(true);
+      }
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.LIST}?project_code=${projectCode}&item_category=MAT_001`,
+          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.LIST}?project_code=${projectCode}&item_category=MAT_001&page=${page}&limit=${PAGE_LIMIT}`,
           method: "GET",
         });
-        setRawData(res.data || []);
+        setRawData(res.data?.data || []);
+        setPagination(res.data?.pagination || null);
       } catch {
         toast.error("Failed to fetch stock data");
       } finally {
         setLoading(false);
+        setTableLoading(false);
       }
     };
     fetchStock();
-  }, [projectCode]);
+  }, [projectCode, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = ({ search: s, from, to }) => {
     setAppliedSearch({ search: s, from, to });
   };
 
-  // Filter: contain search filters item names/codes, date range filters items by...
-  // Since stock items don't have dates, date search is handled by GRN/GIN dates in detail.
-  // For the list view, date range and contain search filter on item_name and item_code within each group.
   const filteredData = useMemo(() => {
-    const { search: s, from, to } = appliedSearch;
-    if (!s && !from && !to) return rawData;
+    const { search: s } = appliedSearch;
+    if (!s) return rawData;
 
     return rawData
       .map((group) => {
         let items = group.items || [];
-
-        // text search on item name or code
-        if (s) {
-          const lower = s.toLowerCase();
-          items = items.filter(
-            (item) =>
-              item.itemName?.toLowerCase().includes(lower) ||
-              item.itemCode?.toLowerCase().includes(lower) ||
-              group.ccCode?.toLowerCase().includes(lower) ||
-              group.ccName?.toLowerCase().includes(lower)
-          );
-        }
-
-        // For date range: no date field on list items, so skip silently
-        // (date filtering will apply to item-detail level)
-
+        const lower = s.toLowerCase();
+        items = items.filter(
+          (item) =>
+            item.itemName?.toLowerCase().includes(lower) ||
+            item.itemCode?.toLowerCase().includes(lower) ||
+            group.ccCode?.toLowerCase().includes(lower) ||
+            group.ccName?.toLowerCase().includes(lower)
+        );
         return { ...group, items };
       })
       .filter((group) => group.items.length > 0);
@@ -121,6 +121,9 @@ export default function StockReportPage() {
         <StockTable
           data={filteredData}
           onItemClick={(item) => setSelectedItem(item)}
+          pagination={pagination}
+          onPageChange={(p) => setPage(p)}
+          tableLoading={tableLoading}
         />
         {selectedItem && (
           <StockItemDetailModal

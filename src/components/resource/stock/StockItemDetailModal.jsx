@@ -34,33 +34,52 @@ function downloadExcel(rows, item) {
 }
 
 
+const ENTRIES_LIMIT = 500;
+
 export default function StockItemDetailModal({ item, projectCode, onClose }) {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!item || !projectCode) return;
-    const fetchDetail = async () => {
-      setLoading(true);
-      try {
-        const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.ITEM_DETAIL}?project_code=${projectCode}&item_code=${item.itemCode}`,
-          method: "GET",
-        });
-        setDetail(res.data);
-      } catch {
-        toast.error("Failed to fetch item detail");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetail();
-  }, [item, projectCode]);
+  const [ledgerLoading, setLedgerLoading] = useState(false);
 
   // ─── LEDGER FILTERS
   const [filterFrom, setFilterFrom] = useState("");
   const [filterTo, setFilterTo]     = useState("");
-  const [typeFilter, setTypeFilter] = useState("ALL"); // "ALL" | "GRN" | "GIN"
+  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [ledgerPage, setLedgerPage] = useState(1);
+
+  const doFetch = async ({ from = "", to = "", page = 1, isInitial = false } = {}) => {
+    isInitial ? setLoading(true) : setLedgerLoading(true);
+    try {
+      let url = `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.STOCK.ITEM_DETAIL}?project_code=${projectCode}&item_code=${item.itemCode}&entries_limit=${ENTRIES_LIMIT}&grn_page=${page}&gin_page=${page}`;
+      if (from) url += `&from_date=${from}`;
+      if (to)   url += `&to_date=${to}`;
+      const res = await apiRequest({ url, method: "GET" });
+      setDetail(res.data);
+    } catch {
+      toast.error("Failed to fetch item detail");
+    } finally {
+      setLoading(false);
+      setLedgerLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!item || !projectCode) return;
+    doFetch({ isInitial: true });
+  }, [item, projectCode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-fetch when date filters change — reset to page 1
+  useEffect(() => {
+    if (!item || !projectCode || loading) return;
+    setLedgerPage(1);
+    doFetch({ from: filterFrom, to: filterTo, page: 1 });
+  }, [filterFrom, filterTo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-fetch when page changes
+  useEffect(() => {
+    if (!item || !projectCode || loading) return;
+    doFetch({ from: filterFrom, to: filterTo, page: ledgerPage });
+  }, [ledgerPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fmtDate = (d) => {
     if (!d) return "-";
@@ -117,19 +136,19 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
             {/* DATE-WISE LEDGER */}
             {(() => {
               // Merge GRN and GIN into a single chronological ledger
-              const grns = (detail.grnEntries || []).map((g) => ({
+              const grns = (detail.grnEntries?.entries || []).map((g) => ({
                 date: g.grnDate, no: g.grnNo, type: "GRN",
                 qtyIn: g.receivedQty, qtyOut: 0, rate: g.rate, amount: g.amount,
                 storeLocation: g.storeLocation ?? null, useLocation: null,
               }));
-              const gins = (detail.ginEntries || []).map((g) => ({
+              const gins = (detail.ginEntries?.entries || []).map((g) => ({
                 date: g.ginDate, no: g.ginNo, type: "GIN",
                 qtyIn: 0, qtyOut: g.issuedQty, rate: g.rate, amount: g.amount,
                 storeLocation: null, useLocation: g.useLocation ?? null,
               }));
               const ledger = [...grns, ...gins].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-              // Compute running balance on the FULL ledger first (unfiltered)
+              // Compute running balance on the API-returned ledger (date-filtered by server)
               let runQty = 0, runAmt = 0;
               const allRows = ledger.map((e) => {
                 runQty += e.qtyIn - e.qtyOut;
@@ -137,19 +156,18 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                 return { ...e, balQty: runQty, balAmt: runAmt };
               });
 
-              // Apply filters on top of the computed rows
-              const rows = allRows.filter((r) => {
-                if (typeFilter !== "ALL" && r.type !== typeFilter) return false;
-                if (filterFrom && r.date < filterFrom) return false;
-                if (filterTo   && r.date > filterTo)   return false;
-                return true;
-              });
-
-              if (allRows.length === 0) return (
-                <p className="text-xs text-gray-400 text-center py-4">No movement entries found</p>
-              );
+              // Apply only type filter client-side (date filter is handled by API)
+              const rows = typeFilter === "ALL"
+                ? allRows
+                : allRows.filter((r) => r.type === typeFilter);
 
               const hasActiveFilter = typeFilter !== "ALL" || filterFrom || filterTo;
+
+              // Pagination — use whichever side has more pages
+              const grnTotalPages = detail.grnEntries?.totalPages ?? 1;
+              const ginTotalPages = detail.ginEntries?.totalPages ?? 1;
+              const totalLedgerPages = Math.max(grnTotalPages, ginTotalPages);
+              const totalEntries = (detail.grnEntries?.total ?? 0) + (detail.ginEntries?.total ?? 0);
 
               return (
                 <div className="space-y-2">
@@ -158,13 +176,13 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                   {/* Date range */}
                   <div className="flex items-center gap-1.5">
                     <span className="px-2.5 py-0.5 bg-[#b4b4d9] border border-[#6a6aa8] text-xs rounded-sm whitespace-nowrap">From</span>
-                    <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}
-                      className="h-6.5 w-34 border border-[#8f8f8f] px-2 text-xs rounded-sm outline-none" />
+                    <input type="date" value={filterFrom} disabled={ledgerLoading} onChange={(e) => setFilterFrom(e.target.value)}
+                      className="h-6.5 w-34 border border-[#8f8f8f] px-2 text-xs rounded-sm outline-none disabled:opacity-50" />
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="px-3 py-0.5 bg-[#b4b4d9] border border-[#6a6aa8] text-xs rounded-sm whitespace-nowrap">To</span>
-                    <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)}
-                      className="h-6.5 w-34 border border-[#8f8f8f] px-2 text-xs rounded-sm outline-none" />
+                    <input type="date" value={filterTo} disabled={ledgerLoading} onChange={(e) => setFilterTo(e.target.value)}
+                      className="h-6.5 w-34 border border-[#8f8f8f] px-2 text-xs rounded-sm outline-none disabled:opacity-50" />
                   </div>
 
                   {/* Type toggle + Excel download */}
@@ -192,18 +210,23 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
 
                   {/* Clear */}
                   {hasActiveFilter && (
-                    <button onClick={() => { setFilterFrom(""); setFilterTo(""); setTypeFilter("ALL"); }}
+                    <button onClick={() => { setFilterFrom(""); setFilterTo(""); setTypeFilter("ALL"); setLedgerPage(1); }}
                       className="text-xs text-blue-500 hover:text-blue-700 underline">
                       Clear filters
                     </button>
                   )}
 
                   <span className="ml-auto text-xs text-gray-400">
-                    {rows.length} of {allRows.length} entries
+                    {rows.length} of {totalEntries} entries
                   </span>
                 </div>
 
-                <div className="border border-[#9e9e9e] overflow-x-auto">
+                <div className="border border-[#9e9e9e] overflow-x-auto relative">
+                  {ledgerLoading && (
+                    <div className="absolute inset-0 z-10 bg-white/60 flex items-center justify-center">
+                      <Loader2 className="animate-spin w-5 h-5 text-[#4d8ea3]" />
+                    </div>
+                  )}
                   <table className="w-full min-w-max border-collapse text-xs">
                     <thead className="bg-[#b7cfa5] sticky top-0 z-10">
                       <tr>
@@ -222,6 +245,13 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                       </tr>
                     </thead>
                     <tbody>
+                      {rows.length === 0 && !ledgerLoading && (
+                        <tr>
+                          <td colSpan={12} className="text-center py-6 text-xs text-gray-400">
+                            {hasActiveFilter ? "No entries found for the selected filters" : "No movement entries found"}
+                          </td>
+                        </tr>
+                      )}
                       {rows.map((r, i) => {
                         const isGRN = r.type === "GRN";
                         return (
@@ -257,6 +287,54 @@ export default function StockItemDetailModal({ item, projectCode, onClose }) {
                     </tbody>
                   </table>
                 </div>
+
+                {/* LEDGER PAGINATION */}
+                {totalLedgerPages > 1 && (
+                  <div className="flex items-center justify-between px-1 py-1 text-xs text-gray-600">
+                    <span>Page {ledgerPage} of {totalLedgerPages}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        disabled={ledgerPage === 1 || ledgerLoading}
+                        onClick={() => setLedgerPage((p) => p - 1)}
+                        className="px-2 py-0.5 border border-[#9e9e9e] rounded disabled:opacity-40 hover:bg-[#e6e6e6] transition"
+                      >
+                        ‹ Prev
+                      </button>
+                      {Array.from({ length: totalLedgerPages }, (_, i) => i + 1)
+                        .filter((p) => p === 1 || p === totalLedgerPages || Math.abs(p - ledgerPage) <= 1)
+                        .reduce((acc, p, i, arr) => {
+                          if (i > 0 && p - arr[i - 1] > 1) acc.push("...");
+                          acc.push(p);
+                          return acc;
+                        }, [])
+                        .map((p, i) =>
+                          p === "..." ? (
+                            <span key={`e-${i}`} className="px-1">…</span>
+                          ) : (
+                            <button
+                              key={p}
+                              disabled={ledgerLoading}
+                              onClick={() => setLedgerPage(p)}
+                              className={`px-2 py-0.5 border rounded transition ${
+                                p === ledgerPage
+                                  ? "bg-[#7fc3d4] border-[#4d8ea3] text-black font-semibold"
+                                  : "border-[#9e9e9e] hover:bg-[#e6e6e6]"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          )
+                        )}
+                      <button
+                        disabled={ledgerPage === totalLedgerPages || ledgerLoading}
+                        onClick={() => setLedgerPage((p) => p + 1)}
+                        className="px-2 py-0.5 border border-[#9e9e9e] rounded disabled:opacity-40 hover:bg-[#e6e6e6] transition"
+                      >
+                        Next ›
+                      </button>
+                    </div>
+                  </div>
+                )}
                 </div>
               );
             })()}
