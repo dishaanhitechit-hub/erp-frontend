@@ -100,7 +100,7 @@ export default function SRNItemsTable({
           className="
             border-collapse
             text-[12px]
-            min-w-[1320px]
+            min-w-[1050px]
             w-full
           "
         >
@@ -123,7 +123,7 @@ export default function SRNItemsTable({
                 Item Code
               </TH>
 
-              <TH w="240px" center>
+              <TH w="160px" center>
                 Item Name
               </TH>
 
@@ -156,11 +156,11 @@ export default function SRNItemsTable({
                 Qty
               </TH>
 
-              <TH w="220px" center>
+              <TH w="140px" center>
                 Use Location
               </TH>
 
-              <TH w="220px" center>
+              <TH w="140px" center>
                 Store Location
               </TH>
 

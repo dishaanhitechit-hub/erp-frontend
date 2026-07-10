@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import SaveButton from "@/components/common/SaveButton";
@@ -85,6 +85,7 @@ export default function GRNForm({ mode = "create", grnId }) {
   const [existingFileUrl, setExistingFileUrl] = useState("");
   const [initialFileUrl, setInitialFileUrl] = useState("");
   const [initialFormData, setInitialFormData] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // ── FORM ──────────────────────────────────────────────────────────────────
   const form = useForm({
@@ -427,25 +428,42 @@ export default function GRNForm({ mode = "create", grnId }) {
   return (
     <div className="p-3">
       {/* ── MAIN BODY: LEFT + RIGHT ──────────────────────────────────────── */}
-      <div className="flex flex-col xl:flex-row items-start gap-4">
+      <div className="flex flex-col xl:flex-row items-start gap-3">
         {/* LEFT PANEL */}
-        <GRNLeftPanel
-          form={form}
-          disabled={disabled}
-          mode={mode}
-          onOrderItemsFetched={handleOrderItemsFetched}
-          onVendorClear={() => {
-            setItems([]);
-            setInitialItems([]);
-          }}
-          fileRef={fileRef}
-          newFileName={newFileName}
-          existingFileUrl={existingFileUrl}
-          onFileChange={handleFileChange}
-        />
+        {sidebarOpen && (
+          <GRNLeftPanel
+            form={form}
+            disabled={disabled}
+            mode={mode}
+            onOrderItemsFetched={handleOrderItemsFetched}
+            onVendorClear={() => {
+              setItems([]);
+              setInitialItems([]);
+            }}
+            fileRef={fileRef}
+            newFileName={newFileName}
+            existingFileUrl={existingFileUrl}
+            onFileChange={handleFileChange}
+          />
+        )}
 
-        {/* VERTICAL DIVIDER */}
-        <div className="hidden xl:block w-px self-stretch bg-sky-300" />
+        {/* DIVIDER + COLLAPSE BUTTON — xl only */}
+        <div className="hidden xl:flex flex-col items-center self-stretch">
+          <div className="flex-1 w-px bg-sky-300" />
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((v) => !v)}
+            title={sidebarOpen ? "Collapse details panel" : "Expand details panel"}
+            className={`flex items-center justify-center w-5 h-10 rounded border transition shrink-0 my-1 ${
+              sidebarOpen
+                ? "bg-sky-100 border-sky-300 hover:bg-sky-200 text-sky-600"
+                : "bg-[#7fc3d4] border-[#4a9fb5] hover:bg-[#6ab8cb] text-white"
+            }`}
+          >
+            {sidebarOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+          </button>
+          <div className="flex-1 w-px bg-sky-300" />
+        </div>
 
         {/* RIGHT PANEL */}
         <div className="w-full flex-1 min-w-0 flex flex-col gap-4">
