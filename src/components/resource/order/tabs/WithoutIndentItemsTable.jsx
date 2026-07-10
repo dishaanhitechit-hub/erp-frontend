@@ -66,20 +66,20 @@ export default function WithoutIndentItemsTable({ form, disabled, itemOptions = 
 
         {!!fields.length && (
           <div ref={scrollRef} className="overflow-auto max-h-[680px]">
-            <table className="w-full border-collapse min-w-[1100px]">
+            <table className="w-full border-collapse min-w-[900px]">
               <thead className="sticky top-0 z-10 bg-[#D3D3D3]">
                 <tr>
-                  <th className="border px-2 py-1 text-sm w-[50px]">Sl no</th>
-                  <th className="border px-2 py-1 text-sm min-w-[110px]">Item Code</th>
-                  <th className="border px-2 py-1 text-sm min-w-[200px]">Item Name</th>
+                  <th className="border px-2 py-1 text-sm w-[44px]">Sl no</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Item Code</th>
+                  <th className="border px-2 py-1 text-sm min-w-[160px]">Item Name</th>
                   <th className="border px-2 py-1 text-sm min-w-[70px]">Unit</th>
                   <th className="border px-2 py-1 text-sm min-w-[90px]">Qty</th>
                   <th className="border px-2 py-1 text-sm min-w-[100px]">Rate</th>
-                  <th className="border px-2 py-1 text-sm min-w-[110px]">Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Amount</th>
                   <th className="border px-2 py-1 text-sm min-w-[80px]">GST %</th>
-                  <th className="border px-2 py-1 text-sm min-w-[110px]">GST Amount</th>
-                  <th className="border px-2 py-1 text-sm min-w-[160px]">Note</th>
-                  <th className="border px-2 py-1 text-sm min-w-[160px]">Location</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">GST Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[80px]">Note</th>
+                  <th className="border px-2 py-1 text-sm min-w-[130px]">Location</th>
                   {!disabled && <th className="border px-2 py-1 text-sm w-[60px]">Action</th>}
                 </tr>
               </thead>
@@ -111,8 +111,16 @@ export default function WithoutIndentItemsTable({ form, disabled, itemOptions = 
                       </td>
 
                       {/* UNIT */}
-                      <td className="border px-2 py-[2px]">
-                        <Input value={items[index]?.unit || ""} disabled className={`${getInputClass(null, true)} text-center`} />
+                      <td className="border px-2 py-[2px] align-top overflow-hidden">
+                        <ExpandableTextField
+                          value={items[index]?.unit || ""}
+                          onChange={() => {}}
+                          disabled
+                          title="Unit"
+                          placeholder=""
+                          minHeight="min-h-[34px]"
+                          modalHeight="min-h-[120px]"
+                        />
                       </td>
 
                       {/* QTY */}
@@ -189,41 +197,45 @@ export default function WithoutIndentItemsTable({ form, disabled, itemOptions = 
                       </td>
 
                       {/* NOTE */}
-                      <td className="border px-2 py-[2px] align-top overflow-hidden">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.note`}
-                          render={({ field: f }) => (
-                            <ExpandableTextField
-                              value={f.value}
-                              onChange={f.onChange}
-                              disabled={disabled}
-                              title="Note"
-                              placeholder="Enter Note"
-                              minHeight="min-h-[34px]"
-                              modalHeight="min-h-[180px]"
-                            />
-                          )}
-                        />
+                      <td className="border p-0 align-top">
+                        <div className="w-[80px] overflow-hidden">
+                          <Controller
+                            control={control}
+                            name={`items.${index}.note`}
+                            render={({ field: f }) => (
+                              <ExpandableTextField
+                                value={f.value}
+                                onChange={f.onChange}
+                                disabled={disabled}
+                                title="Note"
+                                placeholder="Note"
+                                minHeight="min-h-[34px]"
+                                modalHeight="min-h-[180px]"
+                              />
+                            )}
+                          />
+                        </div>
                       </td>
 
                       {/* LOCATION */}
-                      <td className="border px-2 py-[2px] align-top overflow-hidden">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.location`}
-                          render={({ field: f }) => (
-                            <ExpandableTextField
-                              value={f.value}
-                              onChange={f.onChange}
-                              disabled={disabled}
-                              title="Location"
-                              placeholder="Enter Location"
-                              minHeight="min-h-[34px]"
-                              modalHeight="min-h-[180px]"
-                            />
-                          )}
-                        />
+                      <td className="border p-0 align-top">
+                        <div className="w-[130px] overflow-hidden">
+                          <Controller
+                            control={control}
+                            name={`items.${index}.location`}
+                            render={({ field: f }) => (
+                              <ExpandableTextField
+                                value={f.value}
+                                onChange={f.onChange}
+                                disabled={disabled}
+                                title="Location"
+                                placeholder="Enter Location"
+                                minHeight="min-h-[34px]"
+                                modalHeight="min-h-[180px]"
+                              />
+                            )}
+                          />
+                        </div>
                       </td>
 
                       {!disabled && (

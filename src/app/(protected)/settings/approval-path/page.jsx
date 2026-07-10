@@ -667,16 +667,13 @@ export default function ApprovalPathPage() {
           }
         });
 
-        // Creators
-
-        const creatorUsers = selectedUsers[`${row.id}_creator`] || [];
+        // Creators — deduplicate by userId before sending
+        const rawCreators = selectedUsers[`${row.id}_creator`] || [];
+        const uniqueCreatorIds = [...new Set(rawCreators.map((id) => Number(id)))];
 
         return {
           moduleCode: row.moduleCode,
-
-          creatorUsers: creatorUsers.map((id) => ({
-            userId: Number(id),
-          })),
+          creatorUsers: uniqueCreatorIds.map((id) => ({ userId: id })),
           approverUsers,
         };
       })

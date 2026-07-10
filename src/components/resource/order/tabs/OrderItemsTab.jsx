@@ -134,12 +134,7 @@ export default function OrderItemsTab({
               max-h-[680px]
             "
           >
-            <table
-              className="
-                w-full
-                border-collapse
-              "
-            >
+            <table className="w-full border-collapse min-w-[900px]">
               <thead
                 className="
                   sticky
@@ -152,52 +147,19 @@ export default function OrderItemsTab({
                     bg-[#D3D3D3]
                   "
                 >
-                  <th className="border px-2 py-1 text-sm min-w-[60px]">
-                    Sl no
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">
-                    Item Code
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[220px]">
-                    Item Name
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[180px]">
-                    Note
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[80px]">
-                    Unit
-                  </th>
-
+                  <th className="border px-2 py-1 text-sm min-w-[44px]">Sl no</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Item Code</th>
+                  <th className="border px-2 py-1 text-sm min-w-[150px]">Item Name</th>
+                  <th className="border px-2 py-1 text-sm min-w-[70px]">Note</th>
+                  <th className="border px-2 py-1 text-sm min-w-[70px]">Unit</th>
                   <th className="border px-2 py-1 text-sm min-w-[90px]">Qty</th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[100px]">
-                    Rate
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">
-                    Amount
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[90px]">
-                    GST %
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">
-                    GST Amount
-                  </th>
-
-                  <th className="border px-2 py-1 text-sm min-w-[180px]">
-                    Location
-                  </th>
-
+                  <th className="border px-2 py-1 text-sm min-w-[100px]">Rate</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[80px]">GST %</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">GST Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Location</th>
                   {!disabled && (
-                    <th className="border px-2 py-1 text-sm min-w-[90px]">
-                      Action
-                    </th>
+                    <th className="border px-2 py-1 text-sm min-w-[50px]">Action</th>
                   )}
                 </tr>
               </thead>
@@ -245,36 +207,38 @@ export default function OrderItemsTab({
 
                       {/* NOTE */}
 
-                      <td className="border px-2 py-[2px] align-top overflow-hidden">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.note`}
-                          render={({ field }) => (
-                            <ExpandableTextField
-                              value={field.value}
-                              onChange={field.onChange}
-                              disabled={disabled}
-                              error={errors?.items?.[index]?.note}
-                              title="Note"
-                              placeholder="Enter Note"
-                              minHeight="min-h-[34px]"
-                              modalHeight="min-h-[180px]"
-                              //                             className="
-                              //   max-w-full
-                              //   overflow-hidden
-                              // "
-                            />
-                          )}
-                        />
+                      <td className="border p-0 align-top">
+                        <div className="w-[70px] overflow-hidden">
+                          <Controller
+                            control={control}
+                            name={`items.${index}.note`}
+                            render={({ field }) => (
+                              <ExpandableTextField
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={disabled}
+                                error={errors?.items?.[index]?.note}
+                                title="Note"
+                                placeholder="Note"
+                                minHeight="min-h-[34px]"
+                                modalHeight="min-h-[180px]"
+                              />
+                            )}
+                          />
+                        </div>
                       </td>
 
                       {/* UNIT */}
 
-                      <td className="border px-2 py-[2px]">
-                        <Input
+                      <td className="border px-2 py-[2px] align-top overflow-hidden">
+                        <ExpandableTextField
                           value={items[index]?.itemUnit || ""}
+                          onChange={() => {}}
                           disabled
-                          className={getInputClass(null, true)}
+                          title="Unit"
+                          placeholder=""
+                          minHeight="min-h-[34px]"
+                          modalHeight="min-h-[120px]"
                         />
                       </td>
 
@@ -291,7 +255,6 @@ export default function OrderItemsTab({
                       {/* RATE */}
 
                       <td className="border px-2 py-[2px]">
-                        <div className="min-w-[105px]">
                           <Controller
                             control={control}
                             name={`items.${index}.rate`}
@@ -335,7 +298,6 @@ export default function OrderItemsTab({
                               />
                             )}
                           />
-                        </div>
                       </td>
 
                       {/* AMOUNT */}
@@ -350,7 +312,6 @@ export default function OrderItemsTab({
                       {/* GST % */}
 
                       <td className="border px-2 py-[2px]">
-                        <div className="min-w-[90px]">
                           <Controller
                             control={control}
                             name={`items.${index}.gstPercent`}
@@ -392,7 +353,6 @@ export default function OrderItemsTab({
                               />
                             )}
                           />
-                        </div>
                       </td>
 
                       {/* GST AMOUNT */}
@@ -407,23 +367,25 @@ export default function OrderItemsTab({
 
                       {/* LOCATION */}
 
-                      <td className="border px-2 py-[2px] align-top overflow-hidden">
-                        <Controller
-                          control={control}
-                          name={`items.${index}.location`}
-                          render={({ field }) => (
-                            <ExpandableTextField
-                              value={field.value}
-                              onChange={field.onChange}
-                              disabled={true}
-                              error={errors?.items?.[index]?.location}
-                              title="Location"
-                              placeholder="Enter Location"
-                              minHeight="min-h-[34px]"
-                              modalHeight="min-h-[180px]"
-                            />
-                          )}
-                        />
+                      <td className="border p-0 align-top">
+                        <div className="w-[90px] overflow-hidden">
+                          <Controller
+                            control={control}
+                            name={`items.${index}.location`}
+                            render={({ field }) => (
+                              <ExpandableTextField
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={disabled}
+                                error={errors?.items?.[index]?.location}
+                                title="Location"
+                                placeholder="Location"
+                                minHeight="min-h-[34px]"
+                                modalHeight="min-h-[180px]"
+                              />
+                            )}
+                          />
+                        </div>
                       </td>
 
                       {/* ACTION */}

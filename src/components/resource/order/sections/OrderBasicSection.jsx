@@ -26,8 +26,9 @@ const COST_HEAD_OPTIONS = {
   Site_Transfer_Order:   [{ label: "Project Work", value: "Project_Work" }, { label: "Fixed Asset", value: "Fixed_Asset" }],
 };
 
-const LABEL = `${labelClass} w-[180px] min-w-[180px] max-w-[180px]`;
-const INPUT_W = "w-[220px] min-w-[220px] max-w-[220px]";
+// labelClass has w-[250px] baked in — define our own to keep visual style but use fluid width
+const LABEL = "w-[160px] shrink-0 px-3 h-[34px] flex items-center bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
+const INPUT_W = "flex-1 min-w-0";
 
 export default function OrderBasicSection({
   form,
@@ -164,7 +165,7 @@ export default function OrderBasicSection({
     "Party Name";
 
   return (
-    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1">
+    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1 overflow-x-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-4">
 
         {/* ── WITH / WITHOUT INDENT TOGGLE */}
