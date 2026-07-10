@@ -40,21 +40,21 @@ export default function ServiceOrderItemsTab({ form, disabled, openItemModal, se
 
         {!!fields.length && (
           <div className="overflow-auto max-h-[680px]">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse min-w-[900px]">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-[#D3D3D3]">
-                  <th className="border px-2 py-1 text-sm min-w-[60px]">Sl No</th>
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">Item Code</th>
-                  <th className="border px-2 py-1 text-sm min-w-[220px]">Item Name</th>
-                  <th className="border px-2 py-1 text-sm min-w-[180px]">Note</th>
-                  <th className="border px-2 py-1 text-sm min-w-[80px]">Unit</th>
+                  <th className="border px-2 py-1 text-sm min-w-[44px]">Sl No</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Item Code</th>
+                  <th className="border px-2 py-1 text-sm min-w-[150px]">Item Name</th>
+                  <th className="border px-2 py-1 text-sm min-w-[70px]">Note</th>
+                  <th className="border px-2 py-1 text-sm min-w-[70px]">Unit</th>
                   <th className="border px-2 py-1 text-sm min-w-[90px]">Qty</th>
                   <th className="border px-2 py-1 text-sm min-w-[100px]">Rate</th>
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">Amount</th>
-                  <th className="border px-2 py-1 text-sm min-w-[90px]">GST %</th>
-                  <th className="border px-2 py-1 text-sm min-w-[120px]">GST Amount</th>
-                  <th className="border px-2 py-1 text-sm min-w-[180px]">Location</th>
-                  {!disabled && <th className="border px-2 py-1 text-sm min-w-[90px]">Action</th>}
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[80px]">GST %</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">GST Amount</th>
+                  <th className="border px-2 py-1 text-sm min-w-[90px]">Location</th>
+                  {!disabled && <th className="border px-2 py-1 text-sm min-w-[50px]">Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -67,45 +67,45 @@ export default function ServiceOrderItemsTab({ form, disabled, openItemModal, se
                     <td className="border px-2 py-[2px] align-top overflow-hidden">
                       <ExpandableTextField value={items[index]?.itemName || ""} disabled title="Item Name" placeholder="Item Name" minHeight="min-h-[34px]" modalHeight="min-h-[180px]" />
                     </td>
-                    <td className="border px-2 py-[2px] align-top overflow-hidden">
-                      <Controller control={control} name={`items.${index}.note`} render={({ field }) => (
-                        <ExpandableTextField value={field.value} onChange={field.onChange} disabled={disabled} error={errors?.items?.[index]?.note} title="Note" placeholder="Enter Note" minHeight="min-h-[34px]" modalHeight="min-h-[180px]" />
-                      )} />
+                    <td className="border p-0 align-top">
+                      <div className="w-[70px] overflow-hidden">
+                        <Controller control={control} name={`items.${index}.note`} render={({ field }) => (
+                          <ExpandableTextField value={field.value} onChange={field.onChange} disabled={disabled} error={errors?.items?.[index]?.note} title="Note" placeholder="Note" minHeight="min-h-[34px]" modalHeight="min-h-[180px]" />
+                        )} />
+                      </div>
                     </td>
-                    <td className="border px-2 py-[2px]">
-                      <Input value={items[index]?.itemUnit || ""} disabled className={getInputClass(null, true)} />
+                    <td className="border px-2 py-[2px] align-top overflow-hidden">
+                      <ExpandableTextField value={items[index]?.itemUnit || ""} onChange={() => {}} disabled title="Unit" placeholder="" minHeight="min-h-[34px]" modalHeight="min-h-[120px]" />
                     </td>
                     <td className="border px-2 py-[2px]">
                       <Input value={items[index]?.qty || ""} disabled className={getInputClass(null, true)} />
                     </td>
                     <td className="border px-2 py-[2px]">
-                      <div className="min-w-[105px]">
-                        <Controller control={control} name={`items.${index}.rate`} render={({ field }) => (
-                          <Input {...field} type="number" step="0.001" disabled={disabled} className={getInputClass(errors?.items?.[index]?.rate, disabled)}
-                            onChange={(e) => { field.onChange(e.target.value); recalculate(index, "rate", e.target.value); }}
-                          />
-                        )} />
-                      </div>
+                      <Controller control={control} name={`items.${index}.rate`} render={({ field }) => (
+                        <Input {...field} type="number" step="0.001" disabled={disabled} className={getInputClass(errors?.items?.[index]?.rate, disabled)}
+                          onChange={(e) => { field.onChange(e.target.value); recalculate(index, "rate", e.target.value); }}
+                        />
+                      )} />
                     </td>
                     <td className="border px-2 py-[2px]">
                       <Input value={items[index]?.amount ?? 0} disabled className={getInputClass(null, true)} />
                     </td>
                     <td className="border px-2 py-[2px]">
-                      <div className="min-w-[90px]">
-                        <Controller control={control} name={`items.${index}.gstPercent`} render={({ field }) => (
-                          <Input {...field} type="number" step="0.001" disabled={disabled} className={getInputClass(errors?.items?.[index]?.gstPercent, disabled)}
-                            onChange={(e) => { field.onChange(e.target.value); recalculate(index, "gstPercent", e.target.value); }}
-                          />
-                        )} />
-                      </div>
+                      <Controller control={control} name={`items.${index}.gstPercent`} render={({ field }) => (
+                        <Input {...field} type="number" step="0.001" disabled={disabled} className={getInputClass(errors?.items?.[index]?.gstPercent, disabled)}
+                          onChange={(e) => { field.onChange(e.target.value); recalculate(index, "gstPercent", e.target.value); }}
+                        />
+                      )} />
                     </td>
                     <td className="border px-2 py-[2px]">
                       <Input value={items[index]?.gstAmount ?? 0} disabled className={getInputClass(null, true)} />
                     </td>
-                    <td className="border px-2 py-[2px] align-top overflow-hidden">
-                      <Controller control={control} name={`items.${index}.location`} render={({ field }) => (
-                        <ExpandableTextField value={field.value} onChange={field.onChange} disabled={disabled} error={errors?.items?.[index]?.location} title="Location" placeholder="Enter Location" minHeight="min-h-[34px]" modalHeight="min-h-[180px]" />
-                      )} />
+                    <td className="border p-0 align-top">
+                      <div className="w-[90px] overflow-hidden">
+                        <Controller control={control} name={`items.${index}.location`} render={({ field }) => (
+                          <ExpandableTextField value={field.value} onChange={field.onChange} disabled={disabled} error={errors?.items?.[index]?.location} title="Location" placeholder="Location" minHeight="min-h-[34px]" modalHeight="min-h-[180px]" />
+                        )} />
+                      </div>
                     </td>
                     {!disabled && (
                       <td className="border px-2 py-[2px] text-center">

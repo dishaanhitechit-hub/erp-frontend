@@ -150,11 +150,11 @@ export default function IndentItemsTable({
                     Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[110px] text-center">
+                  <th className="border border-[#b5b5b5] w-[80px] text-center">
                     Ammenmend Qty
                   </th>
 
-                  <th className="border border-[#b5b5b5] w-[200px] text-left px-2">
+                  <th className="border border-[#b5b5b5] w-[140px] text-left px-2">
                     Location
                   </th>
 

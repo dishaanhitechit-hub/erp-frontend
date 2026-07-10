@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2, Paperclip } from "lucide-react";
+import { Loader2, Paperclip, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 
@@ -93,6 +93,7 @@ export default function IndentForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [initialFileData, setInitialFileData] = useState({
     fileName: "",
@@ -455,151 +456,86 @@ export default function IndentForm({
   }
 
   const labelClass =
-    "w-[180px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-md rounded-sm";
+    "w-[160px] shrink-0 px-3 h-[34px] flex items-center bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
 
   return (
     <div className="p-3 ">
       <div className="md:flex gap-3 items-start">
         {/* LEFT PANEL */}
+        {sidebarOpen && (
+        <div className="w-full md:w-[400px] shrink-0 bg-[#f7f7f7] p-3 pl-0 pt-0 overflow-x-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-y-0">
 
-        <div className="w-[400px] bg-[#f7f7f7] p-3 pl-0 pt-0 ">
           {/* CATEGORY */}
-          <div className="md:flex md:items-center">
+          <div className="flex items-center">
             <div className={labelClass}>Category</div>
-
             <select
               value={watch("categoryCode")}
               disabled={disabled}
               onChange={(e) => handleCategoryChange(e.target.value)}
-              className={`${getInputClass(
-                errors.categoryCode,
-                disabled,
-              )} flex-1 -ml-px disabled:opacity-100 disabled:text-black`}
+              className={`${getInputClass(errors.categoryCode, disabled)} flex-1 min-w-0 disabled:opacity-100 disabled:text-black`}
             >
               <option value="">Select Category</option>
-
               {CATEGORY_OPTIONS.itemCategory.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
+                <option key={item.value} value={item.value}>{item.label}</option>
               ))}
             </select>
           </div>
 
-          <div className="mt-4">
-            {/* INDENT NO */}
-            <div className="md:flex md:items-center">
-              <div className={`${labelClass} w-[180px]`}>Indent No</div>
-
-              <Input
-                {...register("indentNo")}
-                disabled
-                className={`${getInputClass(false, true)} flex-1 -ml-px`}
-              />
-            </div>
-
-            {/* INDENT DATE */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Indent Date</div>
-
-              <Input
-                type="date"
-                {...register("indentDate")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.indentDate,
-                  disabled,
-                )} flex-1 -ml-px`}
-              />
-            </div>
+          {/* INDENT NO */}
+          <div className="flex items-center">
+            <div className={labelClass}>Indent No</div>
+            <Input {...register("indentNo")} disabled className={`${getInputClass(false, true)} flex-1 min-w-0`} />
           </div>
 
-          <div className="mt-4">
-            {/* PRIORITY */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Priority</div>
-
-              <select
-                {...register("priority")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.priority,
-                  disabled,
-                )} flex-1 -ml-px disabled:opacity-100 disabled:text-black`}
-              >
-                <option value="">Select Priority</option>
-
-                <option value="High">High</option>
-
-                <option value="Medium">Medium</option>
-              </select>
-            </div>
-
-            {/* REQUIRED WITHIN */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Required Within</div>
-
-              <Input
-                type="date"
-                {...register("requiredWithin")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.requiredWithin,
-                  disabled,
-                )} flex-1 -ml-px`}
-              />
-            </div>
+          {/* INDENT DATE */}
+          <div className="flex items-center">
+            <div className={labelClass}>Indent Date</div>
+            <Input type="date" {...register("indentDate")} disabled={disabled} className={`${getInputClass(errors.indentDate, disabled)} flex-1 min-w-0`} />
           </div>
 
-          <div className="mt-4">
-            {/* INDENT PLACED BY */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Indent Placed By</div>
+          {/* PRIORITY */}
+          <div className="flex items-center">
+            <div className={labelClass}>Priority</div>
+            <select
+              {...register("priority")}
+              disabled={disabled}
+              className={`${getInputClass(errors.priority, disabled)} flex-1 min-w-0 disabled:opacity-100 disabled:text-black`}
+            >
+              <option value="">Select Priority</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+            </select>
+          </div>
 
-              <Input
-                {...register("indentPlacedBy")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.indentPlacedBy,
-                  disabled,
-                )} flex-1 -ml-px`}
-              />
-            </div>
+          {/* REQUIRED WITHIN */}
+          <div className="flex items-center">
+            <div className={labelClass}>Required Within</div>
+            <Input type="date" {...register("requiredWithin")} disabled={disabled} className={`${getInputClass(errors.requiredWithin, disabled)} flex-1 min-w-0`} />
+          </div>
 
-            {/* SITE REG SERIAL */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Site Reg Serial No</div>
+          {/* INDENT PLACED BY */}
+          <div className="flex items-center">
+            <div className={labelClass}>Indent Placed By</div>
+            <Input {...register("indentPlacedBy")} disabled={disabled} className={`${getInputClass(errors.indentPlacedBy, disabled)} flex-1 min-w-0`} />
+          </div>
 
-              <Input
-                {...register("siteRegSerialNo")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.siteRegSerialNo,
-                  disabled,
-                )} flex-1 -ml-px`}
-              />
-            </div>
+          {/* SITE REG SERIAL */}
+          <div className="flex items-center">
+            <div className={labelClass}>Site Reg Serial No</div>
+            <Input {...register("siteRegSerialNo")} disabled={disabled} className={`${getInputClass(errors.siteRegSerialNo, disabled)} flex-1 min-w-0`} />
+          </div>
 
-            {/* SALE ORDER */}
-            <div className="md:flex md:items-center">
-              <div className={labelClass}>Sale Order No</div>
-
-              <Input
-                {...register("saleOrderNo")}
-                disabled={disabled}
-                className={`${getInputClass(
-                  errors.saleOrderNo,
-                  disabled,
-                )} flex-1 -ml-px`}
-              />
-            </div>
+          {/* SALE ORDER */}
+          <div className="flex items-center">
+            <div className={labelClass}>Sale Order No</div>
+            <Input {...register("saleOrderNo")} disabled={disabled} className={`${getInputClass(errors.saleOrderNo, disabled)} flex-1 min-w-0`} />
           </div>
 
           {/* REMARKS */}
-          <div className="md:flex md:items-start">
+          <div className="flex items-start">
             <div className={labelClass}>Remarks</div>
-
-            <div className="flex-1 -ml-px max-w-[210px]">
+            <div className="flex-1 min-w-0">
               <ExpandableTextField
                 value={watch("remarks")}
                 onChange={(val) => setValue("remarks", val)}
@@ -614,8 +550,10 @@ export default function IndentForm({
             </div>
           </div>
 
+          </div>{/* end grid */}
+
           {/* ATTACHMENT */}
-          <div className="md:mt-20">
+          <div className="mt-4">
             <div className="flex items-center gap-2">
               {/* FILE NAME BUTTON */}
               <button
@@ -689,8 +627,25 @@ export default function IndentForm({
             )}
           </div>
         </div>
+        )}
 
-        <div className="hidden md:block w-px self-stretch bg-sky-300" />
+        {/* DIVIDER + COLLAPSE BUTTON — md only */}
+        <div className="hidden md:flex flex-col items-center self-stretch">
+          <div className="flex-1 w-px bg-sky-300" />
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((v) => !v)}
+            title={sidebarOpen ? "Collapse details panel" : "Expand details panel"}
+            className={`flex items-center justify-center w-5 h-10 rounded border transition shrink-0 my-1 ${
+              sidebarOpen
+                ? "bg-sky-100 border-sky-300 hover:bg-sky-200 text-sky-600"
+                : "bg-[#7fc3d4] border-[#4a9fb5] hover:bg-[#6ab8cb] text-white"
+            }`}
+          >
+            {sidebarOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+          </button>
+          <div className="flex-1 w-px bg-sky-300" />
+        </div>
 
         <IndentItemsTable
           fields={fields}

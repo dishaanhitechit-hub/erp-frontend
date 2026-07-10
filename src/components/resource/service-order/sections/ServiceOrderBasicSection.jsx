@@ -11,7 +11,11 @@ import {
 import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
-import { getInputClass, labelClass } from "@/lib/formStyles";
+import { getInputClass } from "@/lib/formStyles";
+
+// labelClass has w-[250px] baked in — define fluid version to prevent horizontal scroll
+const LABEL = "w-[160px] shrink-0 px-3 h-[34px] flex items-center bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
+const INPUT_W = "flex-1 min-w-0";
 import { getLocalStorage } from "@/lib/localStorage";
 
 // Category config — drives subCategory options, costHead options, and assetOnly flag
@@ -164,7 +168,7 @@ export default function ServiceOrderBasicSection({
     : "Select";
 
   return (
-    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1">
+    <div className="flex flex-col gap-y-4 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] overflow-x-hidden pr-1">
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-4">
 
       {/* CATEGORY SECTION */}
@@ -172,8 +176,8 @@ export default function ServiceOrderBasicSection({
 
         {/* CATEGORY */}
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Category</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px]">
+          <div className={LABEL}>Category</div>
+          <div className={INPUT_W}>
             <Controller
               control={control}
               name="categoryCode"
@@ -199,8 +203,8 @@ export default function ServiceOrderBasicSection({
 
         {/* SUB CATEGORY — multi-select for Work Order, single for others */}
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Sub Category</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px]">
+          <div className={LABEL}>Sub Category</div>
+          <div className={INPUT_W}>
             {categoryConfig.multiSelect ? (
               // MULTI-SELECT dropdown
               <div ref={subDropdownRef} className="relative">
@@ -269,8 +273,8 @@ export default function ServiceOrderBasicSection({
 
         {/* COST HEAD */}
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Cost Head</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px]">
+          <div className={LABEL}>Cost Head</div>
+          <div className={INPUT_W}>
             <Controller
               control={control}
               name="costHead"
@@ -294,24 +298,24 @@ export default function ServiceOrderBasicSection({
       {/* ORDER SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order No</div>
-          <Input {...register("orderNo")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Order No</div>
+          <Input {...register("orderNo")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} flex-1 min-w-0 h-[34px]`} />
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order Date</div>
-          <Input type="date" {...register("orderDate")} disabled={disabled} className={`${getInputClass(errors.orderDate, disabled)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Order Date</div>
+          <Input type="date" {...register("orderDate")} disabled={disabled} className={`${getInputClass(errors.orderDate, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order Validity</div>
-          <Input type="date" {...register("validityDate")} disabled={disabled} className={`${getInputClass(errors.validityDate, disabled)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Order Validity</div>
+          <Input type="date" {...register("validityDate")} disabled={disabled} className={`${getInputClass(errors.validityDate, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
       </div>
 
       {/* PARTY SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Party Name</div>
-          <div className="w-[220px]">
+          <div className={LABEL}>Party Name</div>
+          <div className={INPUT_W}>
             <Controller
               control={control}
               name="vendorId"
@@ -347,16 +351,16 @@ export default function ServiceOrderBasicSection({
           </div>
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Party Address</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px]">
+          <div className={LABEL}>Party Address</div>
+          <div className={INPUT_W}>
             <Controller control={control} name="partyAddress" render={({ field }) => (
               <ExpandableTextField value={field.value} onChange={field.onChange} disabled={true} title="Party Address" placeholder="[Auto]" minHeight="min-h-[36px]" modalHeight="min-h-[220px]" />
             )} />
           </div>
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Party GSTN</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px]">
+          <div className={LABEL}>Party GSTN</div>
+          <div className={INPUT_W}>
             <Controller control={control} name="gstn" render={({ field }) => (
               <ExpandableTextField value={field.value} onChange={field.onChange} disabled={true} title="Party GSTN" placeholder="[Auto]" minHeight="min-h-[36px]" modalHeight="min-h-[180px]" />
             )} />
@@ -367,12 +371,12 @@ export default function ServiceOrderBasicSection({
       {/* PROJECT SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Site</div>
-          <Input value={projectInfo?.projectCode || ""} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Site</div>
+          <Input value={projectInfo?.projectCode || ""} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} flex-1 min-w-0 h-[34px]`} />
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Billing Address</div>
-          <div className="w-[220px]">
+          <div className={LABEL}>Billing Address</div>
+          <div className={INPUT_W}>
             <Controller control={control} name="billingAddress" render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
                 <SelectTrigger className={`${getInputClass(errors.billingAddress, disabled)} w-full`}>
@@ -386,8 +390,8 @@ export default function ServiceOrderBasicSection({
           </div>
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Shipping Address</div>
-          <div className="w-[220px]">
+          <div className={LABEL}>Shipping Address</div>
+          <div className={INPUT_W}>
             <Controller control={control} name="shippingAddress" render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
                 <SelectTrigger className={`${getInputClass(errors.shippingAddress, disabled)} w-full`}>
@@ -405,32 +409,32 @@ export default function ServiceOrderBasicSection({
       {/* CONTACT SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Contact Person</div>
-          <Input {...register("contactPerson")} disabled={disabled} placeholder="Text" className={`${getInputClass(errors.contactPerson, disabled)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Contact Person</div>
+          <Input {...register("contactPerson")} disabled={disabled} placeholder="Text" className={`${getInputClass(errors.contactPerson, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Contact Number</div>
-          <Input {...register("contactNumber")} disabled={disabled} placeholder="Text" className={`${getInputClass(errors.contactNumber, disabled)} w-[220px] h-[34px]`} />
+          <div className={LABEL}>Contact Number</div>
+          <Input {...register("contactNumber")} disabled={disabled} placeholder="Text" className={`${getInputClass(errors.contactNumber, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
       </div>
 
       {/* QUOTATION SECTION */}
       <div className="flex flex-col gap-[2px] break-inside-avoid">
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Quotation No</div>
-          <Input {...register("quotationNo")} disabled={disabled} className={`${getInputClass(errors.quotationNo, disabled)} w-[220px] min-w-[220px] max-w-[220px] h-[34px]`} />
+          <div className={LABEL}>Quotation No</div>
+          <Input {...register("quotationNo")} disabled={disabled} className={`${getInputClass(errors.quotationNo, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
         <div className="flex items-center">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Quotation Date</div>
-          <Input type="date" {...register("quotationDate")} disabled={disabled} className={`${getInputClass(errors.quotationDate, disabled)} w-[220px] min-w-[220px] max-w-[220px] h-[34px]`} />
+          <div className={LABEL}>Quotation Date</div>
+          <Input type="date" {...register("quotationDate")} disabled={disabled} className={`${getInputClass(errors.quotationDate, disabled)} flex-1 min-w-0 h-[34px]`} />
         </div>
       </div>
 
       {/* ORDER MESSAGE */}
       <div>
         <div className="flex items-start">
-          <div className={`${labelClass} w-[180px] min-w-[180px] max-w-[180px]`}>Order Message</div>
-          <div className="w-[220px] min-w-[220px] max-w-[220px] overflow-hidden break-words">
+          <div className={LABEL}>Order Message</div>
+          <div className={`${INPUT_W} overflow-hidden break-words`}>
             <Controller control={control} name="orderMessage" render={({ field }) => (
               <ExpandableTextField value={field.value} onChange={field.onChange} disabled={disabled} error={errors.orderMessage} title="Order Message" placeholder="Text" minHeight="min-h-[36px]" modalHeight="min-h-[220px]" />
             )} />
@@ -445,7 +449,7 @@ export default function ServiceOrderBasicSection({
         </div>
         <div className="mt-3">
           {!disabled ? (
-            <div className="w-[220px]">
+            <div className={INPUT_W}>
               <input
                 ref={fileRef}
                 type="file"

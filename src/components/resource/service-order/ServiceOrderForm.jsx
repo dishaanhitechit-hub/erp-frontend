@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SaveButton from "@/components/common/SaveButton";
@@ -55,6 +55,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
   const [initialData, setInitialData] = useState(null);
   const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openItemModal, setOpenItemModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // FILE STATE — same as order module
   const [fileName, setFileName] = useState("");
@@ -302,22 +303,40 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
 
   return (
     <>
-      <div className="flex flex-col xl:flex-row items-start gap-5 p-3">
-        {/* LEFT SECTION */}
-        <ServiceOrderBasicSection
-          form={form}
-          mode={mode}
-          disabled={disabled}
-          fileName={fileName}
-          setFileName={setFileName}
-          fileUrl={fileUrl}
-          setFileUrl={setFileUrl}
-          attachedFile={attachedFile}
-          setAttachedFile={setAttachedFile}
-          fileRef={fileRef}
-        />
+      <div className="flex flex-col xl:flex-row items-start gap-3 p-3">
+        {/* LEFT SECTION — xl only collapse */}
+        {sidebarOpen && (
+          <ServiceOrderBasicSection
+            form={form}
+            mode={mode}
+            disabled={disabled}
+            fileName={fileName}
+            setFileName={setFileName}
+            fileUrl={fileUrl}
+            setFileUrl={setFileUrl}
+            attachedFile={attachedFile}
+            setAttachedFile={setAttachedFile}
+            fileRef={fileRef}
+          />
+        )}
 
-        <div className="hidden xl:block w-px self-stretch bg-sky-300" />
+        {/* DIVIDER + COLLAPSE BUTTON — xl only */}
+        <div className="hidden xl:flex flex-col items-center self-stretch gap-0">
+          <div className="flex-1 w-px bg-sky-300" />
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((v) => !v)}
+            title={sidebarOpen ? "Collapse details panel" : "Expand details panel"}
+            className={`flex items-center justify-center w-5 h-10 rounded border transition shrink-0 my-1 ${
+              sidebarOpen
+                ? "bg-sky-100 border-sky-300 hover:bg-sky-200 text-sky-600"
+                : "bg-[#7fc3d4] border-[#4a9fb5] hover:bg-[#6ab8cb] text-white"
+            }`}
+          >
+            {sidebarOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+          </button>
+          <div className="flex-1 w-px bg-sky-300" />
+        </div>
 
         {/* RIGHT SECTION */}
         <div className="w-full flex-1 min-w-0 overflow-x-auto">
