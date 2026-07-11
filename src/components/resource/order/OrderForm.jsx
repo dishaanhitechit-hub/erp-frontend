@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 const defaultValues = {
   categoryCode: "Purchases_Order",
   subCategoryCode: "MAT_001",
-  costHead: "",
+  costHead: "Project_Work",
   vendorId: "",
   transferProjectSite: "",
   orderNo: "",
@@ -96,16 +96,17 @@ export default function OrderForm({ mode = "create", orderId }) {
     isSubmitted ||
     isSubmitting;
 
-  // ─── LOAD WITHOUT-INDENT ITEM OPTIONS — only when first switched to without-indent
+  // ─── LOAD WITHOUT-INDENT ITEM OPTIONS — re-fetch when costHead changes (assetOnly flag)
   useEffect(() => {
-    if (withIndent || withoutIndentItemOptions.length > 0) return;
-    apiRequest({
-      url: `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=MAT_001`,
-      method: "GET",
-    })
+    if (withIndent) return;
+    const url =
+      costHead === "Fixed_Asset"
+        ? `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=MAT_001&assetOnly=true`
+        : `${API_ENDPOINTS.RESOURCE.PROCUREMENT.INDENT.GET_ITEMS_BY_CATEGORY}?categoryCode=MAT_001`;
+    apiRequest({ url, method: "GET" })
       .then((res) => setWithoutIndentItemOptions(res.data || []))
       .catch(() => {});
-  }, [withIndent]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [withIndent, costHead]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── LOAD ORDER
   useEffect(() => {

@@ -137,7 +137,7 @@ export default function OrderBasicSection({
   const handleCategoryChange = (value) => {
     setValue("categoryCode",        value);
     setValue("subCategoryCode",     "MAT_001");
-    setValue("costHead",            "");
+    setValue("costHead",            "Project_Work");
     setValue("items",               []);
     setValue("vendorId",            "");
     setValue("transferProjectSite", "");
