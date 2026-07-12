@@ -1,18 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Check, X, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-import { Input } from "@/components/ui/input";
-
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,449 +19,409 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
+import ExpandableTextField from "@/components/common/ExpandableTextField";
 
-import AddLocationDetailsModal from "./AddLocationDetailsModal";
+const LOCATION_TYPES = [
+    { value: "Store", label: "Store" },
+    { value: "Use", label: "Use To" },
+];
 
-export default function AddLocationModal({
-                                             open,
-                                             onOpenChange,
-                                             projectCode,
-                                             projectData,
-                                         }) {
-    const [openDetailsModal, setOpenDetailsModal] = useState(false);
+const SECTIONS = [
+    { type: "Store", label: "Store Locations", color: "#d6e6f2" },
+    { type: "Use",   label: "Use To Locations", color: "#d6f2e0" },
+];
+
+function LocationSection({
+    section,
+    items,
+    onAdd,
+    onEdit,
+    onDeleteClick,
+    adding,
+    editingId,
+    editValues,
+    setEditValues,
+    onEditSave,
+    onEditCancel,
+    addValues,
+    setAddValues,
+    onAddSave,
+    onAddCancel,
+    saving,
+}) {
+    return (
+        <div className="flex flex-col border border-[#cfcfcf] rounded-sm overflow-hidden">
+            {/* Section header */}
+            <div
+                className="px-3 py-2 font-semibold text-[13px] border-b border-[#cfcfcf] flex items-center justify-between"
+                style={{ background: section.color }}
+            >
+                <span>{section.label}</span>
+                <span className="text-[11px] font-normal text-gray-500">
+                    {items.length} {items.length === 1 ? "entry" : "entries"}
+                </span>
+            </div>
+
+            {/* List */}
+            <div className="flex-1 overflow-y-auto bg-white min-h-[120px]">
+                {items.length === 0 && !adding ? (
+                    <div className="flex items-center justify-center h-[120px] text-[12px] text-gray-400">
+                        No {section.label.toLowerCase()} added yet
+                    </div>
+                ) : (
+                    items.map((item, idx) => (
+                        <div
+                            key={item.id}
+                            className={`flex items-center gap-2 px-3 py-2 border-b border-[#f0f0f0] text-[13px] ${idx % 2 === 0 ? "bg-white" : "bg-[#fafafa]"}`}
+                        >
+                            {editingId === item.id ? (
+                                // Inline edit row
+                                <>
+                                    <span className="text-[11px] text-gray-400 w-4 shrink-0">{idx + 1}.</span>
+                                    <input
+                                        autoFocus
+                                        value={editValues.locationName}
+                                        onChange={(e) => setEditValues((p) => ({ ...p, locationName: e.target.value }))}
+                                        placeholder="Location name"
+                                        className="flex-1 min-w-[80px] h-[28px] border border-[#8f8f8f] rounded-sm px-2 text-[12px] outline-none focus:border-blue-400"
+                                    />
+                                    <button
+                                        type="button"
+                                        disabled={saving}
+                                        onClick={onEditSave}
+                                        className="h-[28px] px-2 bg-blue-500 hover:bg-blue-600 text-white rounded-sm text-[11px] disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                                        Save
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={onEditCancel}
+                                        className="h-[28px] px-2 border border-gray-300 hover:bg-gray-100 rounded-sm text-[11px] flex items-center gap-1"
+                                    >
+                                        <X size={12} /> Cancel
+                                    </button>
+                                </>
+                            ) : (
+                                // Normal row
+                                <>
+                                    <span className="text-[11px] text-gray-400 w-4 shrink-0">{idx + 1}.</span>
+                                    <span className="flex-1 truncate">{item.locationName}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => onEdit(item)}
+                                        className="p-1 rounded-sm hover:bg-blue-50 border border-transparent hover:border-blue-200 transition text-blue-600"
+                                    >
+                                        <Pencil size={13} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => onDeleteClick(item)}
+                                        className="p-1 rounded-sm hover:bg-red-50 border border-transparent hover:border-red-200 transition text-red-500"
+                                    >
+                                        <Trash2 size={13} />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    ))
+                )}
+
+                {/* Inline add row */}
+                {adding && (
+                    <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-t border-[#e0e0e0] bg-[#f7fbff]">
+                        <input
+                            autoFocus
+                            value={addValues.locationName}
+                            onChange={(e) => setAddValues((p) => ({ ...p, locationName: e.target.value }))}
+                            onKeyDown={(e) => { if (e.key === "Enter") onAddSave(); if (e.key === "Escape") onAddCancel(); }}
+                            placeholder={`${section.label.replace(" Locations", "")} name *`}
+                            className="flex-1 min-w-[100px] h-[28px] border border-[#8f8f8f] rounded-sm px-2 text-[12px] outline-none focus:border-blue-400"
+                        />
+                        <button
+                            type="button"
+                            disabled={saving}
+                            onClick={onAddSave}
+                            className="h-[28px] px-2 bg-blue-500 hover:bg-blue-600 text-white rounded-sm text-[11px] disabled:opacity-50 flex items-center gap-1 shrink-0"
+                        >
+                            {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                            Add
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onAddCancel}
+                            className="h-[28px] px-2 border border-gray-300 hover:bg-gray-100 rounded-sm text-[11px] flex items-center gap-1 shrink-0"
+                        >
+                            <X size={12} /> Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Add button */}
+            {!adding && (
+                <button
+                    type="button"
+                    onClick={onAdd}
+                    className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium text-blue-600 hover:bg-blue-50 border-t border-[#cfcfcf] transition"
+                >
+                    <Plus size={13} /> Add {section.label.replace(" Locations", "")}
+                </button>
+            )}
+        </div>
+    );
+}
+
+export default function AddLocationModal({ open, onOpenChange, projectCode, projectData }) {
     const [locations, setLocations] = useState([]);
     const [locationLoading, setLocationLoading] = useState(false);
-    const [savingLocation, setSavingLocation] = useState(false);
-    const [editingLocation, setEditingLocation] = useState(null);
+    const [saving, setSaving] = useState(false);
 
-    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-    const [deleteLocationData, setDeleteLocationData] = useState(null);
+    // Per-section add state
+    const [addingType, setAddingType] = useState(null); // "Store" | "Use" | null
+    const [addValues, setAddValues] = useState({ locationName: "" });
 
-    const [newLocation, setNewLocation] = useState({
-        storeLocation: "",
-        useLocation: "",
-    });
+    // Edit state
+    const [editingId, setEditingId] = useState(null);
+    const [editValues, setEditValues] = useState({ locationName: "", locationType: "" });
 
-    const showValue = (value) => {
-        if (value === null || value === undefined || value === "") {
-            return "_____";
-        }
-
-        return value;
-    };
+    // Delete confirm
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const fetchLocations = async () => {
         if (!projectCode) return;
-
         try {
             setLocationLoading(true);
-
             const res = await apiRequest({
-                url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION}/${projectCode}`,
+                url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
                 method: "GET",
             });
-
             setLocations(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
-            console.log("GET location failed:", err);
-
+            if (err?.response?.status === 404) { setLocations([]); return; }
+            toast.error(err?.response?.data?.message || err.message || "Failed to fetch locations");
             setLocations([]);
-
-            if (
-                err?.response?.status === 404 ||
-                err?.message?.includes("not found")
-            ) {
-                return;
-            }
-
-            toast.error(
-                err?.response?.data?.message ||
-                err.message ||
-                "Failed to fetch locations"
-            );
         } finally {
             setLocationLoading(false);
         }
     };
 
     useEffect(() => {
-        if (open && projectCode) {
-            fetchLocations();
-        }
+        if (open && projectCode) fetchLocations();
     }, [open, projectCode]);
 
-    const handleOpenAdd = () => {
-        setEditingLocation(null);
-
-        setNewLocation({
-            storeLocation: "",
-            useLocation: "",
-        });
-
-        setOpenDetailsModal(true);
+    // Add
+    const handleStartAdd = (type) => {
+        setEditingId(null);
+        setAddingType(type);
+        setAddValues({ locationName: "" });
     };
 
-    const handleEditClick = (location) => {
-        setEditingLocation(location);
-
-        setNewLocation({
-            storeLocation: location.storeLocation || "",
-            useLocation: location.useLocation || "",
-        });
-
-        setOpenDetailsModal(true);
-    };
-
-    const handleSaveLocation = async () => {
-        if (!newLocation.storeLocation && !newLocation.useLocation) {
-            toast.warning("Fill location details");
+    const handleAddSave = async () => {
+        if (!addValues.locationName.trim()) {
+            toast.warning("Location name is required");
             return;
         }
-
-        let toastId;
-
         try {
-            setSavingLocation(true);
-
-            toastId = toast.loading(
-                editingLocation ? "Updating..." : "Saving..."
-            );
-
-            if (editingLocation) {
-                await apiRequest({
-                    url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION}/${editingLocation.id}`,
-                    method: "PUT",
-                    data: {
-                        storeLocation: newLocation.storeLocation || null,
-                        useLocation: newLocation.useLocation || null,
-                    },
-                });
-
-                toast.success("Location updated", { id: toastId });
-            } else {
-                await apiRequest({
-                    url: API_ENDPOINTS.SETTINGS.PROJECT_LOCATION,
-                    method: "POST",
-                    data: {
-                        projectCode,
-                        storeLocation: newLocation.storeLocation || null,
-                        useLocation: newLocation.useLocation || null,
-                    },
-                });
-
-                toast.success("Location created", { id: toastId });
-            }
-
-            setOpenDetailsModal(false);
-            setEditingLocation(null);
-
-            setNewLocation({
-                storeLocation: "",
-                useLocation: "",
+            setSaving(true);
+            await apiRequest({
+                url: API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.CREATE,
+                method: "POST",
+                data: {
+                    projectCode,
+                    locationName: addValues.locationName.trim(),
+                    locationType: addingType,
+                },
             });
-
+            toast.success("Location added");
+            setAddingType(null);
+            setAddValues({ locationName: "" });
             fetchLocations();
         } catch (err) {
-            toast.error(
-                err?.response?.data?.message ||
-                err.message ||
-                "Failed to save location",
-                { id: toastId }
-            );
+            toast.error(err?.response?.data?.message || err.message || "Failed to add location");
         } finally {
-            setSavingLocation(false);
+            setSaving(false);
         }
     };
 
-    const handleDeleteClick = (location) => {
-        setDeleteLocationData(location);
-        setDeleteConfirmOpen(true);
+    const handleAddCancel = () => {
+        setAddingType(null);
+        setAddValues({ locationName: "" });
     };
 
-    const handleDeleteCancel = () => {
-        setDeleteConfirmOpen(false);
-        setDeleteLocationData(null);
+    // Edit
+    const handleEditClick = (item) => {
+        setAddingType(null);
+        setEditingId(item.id);
+        setEditValues({ locationName: item.locationName, locationType: item.locationType });
     };
 
-    const handleDeleteLocation = async () => {
-        if (!deleteLocationData?.id) return;
-
-        let toastId;
-
+    const handleEditSave = async () => {
+        if (!editValues.locationName.trim()) {
+            toast.warning("Location name is required");
+            return;
+        }
         try {
-            toastId = toast.loading("Deleting...");
-
+            setSaving(true);
             await apiRequest({
-                url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION}/${deleteLocationData.id}`,
+                url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.UPDATE}/${editingId}`,
+                method: "PUT",
+                data: {
+                    locationName: editValues.locationName.trim(),
+                    locationType: editValues.locationType,
+                },
+            });
+            toast.success("Location updated");
+            setEditingId(null);
+            fetchLocations();
+        } catch (err) {
+            toast.error(err?.response?.data?.message || err.message || "Failed to update location");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleEditCancel = () => {
+        setEditingId(null);
+        setEditValues({ locationName: "", locationType: "" });
+    };
+
+    // Delete
+    const handleDeleteClick = (item) => setDeleteTarget(item);
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget?.id) return;
+        try {
+            setDeleteLoading(true);
+            await apiRequest({
+                url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.DELETE}/${deleteTarget.id}`,
                 method: "DELETE",
             });
-
-            toast.success("Location deleted successfully", {
-                id: toastId,
-            });
-
-            setLocations((prev) =>
-                prev.filter((item) => item.id !== deleteLocationData.id)
-            );
-
-            setDeleteConfirmOpen(false);
-            setDeleteLocationData(null);
+            toast.success("Location deleted");
+            setLocations((prev) => prev.filter((l) => l.id !== deleteTarget.id));
+            setDeleteTarget(null);
         } catch (err) {
-            toast.error(
-                err?.response?.data?.message ||
-                err.message ||
-                "Failed to delete location",
-                { id: toastId }
-            );
+            toast.error(err?.response?.data?.message || err.message || "Failed to delete location");
+        } finally {
+            setDeleteLoading(false);
         }
     };
+
+    const storeItems = locations.filter((l) => l.locationType === "Store");
+    const useItems   = locations.filter((l) => l.locationType === "Use");
 
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent
-                    className="
-                        !max-w-none
-                        !w-auto
-                        !p-0
-                        border-0
-                        bg-transparent
-                        shadow-none
-                    "
-                >
-                    <div
-                        className="
-                            w-[92vw]
-                            max-w-[1400px]
-                            h-[88vh]
-                            bg-white
-                            rounded-xl
-                            shadow-xl
-                            p-6
-                            flex
-                            flex-col
-                            overflow-y-auto
-                        "
-                    >
-                        <DialogHeader>
-                            <DialogTitle className="text-3xl font-bold">
-                                Add Location
+                <DialogContent className="!max-w-none !w-auto !p-0 border-0 bg-transparent shadow-none">
+                    <div className="w-[95vw] max-w-[860px] bg-white rounded-sm shadow-xl flex flex-col overflow-hidden">
+
+                        {/* Header */}
+                        <DialogHeader className="px-4 py-3 border-b border-[#cfcfcf] bg-[#f7f7f7]">
+                            <DialogTitle className="text-[14px] font-bold text-black">
+                                Project Locations
                             </DialogTitle>
                         </DialogHeader>
 
-                        <div className="space-y-4 mt-5">
-                            <div className="grid grid-cols-[280px_1fr_auto] gap-4 items-center">
-                                <div className="px-4 py-3 bg-[#d6e6f2] border rounded-sm font-semibold text-base">
-                                    Project Code
+                        {/* Project info */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-1.5 px-4 py-3 border-b border-[#cfcfcf] bg-white">
+                            {[
+                                ["Project Code", projectCode],
+                                ["Project Name", projectData?.projectName || ""],
+                                ["Client Name",  projectData?.clientName  || ""],
+                            ].map(([label, value]) => (
+                                <div key={label} className="flex items-center gap-2 min-w-0">
+                                    <div className="px-3 py-1 bg-[#d6e6f2] border border-[#8f8f8f] rounded-sm text-[12px] font-medium whitespace-nowrap shrink-0 h-[30px] flex items-center">
+                                        {label}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <ExpandableTextField
+                                            value={value}
+                                            disabled
+                                            title={label}
+                                            placeholder="—"
+                                            minHeight="min-h-[30px]"
+                                            modalHeight="min-h-[80px]"
+                                            subHeader=""
+                                        />
+                                    </div>
                                 </div>
-
-                                <Input
-                                    value={showValue(projectCode)}
-                                    disabled
-                                    className="h-10 text-base"
-                                />
-
-                                <button
-                                    type="button"
-                                    onClick={handleOpenAdd}
-                                    className="
-                                        bg-green-500
-                                        hover:bg-green-600
-                                        text-black
-                                        px-5
-                                        h-10
-                                        rounded-md
-                                        font-semibold
-                                        shadow
-                                        whitespace-nowrap
-                                    "
-                                >
-                                    + Location
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-[280px_1fr_auto] gap-4 items-center">
-                                <div className="px-4 py-3 bg-[#d6e6f2] border rounded-sm font-semibold text-base">
-                                    Project Name
-                                </div>
-
-                                <Input
-                                    value={showValue(projectData?.projectName)}
-                                    disabled
-                                    className="h-10 text-base"
-                                />
-
-                                <div className="w-[118px]" />
-                            </div>
-
-                            <div className="grid grid-cols-[280px_1fr_auto] gap-4 items-center">
-                                <div className="px-4 py-3 bg-[#d6e6f2] border rounded-sm font-semibold text-base">
-                                    Client Name
-                                </div>
-
-                                <Input
-                                    value={showValue(projectData?.clientName)}
-                                    disabled
-                                    className="h-10 text-base"
-                                />
-
-                                <div className="w-[118px]" />
-                            </div>
+                            ))}
                         </div>
 
-                        <div className="border rounded-md mt-6 overflow-hidden min-h-[360px] flex flex-col">
-                            <div className="grid grid-cols-[1fr_1fr_140px] bg-[#e6d2c1] font-semibold border-b">
-                                <div className="px-5 py-3 text-base border-r">
-                                    Store Location
-                                </div>
-
-                                <div className="px-5 py-3 text-base border-r">
-                                    User Location
-                                </div>
-
-                                <div className="px-5 py-3 text-base text-center">
-                                    Action
-                                </div>
+                        {/* Sections */}
+                        {locationLoading ? (
+                            <div className="flex items-center justify-center h-[200px] text-[13px] text-gray-400 gap-2">
+                                <Loader2 size={16} className="animate-spin" /> Loading locations...
                             </div>
-
-                            <div className="flex-1 overflow-y-auto bg-white">
-                                {locationLoading ? (
-                                    <div className="h-full min-h-[320px] flex items-center justify-center text-gray-500 text-lg">
-                                        Loading locations...
-                                    </div>
-                                ) : locations.length === 0 ? (
-                                    <div className="h-full min-h-[320px] flex items-center justify-center text-gray-500 text-lg">
-                                        No locations added yet.
-                                    </div>
-                                ) : (
-                                    locations.map((location) => (
-                                        <div
-                                            key={location.id}
-                                            className="grid grid-cols-[1fr_1fr_140px] border-b text-sm"
-                                        >
-                                            <div className="px-5 py-3 border-r">
-                                                {showValue(
-                                                    location.storeLocation
-                                                )}
-                                            </div>
-
-                                            <div className="px-5 py-3 border-r">
-                                                {showValue(
-                                                    location.useLocation
-                                                )}
-                                            </div>
-
-                                            <div className="px-5 py-2 flex justify-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleEditClick(
-                                                            location
-                                                        )
-                                                    }
-                                                    className="
-                                                        border
-                                                        rounded-sm
-                                                        p-2
-                                                        hover:bg-blue-100
-                                                        transition
-                                                    "
-                                                >
-                                                    <Pencil size={16} />
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleDeleteClick(
-                                                            location
-                                                        )
-                                                    }
-                                                    className="
-                                                        border
-                                                        rounded-sm
-                                                        p-2
-                                                        hover:bg-red-100
-                                                        transition
-                                                        text-red-600
-                                                    "
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                                {SECTIONS.map((section) => (
+                                    <LocationSection
+                                        key={section.type}
+                                        section={section}
+                                        items={section.type === "Store" ? storeItems : useItems}
+                                        adding={addingType === section.type}
+                                        editingId={editingId}
+                                        editValues={editValues}
+                                        setEditValues={setEditValues}
+                                        onEditSave={handleEditSave}
+                                        onEditCancel={handleEditCancel}
+                                        addValues={addValues}
+                                        setAddValues={setAddValues}
+                                        onAdd={() => handleStartAdd(section.type)}
+                                        onEdit={handleEditClick}
+                                        onDeleteClick={handleDeleteClick}
+                                        onAddSave={handleAddSave}
+                                        onAddCancel={handleAddCancel}
+                                        saving={saving}
+                                    />
+                                ))}
                             </div>
+                        )}
+
+                        {/* Footer */}
+                        <div className="px-4 py-2.5 border-t border-[#cfcfcf] bg-[#f7f7f7] flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => onOpenChange(false)}
+                                className="px-4 py-1.5 text-[12px] border border-[#8f8f8f] rounded-sm hover:bg-gray-100"
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 </DialogContent>
             </Dialog>
 
-            <AddLocationDetailsModal
-                open={openDetailsModal}
-                onOpenChange={setOpenDetailsModal}
-                newLocation={newLocation}
-                setNewLocation={setNewLocation}
-                onSave={handleSaveLocation}
-                loading={savingLocation}
-                isEdit={!!editingLocation}
-            />
-
-            <AlertDialog
-                open={deleteConfirmOpen}
-                onOpenChange={(value) => {
-                    setDeleteConfirmOpen(value);
-
-                    if (!value) {
-                        setDeleteLocationData(null);
-                    }
-                }}
-            >
-                <AlertDialogContent>
+            {/* Delete confirmation */}
+            <AlertDialog open={!!deleteTarget} onOpenChange={(v) => { if (!v && !deleteLoading) setDeleteTarget(null); }}>
+                <AlertDialogContent className="max-w-sm">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Delete Location
-                        </AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            Are you sure you want to delete this location?
-                            This action cannot be undone.
+                        <AlertDialogTitle className="text-[14px]">Delete Location</AlertDialogTitle>
+                        <AlertDialogDescription className="text-[12px]">
+                            Are you sure you want to delete{" "}
+                            <span className="font-semibold text-black">"{deleteTarget?.locationName}"</span>?
+                            This cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-
-                    <div className="rounded-md border bg-gray-50 p-4 text-sm space-y-2">
-                        <p>
-                            <span className="font-semibold">
-                                Store Location:
-                            </span>{" "}
-                            {showValue(deleteLocationData?.storeLocation)}
-                        </p>
-
-                        <p>
-                            <span className="font-semibold">
-                                User Location:
-                            </span>{" "}
-                            {showValue(deleteLocationData?.useLocation)}
-                        </p>
-                    </div>
-
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleDeleteCancel}>
+                        <AlertDialogCancel
+                            disabled={deleteLoading}
+                            className="text-[12px] h-8"
+                            onClick={() => setDeleteTarget(null)}
+                        >
                             Cancel
                         </AlertDialogCancel>
-
                         <AlertDialogAction
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleDeleteLocation();
-                            }}
-                            className="bg-red-600 hover:bg-red-700"
+                            disabled={deleteLoading}
+                            onClick={(e) => { e.preventDefault(); handleDeleteConfirm(); }}
+                            className="bg-red-600 hover:bg-red-700 text-[12px] h-8"
                         >
-                            Confirm Delete
+                            {deleteLoading ? "Deleting..." : "Delete"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

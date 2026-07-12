@@ -17,7 +17,12 @@ export const API_ENDPOINTS = {
     UPDATE_PROJECT_ROLES: "/setting/project-role", //project code also used for get
     DELETE_ROLE: "/setting/delete-project-designation", //delete
 
-    PROJECT_LOCATION: "/setting/project-location",
+    PROJECT_LOCATION: {
+      LIST:   "/setting/project-location", // GET  /{projectCode}
+      CREATE: "/setting/project-location", // POST
+      UPDATE: "/setting/project-location", // PUT  /{locationId}
+      DELETE: "/setting/project-location", // DELETE /{locationId}
+    },
 
     APPROVAL_PATH: {
       SAVE: "/setting/approval-path",

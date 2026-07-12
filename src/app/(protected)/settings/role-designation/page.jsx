@@ -529,14 +529,13 @@ export default function ProjectRolePage() {
 
         <div className="p-4 space-y-2">
           {/* TOP ROW */}
-          <div className="flex flex-wrap justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm w-[180px] shrink-0">
-                Project Code
-              </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="px-3 py-1 bg-[#d6e6f2] border rounded-sm w-[180px] shrink-0 text-sm">
+              Project Code
+            </div>
 
-              {/* Searchable project select */}
-              <div ref={dropdownRef} className="relative flex-1 min-w-[200px]">
+            {/* Searchable project select */}
+            <div ref={dropdownRef} className="relative flex-1 min-w-[200px]">
                 <button
                   type="button"
                   disabled={isEditing || searching}
@@ -557,7 +556,7 @@ export default function ProjectRolePage() {
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute z-50 top-full left-0 w-full min-w-[280px] mt-0.5 border border-[#8f8f8f] rounded-sm bg-white shadow-md max-h-[220px] overflow-hidden flex flex-col">
+                  <div className="absolute z-50 top-full left-0 right-0 mt-0.5 border border-[#8f8f8f] rounded-sm bg-white shadow-md max-h-[220px] overflow-hidden flex flex-col">
                     <div className="p-1 border-b border-gray-200">
                       <input
                         autoFocus
@@ -601,39 +600,35 @@ export default function ProjectRolePage() {
                     </div>
                   </div>
                 )}
-              </div>
-              
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                  onClick={() => {
-                    if (!projectData) {
-                      toast.warning("Search project first");
-                      return;
-                    }
-                    setOpenModal(true);
-                  }}
-                  className={`px-4 py-1 rounded-md text-sm text-black ${
-                      searchSuccess
-                          ? "bg-[#8ed1fc] hover:bg-[#74c4f5]"
-                          : "bg-gray-400 cursor-not-allowed"
-                  }`}
-              >
-                + Add Designation
-              </button>
-              <button
-                  disabled={!searchSuccess}
-                  onClick={() => setOpenLocationModal(true)}
-                  className={`px-4 py-1 rounded-md text-sm text-black ${
-                      searchSuccess
-                          ? "bg-green-500 hover:bg-green-600"
-                          : "bg-gray-400 cursor-not-allowed"
-                  }`}
-              >
-                + Add Location
-              </button>
-            </div>
+            <button
+                onClick={() => {
+                  if (!projectData) {
+                    toast.warning("Search project first");
+                    return;
+                  }
+                  setOpenModal(true);
+                }}
+                className={`px-4 py-1 rounded-md text-sm text-black shrink-0 ${
+                    searchSuccess
+                        ? "bg-[#8ed1fc] hover:bg-[#74c4f5]"
+                        : "bg-gray-400 cursor-not-allowed"
+                }`}
+            >
+              + Add Designation
+            </button>
+            <button
+                disabled={!searchSuccess}
+                onClick={() => setOpenLocationModal(true)}
+                className={`px-4 py-1 rounded-md text-sm text-black shrink-0 ${
+                    searchSuccess
+                        ? "bg-green-500 hover:bg-green-600"
+                        : "bg-gray-400 cursor-not-allowed"
+                }`}
+            >
+              + Add Location
+            </button>
           </div>
 
           {/* RESULTS — fade + slide in when data arrives */}
