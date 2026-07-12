@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 
@@ -18,6 +18,8 @@ import { Trash2, FileText } from "lucide-react";
 import { getInputClass } from "@/lib/formStyles";
 
 import SearchableSelect from "@/components/common/SearchableSelect";
+import { apiRequest } from "@/lib/apiClient";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 export default function IndentItemsTable({
   fields,
@@ -30,6 +32,7 @@ export default function IndentItemsTable({
   isEditing,
   isSubmitting,
   itemsOptions,
+  projectCode,
 }) {
   const defaultItemRow = {
     itemCode: "",
@@ -44,6 +47,21 @@ export default function IndentItemsTable({
   const [activeModal, setActiveModal] = useState(null);
   const [tempValue, setTempValue] = useState("");
   const scrollRef = useRef(null);
+
+  const [useLocations, setUseLocations] = useState([]);
+
+  useEffect(() => {
+    if (!projectCode) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setUseLocations(data.filter((l) => l.locationType === "Use"));
+      })
+      .catch(() => setUseLocations([]));
+  }, [projectCode]);
 
   const totalQty = watch("items")?.reduce(
     (sum, item) => sum + Number(item.qty || 0),
@@ -155,7 +173,7 @@ export default function IndentItemsTable({
                   </th>
 
                   <th className="border border-[#b5b5b5] w-[140px] text-left px-2">
-                    Location
+                    Use To
                   </th>
 
                   {isEditing && (
@@ -314,47 +332,23 @@ export default function IndentItemsTable({
                         />
                       </td>
 
-                      {/* LOCATION */}
+                      {/* USE TO (LOCATION) */}
                       <td className="border border-[#b5b5b5] p-0">
-                        <button
-                          type="button"
-                          onClick={() => openModal(index, "location")}
-                          className={`
-                            w-full
-                            h-[36px]
-                            px-2
-                            flex
-                            items-center
-                            justify-between
-                            gap-2
-                            text-left
-                            transition-colors
-                            cursor-pointer
-                          ${
-                            !isEditing || isSubmitting
-                              ? "bg-[#edf8ed] cursor-default"
-                              : "bg-white hover:bg-[#f7f7f7] cursor-pointer"
+                        <SearchableSelect
+                          options={useLocations}
+                          value={locationValue}
+                          disabled={!isEditing || isSubmitting}
+                          onChange={(value) =>
+                            setValue(`items.${index}.location`, value, {
+                              shouldDirty: true,
+                            })
                           }
-                          `}
-                        >
-                          <span className="truncate text-[13px]">
-                            {renderPreviewText(locationValue)}
-                          </span>
-
-                          <span
-                            className="
-                              text-blue-600
-                              text-[11px]
-                              shrink-0
-                              flex
-                              items-center
-                              gap-1
-                            "
-                          >
-                            <FileText className="w-3 h-3" />
-                            more
-                          </span>
-                        </button>
+                          placeholder="Select location"
+                          labelKey="locationName"
+                          valueKey="locationName"
+                          searchKeys={["locationName"]}
+                          className="rounded-none border-0"
+                        />
                       </td>
 
                       {/* DELETE */}
@@ -446,29 +440,21 @@ export default function IndentItemsTable({
         <DialogContent className="sm:max-w-[650px]">
           <DialogHeader>
             <DialogTitle className="text-[18px] font-semibold">
-              {activeModal?.field === "note"
-                ? "Note Details"
-                : "Location Details"}
+              Note Details
             </DialogTitle>
           </DialogHeader>
 
           {activeModal && (
             <div className="space-y-3">
               <div className="text-[13px] text-[#666]">
-                {activeModal?.field === "note"
-                  ? "Add detailed note information below."
-                  : "Add detailed location information below."}
+                Add detailed note information below.
               </div>
 
               <textarea
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
                 disabled={!isEditing || isSubmitting}
-                placeholder={
-                  activeModal?.field === "note"
-                    ? "Enter detailed note..."
-                    : "Enter detailed location..."
-                }
+                placeholder="Enter detailed note..."
                 className={`
             ${getInputClass(
               errors?.items?.[activeModal.index]?.[activeModal.field],
