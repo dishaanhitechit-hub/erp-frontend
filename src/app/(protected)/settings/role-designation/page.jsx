@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import SaveButton from "@/components/common/SaveButton";
 import EditButton from "@/components/common/EditButton";
@@ -13,7 +13,7 @@ import {
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
-import { Search, Trash2, Link2, Loader2 } from "lucide-react";
+import { ChevronDown, Trash2, Link2, Loader2, X } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
 import { useRouter } from "next/navigation";
 import { getPageActions } from "@/components/common/PageActionButtons";
@@ -27,10 +27,16 @@ export default function ProjectRolePage() {
   const [projectCode, setProjectCode] = useState("");
   const [projectData, setProjectData] = useState(null);
   const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projectId, setProjectId] = useState("");
   const [loadingModal, setLoadingModal] = useState(false);
+
+  // Searchable select state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const dropdownRef = useRef(null);
 
   const [siteTeam, setSiteTeam] = useState([]);
   const [hoTeam, setHoTeam] = useState([]);
@@ -61,88 +67,70 @@ export default function ProjectRolePage() {
   const labelClass =
       "w-[250px] px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-sm rounded-sm";
 
-  //  FETCH USERS
+  //  FETCH USERS + PROJECTS
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await apiRequest({
-        url: API_ENDPOINTS.SETTINGS.GET_ALL_USERS,
-        method: "GET",
-      });
+      const res = await apiRequest({ url: API_ENDPOINTS.SETTINGS.GET_ALL_USERS, method: "GET" });
       setUsers(res.data || []);
     };
+    const fetchProjects = async () => {
+      const res = await apiRequest({ url: API_ENDPOINTS.SETTINGS.GET_ALL_PROJECTS, method: "GET" });
+      setProjects(Array.isArray(res?.data) ? res.data : []);
+    };
     fetchUsers();
+    fetchProjects();
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+        setSearchText("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   //  SEARCH PROJECT
-  const handleSearch = async () => {
-    if (!projectCode) {
-      toast.warning("Enter project code");
-      return;
-    }
-
+  const handleSearchWithCode = async (code) => {
+    const codeToUse = code || projectCode;
+    if (!codeToUse) return;
     try {
       setSearching(true);
-
-      const res = await apiRequest({
-        url: `${API_ENDPOINTS.SETTINGS.UPDATE_PROJECT_ROLES}/${projectCode}`,
-        method: "GET",
-      });
-
-      if (!res.data?.length) {
-        setProjectData(null);
-        setSiteTeam([]);
-        setHoTeam([]);
-        setSearchSuccess(false);
-        toast.error("Project not found");
-        return;
-      }
-
-      const data = res.data[0];
-
-      setProjectData(data);
-      setProjectId(data.projectId);
-
-      // enable button
-      setSearchSuccess(true);
-
-      const grouped = {};
-
-      data.roleUserMap.forEach((item) => {
-        if (!grouped[item.teamId]) {
-          grouped[item.teamId] = {
-            teamName: item.teamName,
-            list: [],
-          };
-        }
-
-        grouped[item.teamId].list.push({
-          id: item.id,
-          designationId: item.designationId,
-          designationName: item.designationName,
-          userId: item.userId || "",
-          teamId: item.teamId,
-
-          // permissions
-          permissions: item.permissions || {},
-          userPermissions: item.userPermissions || {},
-        });
-      });
-
-      const teams = Object.values(grouped);
-      // setHoTeam(teams[0]?.list || []);
-      // setSiteTeam(teams[1]?.list || []);
-      setHoTeam(grouped[1]?.list || []);
-      setSiteTeam(grouped[2]?.list || []);
-    } catch (err) {
       setProjectData(null);
       setSiteTeam([]);
       setHoTeam([]);
-      setSearchSuccess(false);
+      const res = await apiRequest({
+        url: `${API_ENDPOINTS.SETTINGS.UPDATE_PROJECT_ROLES}/${codeToUse}`,
+        method: "GET",
+      });
+      if (!res.data?.length) {
+        setProjectData(null); setSiteTeam([]); setHoTeam([]); setSearchSuccess(false);
+        toast.error("Project not found");
+        return;
+      }
+      const data = res.data[0];
+      setProjectData(data);
+      setProjectId(data.projectId);
+      setSearchSuccess(true);
+      const grouped = {};
+      data.roleUserMap.forEach((item) => {
+        if (!grouped[item.teamId]) grouped[item.teamId] = { teamName: item.teamName, list: [] };
+        grouped[item.teamId].list.push({ id: item.id, designationId: item.designationId, designationName: item.designationName, userId: item.userId || "", teamId: item.teamId, permissions: item.permissions || {}, userPermissions: item.userPermissions || {} });
+      });
+      setHoTeam(grouped[1]?.list || []);
+      setSiteTeam(grouped[2]?.list || []);
+    } catch {
+      setProjectData(null); setSiteTeam([]); setHoTeam([]); setSearchSuccess(false);
       toast.error("Project not found");
     } finally {
       setSearching(false);
     }
   };
+
+  const handleSearch = () => handleSearchWithCode(projectCode);
 
   //  HANDLE CHANGE
   const handleUserChange = (teamSetter, team, index, value) => {
@@ -547,19 +535,74 @@ export default function ProjectRolePage() {
                 Project Code
               </div>
 
-              <Input
-                  value={projectCode}
-                  onChange={(e) => setProjectCode(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !isEditing && !searching) handleSearch();
-                  }}
+              {/* Searchable project select */}
+              <div ref={dropdownRef} className="relative flex-1 min-w-[200px]">
+                <button
+                  type="button"
                   disabled={isEditing || searching}
-                  className={`w-[180px] ${inputClass}`}
-              />
+                  onClick={() => { if (!isEditing && !searching) setDropdownOpen((v) => !v); }}
+                  className={`flex items-center justify-between w-full h-[30px] px-2 border border-[#8f8f8f] rounded-sm bg-white text-sm disabled:opacity-40 disabled:cursor-not-allowed ${searching ? "opacity-40" : ""}`}
+                >
+                  <span className={`truncate ${projectCode ? "text-black" : "text-gray-400"}`}>
+                    {projectCode
+                      ? (() => { const p = projects.find((x) => String(x.projectCode) === String(projectCode)); return p ? `${p.projectCode} - ${p.projectName}` : projectCode; })()
+                      : "Select project..."}
+                  </span>
+                  <span className="flex items-center gap-1 shrink-0 ml-1">
+                    {projectCode && !isEditing && (
+                      <X size={12} className="text-gray-400 hover:text-gray-600" onClick={(e) => { e.stopPropagation(); setProjectCode(""); setProjectData(null); setSiteTeam([]); setHoTeam([]); setSearchSuccess(false); }} />
+                    )}
+                    {searching ? <Loader2 size={14} className="animate-spin text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+                  </span>
+                </button>
 
-              <button onClick={handleSearch} disabled={searching} className="disabled:opacity-50">
-                {searching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
-              </button>
+                {dropdownOpen && (
+                  <div className="absolute z-50 top-full left-0 w-full min-w-[280px] mt-0.5 border border-[#8f8f8f] rounded-sm bg-white shadow-md max-h-[220px] overflow-hidden flex flex-col">
+                    <div className="p-1 border-b border-gray-200">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder="Search by code or name..."
+                        className="w-full h-[26px] px-2 text-sm border border-gray-300 rounded-sm outline-none"
+                      />
+                    </div>
+                    <div className="overflow-y-auto flex-1">
+                      {(() => {
+                        const q = searchText.toLowerCase().trim();
+                        const filtered = q
+                          ? projects.filter((p) =>
+                              String(p.projectCode).toLowerCase().includes(q) ||
+                              String(p.projectName).toLowerCase().includes(q)
+                            )
+                          : projects;
+                        return filtered.length > 0 ? (
+                          filtered.map((p) => (
+                            <button
+                              key={p.projectCode}
+                              type="button"
+                              className={`w-full text-left px-2 py-1.5 text-sm hover:bg-blue-50 ${String(p.projectCode) === String(projectCode) ? "bg-blue-100 font-medium" : ""}`}
+                              onClick={() => {
+                                setProjectCode(String(p.projectCode));
+                                setDropdownOpen(false);
+                                setSearchText("");
+                                setTimeout(() => handleSearchWithCode(String(p.projectCode)), 0);
+                              }}
+                            >
+                              <span className="font-medium">{p.projectCode}</span>
+                              <span className="text-gray-500"> – {p.projectName}</span>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-2 py-2 text-sm text-gray-400">No projects found</div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -604,7 +647,7 @@ export default function ProjectRolePage() {
               <Input
                   value={projectData?.projectName || "[Auto]"}
                   disabled
-                  className={`flex-1 min-w-[180px] max-w-[400px] ${inputClass}`}
+                  className={`flex-1 min-w-[180px] ${inputClass}`}
               />
             </div>
 
@@ -615,7 +658,7 @@ export default function ProjectRolePage() {
               <Input
                   value={projectData?.clientName || "[Auto]"}
                   disabled
-                  className={`flex-1 min-w-[180px] max-w-[400px] ${inputClass}`}
+                  className={`flex-1 min-w-[180px] ${inputClass}`}
               />
             </div>
 
