@@ -53,7 +53,7 @@ export const sidebarConfig = [
     basePath: "/master",
     children: [
       {
-        title: "Ledger Code",
+        title: "Vendor Code",
         path: "/master/ledger-code",
         permissionKey: "ledger_code",
       },
@@ -69,7 +69,7 @@ export const sidebarConfig = [
       },
       { title: "Unit", path: "/master/unit", permissionKey: "unit" },
       {
-        title: "Cost Center Code",
+        title: "Cost Center (CC)",
         path: "/master/cc-code",
         permissionKey: "cost_center_code",
       },
@@ -84,15 +84,15 @@ export const sidebarConfig = [
         permissionKey: "terms_condition",
       },
       {
-        title: "Bank & Cash ID",
+        title: "Bank & Cash Master",
         path: "/master/bank-cash",
         permissionKey: "bank_cash",
-      }
+      },
     ],
   },
 
   {
-    title: "Resource Management",
+    title: "Resources Management",
     key: "hr",
     icon: Package,
     basePath: "/resource-management",
@@ -111,164 +111,127 @@ export const sidebarConfig = [
             permissionKey: "enquiry",
           },
           {
-            title:"Order",
+            title: "Order",
             showChildrenInPermission: false,
-            children :[
+            children: [
               {
-            title: "Material Order",
-            path: "/resource-management/procurement/order/material-order",
-            // permissionKey: "order",
+                title: "Material Order",
+                path: "/resource-management/procurement/order/material-order",
                 permissionKey: "order",
-
-                permissionAccessKey: "material_order",
-          },
-          {
-            title: "Service Order",
-            path: "/resource-management/procurement/order/service-order",
-            // permissionKey: "service_order", //same as it is assign same material and service order
-            permissionKey: "order",
-
-            permissionAccessKey: "service_order",
-          },
-            ]
+              },
+              {
+                title: "Service Order",
+                path: "/resource-management/procurement/order/service-order",
+                permissionKey: "order",
+              },
+            ],
           },
         ],
       },
       {
-        title: "Material Management",
+        title: "Materials",
         children: [
-          // {
-          //   title: "Goods Received Note",
-          //   path: "/resource-management/material/grn",
-          //   permissionKey: "goods_received_note",
-          // },
-          // {
-          //   title: "Service Received Note",
-          //   path: "/resource-management/material/srn",
-          //   permissionKey: "goods_received_note",
-          // },
           {
-            title:"Received Note",
-            showChildrenInPermission: false,
-            children :[
-              {
-            title: "Goods Received Note",
+            title: "Goods Received Note (GRN)",
             path: "/resource-management/material/received-note/grn",
             permissionKey: "goods_received_note",
-            permissionAccessKey: "goods_received_note_by_grn",
           },
           {
-            title: "Service Received Note",
-            path: "/resource-management/material/received-note/srn",
-            permissionKey: "goods_received_note",
-
-            permissionAccessKey: "goods_received_note_by_srn",
-          },
-            ]
-          },
-
-          {
-            title: "Goods Issue Note",
+            title: "Goods Issue Note (GIN)",
             path: "/resource-management/material/gin",
             permissionKey: "goods_issue_note",
           },
           {
-            title: "Stock Report",
+            title: "Inventory",
             path: "/resource-management/material/stock-report",
             permissionKey: "stock_report",
           },
+        ],
+      },
+      {
+        title: "Services",
+        children: [
           {
-            title:"Logistics",
-            // showChildrenInPermission: false,
-            children :[
+            title: "Manpower",
+            children: [
               {
-            title: "Delivery Challan",
-            path: "/resource-management/material/logistics/delivery-challan",
-            permissionKey: "delivery_challan",
-          },
-            ]
-          },
-
-        ],
-      },
-      {
-        title: "Manpower Management",
-        children: [
-          {
-            title: "Manpower ID",
-            path: "/resource-management/manpower/id",
-            permissionKey: "manpower_id",
+                title: "DLR",
+                path: "/resource-management/manpower/attendance",
+                permissionKey: "attendance",
+              },
+              {
+                title: "Labour ID",
+                path: "/resource-management/manpower/id",
+                permissionKey: "manpower_id",
+              },
+            ],
           },
           {
-            title: "Attendance",
-            path: "/resource-management/manpower/attendance",
-            permissionKey: "attendance",
+            title: "Plant & Machinery",
+            children: [
+              {
+                title: "P&M Inventory",
+                path: "/resource-management/machinery/stock",
+                permissionKey: "machinery_stock_summary",
+              },
+              {
+                title: "Log Sheet",
+                path: "/resource-management/machinery/log-sheet",
+                permissionKey: "log_sheet",
+              },
+              {
+                title: "Batching Plant",
+                path: "/resource-management/machinery/batching-plant",
+                permissionKey: "batching_plant",
+              },
+            ],
           },
-        ],
-      },
-      {
-        title: "Machinery Management",
-        children: [
           {
-            title: "Log Sheet",
-            path: "/resource-management/machinery/log-sheet",
-            permissionKey: "log_sheet",
-          },
-          {
-            title: "Machinery Stock Summary",
-            path: "/resource-management/machinery/stock",
-            permissionKey: "machinery_stock_summary",
-          },
-          {
-            title: "Monthly Rent Calculation",
-            path: "/resource-management/machinery/rent",
-            permissionKey: "monthly_rent_calculation",
+            title: "Service Received Note (SRN)",
+            path: "/resource-management/material/received-note/srn",
+            permissionKey: "service_received_note",
           },
         ],
       },
       {
-        title: "Vendor Billing",
+        title: "Sub Contractor Billing",
         children: [
           {
-            title: "Billing by GRN",
+            title: "Bill Receive Register",
             path: "/resource-management/vendor-billing/grn",
             permissionKey: "billing_by_grn",
           },
           {
-            title: "Billing by SRN",
+            title: "e-reconcile Bill",
             path: "/resource-management/vendor-billing/srn",
             permissionKey: "billing_by_srn",
           },
+          {
+            title: "Payment Request",
+            path: "/resource-management/vendor-billing/payment-request",
+            permissionKey: "payment_request",
+          },
         ],
       },
-    ],
-  },
-
-  {
-    title: "Asset Management",
-    key: "am",
-    icon: Boxes,
-    basePath: "/asset-management",
-    children: [
       {
-        title: "Asset Indent",
-        path: "/asset-management/indent",
-        permissionKey: "asset_indent",
-      },
-      {
-        title: "Allocation",
-        path: "/asset-management/allocation",
-        permissionKey: "allocation",
-      },
-      {
-        title: "Asset ID Creation",
-        path: "/asset-management/asset-id",
-        permissionKey: "asset_id_creation",
-      },
-      {
-        title: "Asset Stock Report",
-        path: "/asset-management/stock-report",
-        permissionKey: "asset_stock_report",
+        title: "Contact Dairy",
+        children: [
+          {
+            title: "Materials",
+            path: "/resource-management/contact-dairy/materials",
+            permissionKey: "contact_dairy_materials",
+          },
+          {
+            title: "Work Force",
+            path: "/resource-management/contact-dairy/work-force",
+            permissionKey: "contact_dairy_work_force",
+          },
+          {
+            title: "Plant & Machinery",
+            path: "/resource-management/contact-dairy/plant-machinery",
+            permissionKey: "contact_dairy_plant_machinery",
+          },
+        ],
       },
     ],
   },
@@ -280,54 +243,64 @@ export const sidebarConfig = [
     basePath: "/project-management",
     children: [
       {
-        title: "Order & BOQ",
-        path: "/project-management/order-boq",
-        permissionKey: "order_boq",
-      },
-      {
-        title: "Budget & Costing",
-        path: "/project-management/budget",
-        permissionKey: "budget_costing",
+        title: "Contacts",
+        children: [
+          {
+            title: "Sale Order",
+            path: "/project-management/order-boq",
+            permissionKey: "order_boq",
+          },
+          {
+            title: "Budget Master",
+            path: "/project-management/budget",
+            permissionKey: "budget_costing",
+          },
+          {
+            title: "Extra Work",
+            path: "/project-management/extra-work",
+            permissionKey: "extra_work",
+          },
+        ],
       },
 
       {
         title: "Planning",
         children: [
           {
+            title: "L1 Schedule",
+            path: "/project-management/planning/l1-schedule",
+            permissionKey: "l1_schedule",
+          },
+          {
             title: "Monthly Planning",
             path: "/project-management/planning/monthly",
             permissionKey: "monthly_planning",
           },
+          {
+            title: "Micro Planning",
+            path: "/project-management/planning/micro",
+            permissionKey: "micro_planning",
+          },
+          {
+            title: "Promise Schedule",
+            path: "/project-management/planning/promise-schedule",
+            permissionKey: "promise_schedule",
+          },
+        ],
+      },
+
+      {
+        title: "Progress",
+        children: [
           {
             title: "Daily Progress Report",
             path: "/project-management/planning/dpr",
             permissionKey: "daily_progress_report",
           },
           {
-            title: "Reconciliation",
-            path: "/project-management/planning/reconciliation",
-            permissionKey: "reconciliation",
-          },
-        ],
-      },
-
-      {
-        title: "Customer Billing",
-        children: [
-          {
-            title: "Certified Bill",
-            path: "/project-management/customer-billing/certified",
-            permissionKey: "certified_bill",
-          },
-          {
-            title: "Hold / Amend Pending",
-            path: "/project-management/customer-billing/pending",
-            permissionKey: "hold_amend_pending",
-          },
-          {
-            title: "Work In Progress",
-            path: "/project-management/customer-billing/wip",
-            permissionKey: "work_in_progress",
+            title: "Job Achievement",
+            path: "/project-management/progress/job-achievement",
+            permissionKey: "job_achievement",
           },
         ],
       },
@@ -350,33 +323,86 @@ export const sidebarConfig = [
             path: "/project-management/register/concrete",
             permissionKey: "concrete_register",
           },
+          {
+            title: "Hindrance Register",
+            path: "/project-management/register/hindrance",
+            permissionKey: "hindrance_register",
+          },
         ],
       },
 
       {
-        title: "Tool Kit",
+        title: "Customer Billing",
         children: [
           {
-            title: "BBS",
-            path: "/project-management/toolkit/bbs",
-            permissionKey: "bbs",
+            title: "Sale Claim Bill",
+            path: "/project-management/customer-billing/certified",
+            permissionKey: "certified_bill",
           },
           {
-            title: "Measurement",
-            path: "/project-management/toolkit/measurement",
-            permissionKey: "measurement",
+            title: "Certified Sale",
+            path: "/project-management/customer-billing/pending",
+            permissionKey: "hold_amend_pending",
           },
           {
-            title: "Abstract",
-            path: "/project-management/toolkit/abstract",
-            permissionKey: "abstract",
-          },
-          {
-            title: "C. Abstract",
-            path: "/project-management/toolkit/c-abstract",
-            permissionKey: "c_abstract",
+            title: "Uncertified Statement",
+            path: "/project-management/customer-billing/wip",
+            permissionKey: "work_in_progress",
           },
         ],
+      },
+    ],
+  },
+
+  {
+    title: "Asset Management",
+    key: "am",
+    icon: Boxes,
+    basePath: "/asset-management",
+    children: [
+      {
+        title: "Asset ID",
+        path: "/asset-management/asset-id",
+        permissionKey: "asset_id_creation",
+      },
+      {
+        title: "Asset Inventory",
+        path: "/asset-management/stock-report",
+        permissionKey: "asset_stock_report",
+      },
+      {
+        title: "Asset Reconciliation",
+        path: "/asset-management/reconciliation",
+        permissionKey: "asset_reconciliation",
+      },
+      {
+        title: "Asset Rental Bill",
+        path: "/asset-management/rental-bill",
+        permissionKey: "asset_rental_bill",
+      },
+    ],
+  },
+
+  {
+    title: "Logistics",
+    key: "logistics",
+    icon: Package,
+    basePath: "/logistics",
+    children: [
+      {
+        title: "Transit Request",
+        path: "/logistics/transit-request",
+        permissionKey: "transit_request",
+      },
+      {
+        title: "Delivery Challan",
+        path: "/resource-management/material/logistics/delivery-challan",
+        permissionKey: "delivery_challan",
+      },
+      {
+        title: "Logistics Bill Register",
+        path: "/logistics/bill-register",
+        permissionKey: "logistics_bill_register",
       },
     ],
   },
@@ -388,7 +414,7 @@ export const sidebarConfig = [
     basePath: "/finance-management",
     children: [
       {
-        title: "Account",
+        title: "Accounts",
         children: [
           {
             title: "Sale",
@@ -430,11 +456,21 @@ export const sidebarConfig = [
             path: "/finance-management/account/journal",
             permissionKey: "journal",
           },
+          {
+            title: "Petty Cash",
+            path: "/finance-management/account/petty-cash",
+            permissionKey: "petty_cash",
+          },
+          {
+            title: "Ledger View",
+            path: "/finance-management/report/ledger",
+            permissionKey: "ledger_view",
+          },
         ],
       },
 
       {
-        title: "Finance Report",
+        title: "Finance",
         children: [
           {
             title: "Profit & Loss",
@@ -461,31 +497,106 @@ export const sidebarConfig = [
             path: "/finance-management/report/vendor-liability",
             permissionKey: "vendor_liability",
           },
-          {
-            title: "Ledger View",
-            path: "/finance-management/report/ledger",
-            permissionKey: "ledger_view",
-          },
         ],
       },
     ],
   },
 
   {
-    title: "HR Management",
+    title: "Human Resource Management System (HRMS)",
     key: "hr",
     icon: Users,
     basePath: "/hr-management",
     children: [
       {
         title: "Employee Management",
-        path: "/hr-management/employee",
-        permissionKey: "employee_management",
+        children: [
+          {
+            title: "Recruitment",
+            path: "/hr-management/employee/recruitment",
+            permissionKey: "recruitment",
+          },
+          {
+            title: "Offer Letter",
+            path: "/hr-management/employee/offer-letter",
+            permissionKey: "offer_letter",
+          },
+          {
+            title: "Appointment Letter",
+            path: "/hr-management/employee/appointment-letter",
+            permissionKey: "appointment_letter",
+          },
+          {
+            title: "Onboarding",
+            path: "/hr-management/employee/onboarding",
+            permissionKey: "onboarding",
+          },
+          {
+            title: "Employee Master",
+            path: "/hr-management/employee",
+            permissionKey: "employee_management",
+          },
+          {
+            title: "Employee F&F",
+            path: "/hr-management/employee/fnf",
+            permissionKey: "employee_fnf",
+          },
+        ],
       },
       {
         title: "Administration",
-        path: "/hr-management/admin",
-        permissionKey: "administration",
+        children: [
+          {
+            title: "Attendance",
+            path: "/hr-management/admin/attendance",
+            permissionKey: "hr_attendance",
+          },
+          {
+            title: "Leave",
+            path: "/hr-management/admin/leave",
+            permissionKey: "leave",
+          },
+          {
+            title: "Payroll",
+            path: "/hr-management/admin/payroll",
+            permissionKey: "payroll",
+          },
+          {
+            title: "Statutory Compliance",
+            path: "/hr-management/admin/statutory-compliance",
+            permissionKey: "statutory_compliance",
+          },
+        ],
+      },
+      {
+        title: "IT & Office Asset",
+        path: "/hr-management/it-office-asset",
+        permissionKey: "it_office_asset",
+      },
+      {
+        title: "Travel & Expense",
+        path: "/hr-management/travel-expense",
+        permissionKey: "travel_expense",
+      },
+      {
+        title: "Organization Structure",
+        path: "/hr-management/org-structure",
+        permissionKey: "org_structure",
+      },
+      {
+        title: "Reports & Analytics",
+        children: [
+          {
+            title: "Monthly Performance Appraisal",
+            path: "/hr-management/reports/performance-appraisal",
+            permissionKey: "performance_appraisal",
+          },
+          {
+            title: "FY KRA",
+            path: "/hr-management/reports/fy-kra",
+            permissionKey: "fy_kra",
+          },
+        ],
       },
       {
         title: "Circular",
@@ -501,30 +612,29 @@ export const sidebarConfig = [
   },
 
   {
-    title: "Task Management",
+    title: "Management Information System (MIS)",
     key: "tm",
     icon: ListTodo,
     basePath: "/task-management",
     children: [
       {
-        title: "New Task",
+        title: "Task Tracker",
         path: "/task-management/new",
         permissionKey: "new_task",
       },
       {
-        title: "Closing Task",
+        title: "Schedule Compliance",
         path: "/task-management/closing",
         permissionKey: "closing_task",
       },
       {
-        title: "To Do List",
+        title: "Self To do List",
         path: "/task-management/todo",
         permissionKey: "to_do_list",
       },
     ],
   },
 ];
-
 
 // for more levels use like this
 

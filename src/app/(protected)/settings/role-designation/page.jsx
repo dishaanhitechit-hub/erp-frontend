@@ -320,7 +320,6 @@ export default function ProjectRolePage() {
             sub.children.forEach((inner) => {
 
               const childAccessKey =
-                  inner.permissionAccessKey ||
                   inner.permissionKey;
 
               // Only delete if child key is different from the parent row key

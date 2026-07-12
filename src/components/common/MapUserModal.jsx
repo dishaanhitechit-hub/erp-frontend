@@ -65,7 +65,7 @@ function collectKeys(items = []) {
                 keys.push(...collectKeys(item.children));
             }
         } else {
-            const key = item.permissionAccessKey || item.permissionKey;
+            const key = item.permissionKey;
             if (key) keys.push(key);
         }
     });
@@ -108,7 +108,7 @@ const renderPermissionTree = (items = [], serial = "", permissions, handleCheckb
             <PermissionRow
                 key={`${item.title}-${currentSerial}`}
                 title={item.title}
-                permissionKey={item.permissionAccessKey || item.permissionKey}
+                permissionKey={item.permissionKey}
                 serialNo={currentSerial}
                 permissions={permissions}
                 handleCheckbox={handleCheckbox}
