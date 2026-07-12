@@ -157,12 +157,12 @@ export const sidebarConfig = [
               {
                 title: "DLR",
                 path: "/resource-management/manpower/attendance",
-                permissionKey: "attendance",
+                permissionKey: "dlr",
               },
               {
                 title: "Labour ID",
-                path: "/resource-management/manpower/id",
-                permissionKey: "manpower_id",
+                path: "/resource-management/manpower/labour-id",
+                permissionKey: "labour_id",
               },
             ],
           },
@@ -172,7 +172,7 @@ export const sidebarConfig = [
               {
                 title: "P&M Inventory",
                 path: "/resource-management/machinery/stock",
-                permissionKey: "machinery_stock_summary",
+                permissionKey: "pm_inventory",
               },
               {
                 title: "Log Sheet",
@@ -248,12 +248,12 @@ export const sidebarConfig = [
           {
             title: "Sale Order",
             path: "/project-management/order-boq",
-            permissionKey: "order_boq",
+            permissionKey: "sale_order",
           },
           {
             title: "Budget Master",
             path: "/project-management/budget",
-            permissionKey: "budget_costing",
+            permissionKey: "budget_master",
           },
           {
             title: "Extra Work",
@@ -337,17 +337,17 @@ export const sidebarConfig = [
           {
             title: "Sale Claim Bill",
             path: "/project-management/customer-billing/certified",
-            permissionKey: "certified_bill",
+            permissionKey: "sale_claim_bill",
           },
           {
             title: "Certified Sale",
             path: "/project-management/customer-billing/pending",
-            permissionKey: "hold_amend_pending",
+            permissionKey: "certified_sale",
           },
           {
             title: "Uncertified Statement",
             path: "/project-management/customer-billing/wip",
-            permissionKey: "work_in_progress",
+            permissionKey: "uncertified_statement",
           },
         ],
       },
@@ -363,12 +363,12 @@ export const sidebarConfig = [
       {
         title: "Asset ID",
         path: "/asset-management/asset-id",
-        permissionKey: "asset_id_creation",
+        permissionKey: "asset_id",
       },
       {
         title: "Asset Inventory",
         path: "/asset-management/stock-report",
-        permissionKey: "asset_stock_report",
+        permissionKey: "asset_inventory",
       },
       {
         title: "Asset Reconciliation",
@@ -620,12 +620,12 @@ export const sidebarConfig = [
       {
         title: "Task Tracker",
         path: "/task-management/new",
-        permissionKey: "new_task",
+        permissionKey: "task_tracker",
       },
       {
         title: "Schedule Compliance",
         path: "/task-management/closing",
-        permissionKey: "closing_task",
+        permissionKey: "schedule_compliance",
       },
       {
         title: "Self To do List",
