@@ -662,7 +662,7 @@ export default function IndentForm({
       </div>
 
       {!isViewMode && (
-        <div className="flex justify-end gap-3 pt-4 md:pt-0">
+        <div className="flex justify-end gap-3 mt-6">
           {((mode === "create" && isEditing) ||
             (mode === "edit" && isEditing && !isSubmitted)) && (
             <SaveDraftButton
