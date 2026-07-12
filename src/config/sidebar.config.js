@@ -335,12 +335,12 @@ export const sidebarConfig = [
         title: "Customer Billing",
         children: [
           {
-            title: "Sale Claim Bill",
+            title: "Sale Bill - Claim",
             path: "/project-management/customer-billing/certified",
             permissionKey: "sale_claim_bill",
           },
           {
-            title: "Certified Sale",
+            title: " Sale Bill - Certified",
             path: "/project-management/customer-billing/pending",
             permissionKey: "certified_sale",
           },
@@ -503,7 +503,7 @@ export const sidebarConfig = [
   },
 
   {
-    title: "Human Resource Management System (HRMS)",
+    title: "HRMS",
     key: "hr",
     icon: Users,
     basePath: "/hr-management",
@@ -587,12 +587,12 @@ export const sidebarConfig = [
         title: "Reports & Analytics",
         children: [
           {
-            title: "Monthly Performance Appraisal",
+            title: "Performance Appraisal",
             path: "/hr-management/reports/performance-appraisal",
             permissionKey: "performance_appraisal",
           },
           {
-            title: "FY KRA",
+            title: "Financial KRA",
             path: "/hr-management/reports/fy-kra",
             permissionKey: "fy_kra",
           },
@@ -612,7 +612,7 @@ export const sidebarConfig = [
   },
 
   {
-    title: "Management Information System (MIS)",
+    title: "MIS",
     key: "tm",
     icon: ListTodo,
     basePath: "/task-management",
@@ -623,15 +623,16 @@ export const sidebarConfig = [
         permissionKey: "task_tracker",
       },
       {
-        title: "Schedule Compliance",
-        path: "/task-management/closing",
-        permissionKey: "schedule_compliance",
-      },
-      {
         title: "Self To do List",
         path: "/task-management/todo",
         permissionKey: "to_do_list",
       },
+      {
+        title: "Schedule Compliance",
+        path: "/task-management/closing",
+        permissionKey: "schedule_compliance",
+      },
+      
     ],
   },
 ];
