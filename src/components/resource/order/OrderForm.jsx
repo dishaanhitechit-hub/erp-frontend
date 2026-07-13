@@ -527,6 +527,7 @@ export default function OrderForm({ mode = "create", orderId }) {
                   setOpenItemModal={setOpenItemModal}
                   withIndent={withIndent}
                   itemOptions={withoutIndentItemOptions}
+                  projectCode={projectCode}
                 />
               </TabsContent>
               <TabsContent value="terms" className="m-0">

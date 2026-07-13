@@ -22,6 +22,7 @@ export default function OrderItemsTab({
   setOpenItemModal,
   withIndent,
   itemOptions,
+  projectCode,
 }) {
   const {
     control,
@@ -61,7 +62,7 @@ export default function OrderItemsTab({
   );
 
   if (!withIndent) {
-    return <WithoutIndentItemsTable form={form} disabled={disabled} itemOptions={itemOptions} />;
+    return <WithoutIndentItemsTable form={form} disabled={disabled} itemOptions={itemOptions} projectCode={projectCode} />;
   }
 
   return (
@@ -376,7 +377,7 @@ export default function OrderItemsTab({
                               <ExpandableTextField
                                 value={field.value}
                                 onChange={field.onChange}
-                                disabled={disabled}
+                                disabled={true}
                                 error={errors?.items?.[index]?.location}
                                 title="Location"
                                 placeholder="Location"

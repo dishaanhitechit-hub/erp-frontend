@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 // itemOptions fetched once in OrderForm and passed as prop to avoid re-fetching on tab switch
 import { useFieldArray, Controller } from "react-hook-form";
 import { Trash2 } from "lucide-react";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import SearchableSelect from "@/components/common/SearchableSelect";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { getInputClass } from "@/lib/formStyles";
+import { apiRequest } from "@/lib/apiClient";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 
 const defaultRow = {
@@ -23,10 +25,25 @@ const defaultRow = {
   location: "",
 };
 
-export default function WithoutIndentItemsTable({ form, disabled, itemOptions = [] }) {
+export default function WithoutIndentItemsTable({ form, disabled, itemOptions = [], projectCode }) {
   const { control, watch, setValue, formState: { errors } } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
   const scrollRef = useRef(null);
+
+  const [useLocations, setUseLocations] = useState([]);
+
+  useEffect(() => {
+    if (!projectCode) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setUseLocations(data.filter((l) => l.locationType === "Use"));
+      })
+      .catch(() => setUseLocations([]));
+  }, [projectCode]);
 
   const items = watch("items") || [];
 
@@ -79,7 +96,7 @@ export default function WithoutIndentItemsTable({ form, disabled, itemOptions = 
                   <th className="border px-2 py-1 text-sm min-w-[80px]">GST %</th>
                   <th className="border px-2 py-1 text-sm min-w-[90px]">GST Amount</th>
                   <th className="border px-2 py-1 text-sm min-w-[80px]">Note</th>
-                  <th className="border px-2 py-1 text-sm min-w-[130px]">Location</th>
+                  <th className="border px-2 py-1 text-sm min-w-[130px]">Use To</th>
                   {!disabled && <th className="border px-2 py-1 text-sm w-[60px]">Action</th>}
                 </tr>
               </thead>
@@ -217,25 +234,21 @@ export default function WithoutIndentItemsTable({ form, disabled, itemOptions = 
                         </div>
                       </td>
 
-                      {/* LOCATION */}
-                      <td className="border p-0 align-top">
-                        <div className="w-[130px] overflow-hidden">
-                          <Controller
-                            control={control}
-                            name={`items.${index}.location`}
-                            render={({ field: f }) => (
-                              <ExpandableTextField
-                                value={f.value}
-                                onChange={f.onChange}
-                                disabled={disabled}
-                                title="Location"
-                                placeholder="Enter Location"
-                                minHeight="min-h-[34px]"
-                                modalHeight="min-h-[180px]"
-                              />
-                            )}
-                          />
-                        </div>
+                      {/* USE TO (LOCATION) */}
+                      <td className="border p-0">
+                        <SearchableSelect
+                          options={useLocations}
+                          value={watch(`items.${index}.location`)}
+                          disabled={disabled}
+                          onChange={(value) =>
+                            setValue(`items.${index}.location`, value, { shouldDirty: true })
+                          }
+                          placeholder="Select location"
+                          labelKey="locationName"
+                          valueKey="locationName"
+                          searchKeys={["locationName"]}
+                          className="rounded-none"
+                        />
                       </td>
 
                       {!disabled && (
