@@ -4,11 +4,20 @@ import { useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { sidebarConfig } from "@/config/sidebar.config";
 import { ChevronRight, ChevronDown, Menu } from "lucide-react";
+import { getCookie } from "@/lib/cookies";
+import { ROLE } from "@/config/role.config";
 
 export default function AppSidebar({ collapsed, setCollapsed }) {
   const pathname = usePathname();
   const router = useRouter();
   const [manualOpen, setManualOpen] = useState({});
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // React-idiomatic way to reset state on prop/context change (no useEffect needed)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setManualOpen({});
+  }
 
   // --- Collapsed flyout state ---
   const [flyout, setFlyout] = useState(null);
@@ -39,8 +48,8 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
     setManualOpen((prev) => {
       const updated = { ...prev };
       if (level === 0) {
-        sidebarConfig.forEach((_, index) => {
-          updated[`-${index}`] = false;
+        visibleConfig.forEach((item) => {
+          updated[`-${item.title}`] = false;
         });
         updated[key] = !isMenuOpen(key);
       } else {
@@ -69,11 +78,26 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
     return "bg-[#c9d9e8]"; // level 3+ — lighter shade so nested items differ visually
   };
 
+  // Role-based sidebar filtering
+  const role = getCookie("role"); // raw cookie value e.g. "super_admin"
+  const visibleConfig = sidebarConfig.filter((item) => {
+    if (role === ROLE.SUPER_ADMIN) {
+      if (item.title === "Settings") return true;
+      if (item.title === "Master") return pathname.startsWith("/master");
+      return false;
+    }
+    if (role === ROLE.ADMIN) return item.title === "Master";
+    // General user: Resources etc., plus Master only when on a /master/* page
+    if (item.title === "Settings") return false;
+    if (item.title === "Master") return pathname.startsWith("/master");
+    return true;
+  });
+
   const renderItems = (items, level = 0, parentKey = "") => {
     if (!items) return null;
     return items.map((item, index) => {
       if (!item) return null;
-      const key = `${parentKey}-${index}`;
+      const key = level === 0 ? `-${item.title}` : `${parentKey}-${index}`;
       const hasChildren = item.children && Array.isArray(item.children);
       const open = isMenuOpen(key, item);
       const isParentActive = hasActiveChild(item);
@@ -418,14 +442,14 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
       {/* EXPANDED: existing renderItems — fully unchanged */}
       {!collapsed && (
         <div className="flex-1 overflow-y-auto">
-          {renderItems(sidebarConfig)}
+          {renderItems(visibleConfig)}
         </div>
       )}
 
       {/* COLLAPSED: icon rail — only icons, flyout on hover */}
       {collapsed && (
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          {sidebarConfig.map((item, index) => {
+          {visibleConfig.map((item, index) => {
             const isModuleActive = hasActiveChild(item);
 
             return (
