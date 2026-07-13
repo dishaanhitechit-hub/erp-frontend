@@ -143,7 +143,7 @@ export default function Page() {
                   {
                     label: "+ New DC",
                     onClick: () =>
-                      router.push("/resource-management/material/logistics/delivery-challan/new"),
+                      router.push("/logistics/delivery-challan/new"),
                   },
                 ]
               : []
@@ -155,7 +155,7 @@ export default function Page() {
           data={filteredData}
           onRowClick={(row) => {
             if (access.canOpenDetails) {
-              router.push(`/resource-management/material/logistics/delivery-challan/${row.id}`);
+              router.push(`/logistics/delivery-challan/${row.id}`);
             }
           }}
         />

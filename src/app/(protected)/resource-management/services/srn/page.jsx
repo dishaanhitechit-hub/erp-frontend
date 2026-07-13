@@ -38,25 +38,25 @@ export default function Page() {
     const fetchList = async () => {
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.GRN.GET_ALL_GRN}?projectCode=${projectCode}`,
+          url: `${API_ENDPOINTS.RESOURCE.MATERIAL_MANAGEMENT.SRN.GET_ALL_SRN}?projectCode=${projectCode}`,
         });
         const list = res.data || [];
         const formatted = list.map((r, i) => ({
           id:               r.id,
           sl:               i + 1,
-          grnNo:            r.grnNo            || "",
-          grnDate:          getfmtDisplaydate(r.grnDate),
-          _rawDate:         r.grnDate          || "",
+          srnNo:            r.srnNo            || "",
+          srnDate:          getfmtDisplaydate(r.srnDate),
+          _rawDate:         r.srnDate          || "",
           partyName:        r.partyName        || "",
           orderNo:          r.orderNo          || "",
-          receivedCategory:getFormatCategoryName( r.receivedCategory )|| "",
-          costHead:         getFormatCategoryName( r.costHead   )      || "",
+          receivedCategory: getFormatCategoryName( r.receivedCategory) || "",
+          costHead:         getFormatCategoryName( r.costHead )        || "",
           workflowStatus:   r.workflowStatus   || "",
         }));
         setData(formatted);
         setFilteredData(formatted);
       } catch {
-        toast.error("Failed to load GRN list");
+        toast.error("Failed to load SRN list");
       } finally {
         setLoading(false);
       }
@@ -92,13 +92,13 @@ export default function Page() {
 
   const columns = [
     { header: "Sl. No",            accessor: "sl"               },
-    { header: "GRN No",            accessor: "grnNo"            },
-    { header: "Date",              accessor: "grnDate"          },
+    { header: "SRN No",            accessor: "srnNo"            },
+    { header: "Date",              accessor: "srnDate"          },
     { header: "Party Name",        accessor: "partyName"        },
     { header: "Order No",          accessor: "orderNo"          },
     { header: "Received Category", accessor: "receivedCategory" },
     { header: "Cost Head",         accessor: "costHead"         },
-    { header: "GRN Status",        accessor: "workflowStatus"   },
+    { header: "SRN Status",        accessor: "workflowStatus"   },
   ];
 
   const actions = getPageActions({ router });
@@ -121,7 +121,7 @@ export default function Page() {
           showDateRange
           actions={
             access.canAdd
-              ? [{ label: "+ New GRN", onClick: () => router.push("/resource-management/material/received-note/grn/new") }]
+              ? [{ label: "+ New SRN", onClick: () => router.push("/resource-management/services/srn/new") }]
               : []
           }
         />
@@ -130,7 +130,7 @@ export default function Page() {
           data={filteredData}
           onRowClick={(row) => {
             if (access.canOpenDetails)
-              router.push(`/resource-management/material/received-note/grn/${row.id}`);
+              router.push(`/resource-management/services/srn/${row.id}`);
           }}
         />
       </div>

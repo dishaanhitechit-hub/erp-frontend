@@ -133,7 +133,7 @@ export const sidebarConfig = [
         children: [
           {
             title: "Goods Received Note (GRN)",
-            path: "/resource-management/material/received-note/grn",
+            path: "/resource-management/material/grn",//need path change 
             permissionKey: "goods_received_note",
           },
           {
@@ -156,12 +156,12 @@ export const sidebarConfig = [
             children: [
               {
                 title: "DLR",
-                path: "/resource-management/manpower/attendance",
+                path: "/resource-management/services/manpower/dlr",
                 permissionKey: "dlr",
               },
               {
                 title: "Labour ID",
-                path: "/resource-management/manpower/labour-id",
+                path: "/resource-management/services/manpower/labour-id",
                 permissionKey: "labour_id",
               },
             ],
@@ -171,24 +171,24 @@ export const sidebarConfig = [
             children: [
               {
                 title: "P&M Inventory",
-                path: "/resource-management/machinery/stock",
+                path: "/resource-management/services/plant-machinery/pm-inventory",
                 permissionKey: "pm_inventory",
               },
               {
                 title: "Log Sheet",
-                path: "/resource-management/machinery/log-sheet",
+                path: "/resource-management/services/plant-machinery/log-sheet", //chanded required latter in file 
                 permissionKey: "log_sheet",
               },
               {
                 title: "Batching Plant",
-                path: "/resource-management/machinery/batching-plant",
+                path: "/resource-management/services/plant-machinery/batching-plant",
                 permissionKey: "batching_plant",
               },
             ],
           },
           {
             title: "Service Received Note (SRN)",
-            path: "/resource-management/material/received-note/srn",
+            path: "/resource-management/services/srn", 
             permissionKey: "service_received_note",
           },
         ],
@@ -197,22 +197,27 @@ export const sidebarConfig = [
         title: "Sub Contractor Billing",
         children: [
           {
-            title: "Bill Receive Register",
-            path: "/resource-management/vendor-billing/grn",
+            title: "Bill Receive Register(GRN)",
+            path: "/resource-management/sub-contractor-billing/grn", //need path change
             permissionKey: "billing_by_grn",
           },
           {
-            title: "e-reconcile Bill",
-            path: "/resource-management/vendor-billing/srn",
+            title: "Bill Receive Register(SRN)",
+            path: "/resource-management/sub-contractor-billing/srn", //need path change
             permissionKey: "billing_by_srn",
           },
           {
+            title: "e-reconcile Bill",
+            path: "/resource-management/sub-contractor-billing/e-reconcile-bill", //need path change
+            permissionKey: "e_reconcile_bill", //need to be added in backend
+          },
+          {
             title: "Payment Request",
-            path: "/resource-management/vendor-billing/payment-request",
+            path: "/resource-management/sub-contractor-billing/payment-request",
             permissionKey: "payment_request",
           },
         ],
-      },
+      },//upto this done
       {
         title: "Contact Dairy",
         children: [
@@ -396,7 +401,7 @@ export const sidebarConfig = [
       },
       {
         title: "Delivery Challan",
-        path: "/resource-management/material/logistics/delivery-challan",
+        path: "/logistics/delivery-challan",
         permissionKey: "delivery_challan",
       },
       {

@@ -114,7 +114,7 @@ export default function Page() {
             className="text-blue-600 hover:underline cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              if (row.logBookId) router.push(`/resource-management/machinery/log-sheet/log-book/${row.logBookId}`);
+              if (row.logBookId) router.push(`/resource-management/services/plant-machinery/log-sheet/log-book/${row.logBookId}`);
             }}
           >
             {row.logBookNo}
@@ -131,7 +131,7 @@ export default function Page() {
             className="text-blue-600 hover:underline cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              if (row.entryId) router.push(`/resource-management/machinery/log-sheet/log-entry/${row.entryId}`);
+              if (row.entryId) router.push(`/resource-management/services/plant-machinery/log-sheet/log-entry/${row.entryId}`);
             }}
           >
             {row.logUid}
@@ -173,11 +173,11 @@ export default function Page() {
               ? [
                   {
                     label: "+ Create Log Book",
-                    onClick: () => router.push("/resource-management/machinery/log-sheet/log-book/new"),
+                    onClick: () => router.push("/resource-management/services/plant-machinery/log-sheet/log-book/new"),
                   },
                   {
                     label: "+ Log Book Data Entry",
-                    onClick: () => router.push("/resource-management/machinery/log-sheet/log-entry/new"),
+                    onClick: () => router.push("/resource-management/services/plant-machinery/log-sheet/log-entry/new"),
                   },
                 ]
               : []),

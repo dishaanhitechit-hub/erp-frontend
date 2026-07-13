@@ -28,7 +28,7 @@ const formatAmount = (value) =>
 
 export default function Page() {
   const router = useRouter();
-  const access = getPageAccess({ pageCode: "billing_by_srn", pageType: "LIST" });
+  const access = getPageAccess({ pageCode: "billing_by_grn", pageType: "LIST" });
 
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -42,18 +42,18 @@ export default function Page() {
 
   useEffect(() => {
     if (!projectCode || !access.allowed) return;
-    const fetchBSSList = async () => {
+    const fetchBVSList = async () => {
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.VENDOR_BILLING.BSS.GET_ALL_BSS}?projectCode=${projectCode}`,
+          url: `${API_ENDPOINTS.RESOURCE.VENDOR_BILLING.BVS.GET_ALL_BVS}?projectCode=${projectCode}`,
           method: "GET",
         });
         const list = res.data || [];
         const formatted = list.map((item, index) => ({
           id: item.id,
           sl: index + 1,
-          bssNo: item.bssNo,
-          bssDate: getfmtDisplaydate(item.bssDate),
+          bvsNo: item.bvsNo,
+          bvsDate: getfmtDisplaydate(item.bvsDate),
           partyName: item.partyName || "",
           categoryCode: item.receivedCategory || "",
           category: getFormatCategoryName(item.receivedCategory) || "",
@@ -73,12 +73,12 @@ export default function Page() {
         setData(formatted);
         setFilteredData(formatted);
       } catch (err) {
-        toast.error(err.message || "Failed to fetch BSS list");
+        toast.error(err.message || "Failed to fetch BVS list");
       } finally {
         setLoading(false);
       }
     };
-    fetchBSSList();
+    fetchBVSList();
   }, [projectCode, access.allowed]);
 
   const handleSearch = ({ search, from, to }) => {
@@ -92,8 +92,8 @@ export default function Page() {
     }
     if (from || to) {
       filtered = filtered.filter((item) => {
-        if (!item.bssDate) return false;
-        const itemDate = new Date(item.bssDate);
+        if (!item.bvsDate) return false;
+        const itemDate = new Date(item.bvsDate);
         itemDate.setHours(0, 0, 0, 0);
         if (from) {
           const fromDate = new Date(from);
@@ -113,9 +113,9 @@ export default function Page() {
 
   const summaryData = useMemo(() => {
     const categoryList = [
-      { code: "Work_Order", label: "Work Order" },
-      { code: "Hire_Order", label: "Hire Order" },
-      { code: "Job_Contract_Order", label: "Job Contract Order" },
+      { code: "Purchases_Order", label: "Purchases Order" },
+      { code: "Customer_Supply_Order", label: "Customer Supply Order" },
+      { code: "Site_Transfer_Order", label: "Site Transfer Order" },
     ];
     const rows = categoryList.map(({ code, label }) => {
       const categoryRows = filteredData.filter((item) => item.categoryCode === code);
@@ -138,8 +138,8 @@ export default function Page() {
 
   const columns = [
     { header: "Sl. no", accessor: "sl" },
-    { header: "BSS No", accessor: "bssNo" },
-    { header: "Date", accessor: "bssDate" },
+    { header: "BVS No", accessor: "bvsNo" },
+    { header: "Date", accessor: "bvsDate" },
     { header: "Party Name", accessor: "partyName" },
     { header: "Category", accessor: "category" },
     { header: "Basic", accessor: "basicAmount" },
@@ -170,8 +170,8 @@ export default function Page() {
             access.canAdd
               ? [
                   {
-                    label: "+ Create BSS",
-                    onClick: () => router.push("/resource-management/vendor-billing/srn/new"),
+                    label: "+ Create BVS",
+                    onClick: () => router.push("/resource-management/sub-contractor-billing/grn/new"),
                   },
                 ]
               : []
@@ -182,7 +182,7 @@ export default function Page() {
           columns={columns}
           data={filteredData}
           onRowClick={(row) => {
-            router.push(`/resource-management/vendor-billing/srn/${row.id}`);
+            router.push(`/resource-management/sub-contractor-billing/grn/${row.id}`);
           }}
         />
 
@@ -201,7 +201,7 @@ export default function Page() {
             <DialogContent showCloseButton={false} className="w-[95vw] sm:w-auto sm:min-w-[580px] sm:max-w-[720px] p-0 gap-0">
               <div className="flex items-center justify-between px-5 py-3 border-b border-[#6b8f4e] bg-[#f5f5f5] rounded-t-xl">
                 <DialogTitle className="text-[16px] font-semibold text-[#1f1f1f]">
-                  BSS Summary
+                  BVS Summary
                 </DialogTitle>
                 <DialogClose className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-200 transition-colors cursor-pointer">
                   <X size={16} className="text-gray-600" />

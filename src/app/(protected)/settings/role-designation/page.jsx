@@ -20,6 +20,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import MapUserModal from "@/components/common/MapUserModal";
 
 import AddLocationModal from "@/components/settings/project-location/AddLocationModal";
+import ApproverSection from "@/components/settings/role-designation/ApproverSection";
 
 import { sidebarConfig } from "@/config/sidebar.config";
 
@@ -669,46 +670,52 @@ export default function ProjectRolePage() {
                 {renderTeam(hoTeam, setHoTeam)}
               </div>
             </div>
-          </div>
 
-          {/* BUTTONS */}
-          <div className="flex justify-end gap-3 mt-10">
-            <SaveButton
-                onClick={handleSave}
-                disabled={!isEditing || loading}
-                loading={loading}
+            {/* BUTTONS — for teams section, above approval path */}
+            <div className="flex justify-end gap-3 mt-6">
+              <SaveButton
+                  onClick={handleSave}
+                  disabled={!isEditing || loading}
+                  loading={loading}
+              />
+
+              <EditButton
+                  onClick={() => {
+                    if (!projectData) {
+                      toast.warning("Search project first");
+                      return;
+                    }
+
+                    // EDIT START
+                    if (!isEditing) {
+                      setBackupData({
+                        siteTeam: structuredClone(siteTeam),
+                        hoTeam: structuredClone(hoTeam),
+                        tempPermissions: structuredClone(tempPermissions),
+                      });
+
+                      setIsEditing(true);
+                      return;
+                    }
+
+                    // CANCEL
+                    setSiteTeam(backupData?.siteTeam || []);
+                    setHoTeam(backupData?.hoTeam || []);
+                    setTempPermissions(backupData?.tempPermissions || {});
+                    setBackupData(null);
+                    setIsEditing(false);
+                  }}
+                  disabled={loading}
+              >
+                {isEditing ? "Cancel" : "Edit"}
+              </EditButton>
+            </div>
+
+            {/* APPROVAL PATH — collapsible section, separate from teams */}
+            <ApproverSection
+              projectCode={projectCode}
+              projectData={projectData}
             />
-
-            <EditButton
-                onClick={() => {
-                  if (!projectData) {
-                    toast.warning("Search project first");
-                    return;
-                  }
-
-                  // EDIT START
-                  if (!isEditing) {
-                    setBackupData({
-                      siteTeam: structuredClone(siteTeam),
-                      hoTeam: structuredClone(hoTeam),
-                      tempPermissions: structuredClone(tempPermissions),
-                    });
-
-                    setIsEditing(true);
-                    return;
-                  }
-
-                  // CANCEL
-                  setSiteTeam(backupData?.siteTeam || []);
-                  setHoTeam(backupData?.hoTeam || []);
-                  setTempPermissions(backupData?.tempPermissions || {});
-                  setBackupData(null);
-                  setIsEditing(false);
-                }}
-                disabled={loading}
-            >
-              {isEditing ? "Cancel" : "Edit"}
-            </EditButton>
           </div>
 
           {/* MODAL */}

@@ -132,161 +132,162 @@ export const routeMetaConfig = [
   //indent
   {
     basePath: "/resource-management/procurement/indent",
-    breadcrumbs: ["Resource Management", "Procurement","Indent List"],
+    breadcrumbs: ["Resources Management", "Procurement","Indent List"],
   },
   {
     basePath: "/resource-management/procurement/indent/new",
-    breadcrumbs: ["Resource Management", "Procurement","Indent","New"],
+    breadcrumbs: ["Resources Management", "Procurement","Indent","New"],
   },
   {
     basePath: "/resource-management/procurement/indent/[id]",
-    breadcrumbs: ["Resource Management", "Procurement","Indent","Edit"],
+    breadcrumbs: ["Resources Management", "Procurement","Indent","Edit"],
   },
   ///resource-management/procurement/order/material-order/new
   //material-order
   {
     basePath: "/resource-management/procurement/order/material-order",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Material Order","Material Order List"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Material Order","Material Order List"],
   },
   {
     basePath: "/resource-management/procurement/order/material-order/new",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Material Order","New"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Material Order","New"],
   },
   {
     basePath: "/resource-management/procurement/order/material-order/[id]",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Material Order","Edit"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Material Order","Edit"],
   },
   //service-order
   {
     basePath: "/resource-management/procurement/order/service-order",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Service Order","Service Order List"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Service Order","Service Order List"],
   },
   {
     basePath: "/resource-management/procurement/order/service-order/new",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Service Order","New"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Service Order","New"],
   },
   {
     basePath: "/resource-management/procurement/order/service-order/[id]",
-    breadcrumbs: ["Resource Management", "Procurement","Order","Service Order","Edit"],
+    breadcrumbs: ["Resources Management", "Procurement","Order","Service Order","Edit"],
   },
   //Material management
   //grn
   {
-    basePath: "/resource-management/material/received-note/grn",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","GRN","List"],
+    basePath: "/resource-management/material/grn",
+    breadcrumbs: ["Resources Management", "Materials","Goods Received Note (GRN)","List"],
   },
   {
-    basePath: "/resource-management/material/received-note/grn/new",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","GRN","New"],
+    basePath: "/resource-management/material/grn/new",
+    breadcrumbs: ["Resources Management", "Materials","Goods Received Note (GRN)","New"],
   },
   {
-    basePath: "/resource-management/material/received-note/grn/[id]",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","GRN","Edit"],
+    basePath: "/resource-management/material/grn/[id]",
+    breadcrumbs: ["Resources Management", "Materials","Goods Received Note (GRN)","Edit"],
   },
   //srn
   {
-    basePath: "/resource-management/material/received-note/srn",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","SRN","List"],
+    basePath: "/resource-management/services/srn",
+    breadcrumbs: ["Resources Management", "Services","Service Received Note (SRN)","List"],
   },
   {
-    basePath: "/resource-management/material/received-note/srn/new",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","SRN","New"],
+    basePath: "/resource-management/services/srn/new",
+    breadcrumbs: ["Resources Management", "Services","Service Received Note (SRN)","New"],
   },
   {
-    basePath: "/resource-management/material/received-note/srn/[id]",
-    breadcrumbs: ["Resource Management", "Material Management","Received Note","SRN","Edit"],
+    basePath: "/resource-management/services/srn/[id]",
+    breadcrumbs: ["Resources Management", "Services","Service Received Note (SRN)","Edit"],
   },
-
+  //gin
   {
     basePath: "/resource-management/material/gin",
-    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","List"],
+    breadcrumbs: ["Resources Management", "Materials","Goods Issue Note","List"],
   },
   {
     basePath: "/resource-management/material/gin/new",
-    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","New"],
+    breadcrumbs: ["Resources Management", "Materials","Goods Issue Note","New"],
   },
   {
     basePath: "/resource-management/material/gin/[id]",
-    breadcrumbs: ["Resource Management", "Material Management","Goods Issue Note","Edit"],
+    breadcrumbs: ["Resources Management", "Materials","Goods Issue Note","Edit"],
   },
-  //resource-management/material/logistics/delivery-challan
-  {
-    basePath: "/resource-management/material/logistics/delivery-challan",
-    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","List"],
-  },
-  {
-    basePath: "/resource-management/material/logistics/delivery-challan/new",
-    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","New"],
-  },
-  {
-    basePath: "/resource-management/material/logistics/delivery-challan/[id]",
-    breadcrumbs: ["Resource Management", "Material Management","Logistics","Delivery Challan","Edit"],
-  },
+  
   //machinery/log-sheet
   {
-    basePath: "/resource-management/machinery/log-sheet",
-    breadcrumbs: ["Resource Management", "Machinery Management","Machine Log Book","List"],
+    basePath: "/resource-management/services/plant-machinery/log-sheet",
+    breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Log Sheet"],
   },
   {
-    basePath: "/resource-management/machinery/log-sheet/log-book/new",
-    breadcrumbs: ["Resource Management", "Machinery Management","Machine Log Book","Add"],
+    basePath: "/resource-management/services/plant-machinery/log-sheet/log-book/new",
+    breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Machine Log Book","Add"],
   },
   {
-    basePath: "/resource-management/log-sheet/log-book/[id]",
-    breadcrumbs: ["Resource Management", "Machinery Management","Machine Log Book","Edit"],
+    basePath: "/resource-management/services/plant-machinery/log-sheet/log-book/[id]",
+    breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Machine Log Book","Edit"],
   },
   {
-    basePath: "/resource-management/machinery/log-sheet/log-entry/new",
-    breadcrumbs: ["Resource Management", "Machinery Management","Log Book Entry","Add"],
+    basePath: "/resource-management/services/plant-machinery/log-sheet/log-entry/new",
+    breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Log Book Entry","Add"],
   },
   {
-    basePath: "/resource-management/log-sheet/log-entry/[id]",
-    breadcrumbs: ["Resource Management", "Machinery Management","Log Book Entry","Edit"],
+    basePath: "/resource-management/services/plant-machinery/log-sheet/log-entry/[id]",
+    breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Log Book Entry","Edit"],
   },
 
   //billing by grn
   {
-    basePath: "/resource-management/vendor-billing/grn",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","List"],
+    basePath: "/resource-management/sub-contractor-billing/grn",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","List"],
   },
   {
-    basePath: "/resource-management/vendor-billing/grn/new",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","New"],
+    basePath: "/resource-management/sub-contractor-billing/grn/new",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","New"],
   },
   {
-    basePath: "/resource-management/vendor-billing/grn/[id]",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By GRN","Edit"],
+    basePath: "/resource-management/sub-contractor-billing/grn/[id]",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","Edit"],
   },
   //billing by srn
   {
-    basePath: "/resource-management/vendor-billing/srn",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By SRN","List"],
+    basePath: "/resource-management/sub-contractor-billing/srn",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","List"],
   },
   {
-    basePath: "/resource-management/vendor-billing/srn/new",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By SRN","New"],
+    basePath: "/resource-management/sub-contractor-billing/srn/new",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","New"],
   },
   {
-    basePath: "/resource-management/vendor-billing/srn/[id]",
-    breadcrumbs: ["Resource Management", "Vendor Billing","By SRN","Edit"],
+    basePath: "/resource-management/sub-contractor-billing/srn/[id]",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","Edit"],
   },
   //stock report
   {
     basePath: "/resource-management/material/stock-report",
-    breadcrumbs: ["Resource Management", "Material Management", "Stock Report"],
+    breadcrumbs: ["Resources Management", "Materials", "Inventory"],
+  },
+  //logistics/delivery-challan
+  {
+    basePath: "/logistics/delivery-challan",
+    breadcrumbs: ["Logistics","Delivery Challan","List"],
+  },
+  {
+    basePath: "/logistics/delivery-challan/new",
+    breadcrumbs: ["Logistics","Delivery Challan","New"],
+  },
+  {
+    basePath: "/logistics/delivery-challan/[id]",
+    breadcrumbs: ["Logistics","Delivery Challan","Edit"],
   },
   //project management
   {
     basePath: "/project-management/register/concrete",
-    breadcrumbs: ["Project Management", "Register","Concrete","List"],
+    breadcrumbs: ["Project Management", "Register","Concrete Register","List"],
   },
   {
     basePath: "/project-management/register/concrete/new",
-    breadcrumbs: ["Project Management", "Register","Concrete","New"],
+    breadcrumbs: ["Project Management", "Register","Concrete Register","New"],
   },
   {
     basePath: "/project-management/register/concrete/[id]",
-    breadcrumbs: ["Project Management", "Register","Concrete","Edit"],
+    breadcrumbs: ["Project Management", "Register","Concrete Register","Edit"],
   },
   
 ];
