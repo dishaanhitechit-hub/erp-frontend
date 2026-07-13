@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { tcodeConfig } from "@/config/tcode.config";
 import Image from "next/image";
@@ -39,52 +39,32 @@ export default function AppNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [tcode, setTcode] = useState("");
-  const [mounted, setMounted] = useState(false);
   // const [showProjectSelect, setShowProjectSelect] = useState(false);
   // const [projectList, setProjectList] = useState([]);
   // const [loadingProjects, setLoadingProjects] = useState(false);
   // const projectRef = useRef(null);
   const profileRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [role, setRole] = useState("");
 
-  const [projectInfo, setProjectInfo] = useState({
-    projectId: "",
-    projectCode: "",
-    clientName: "",
-    projectName: "",
+  // Lazy initialisers read localStorage/cookies once on client mount — no effect needed
+  const [projectInfo] = useState(() => {
+    try {
+      const stored = getLocalStorage("projectInfo");
+      if (stored) return typeof stored === "string" ? JSON.parse(stored) : stored;
+    } catch {}
+    return { projectId: "", projectCode: "", clientName: "", projectName: "" };
   });
 
-  const [username, setUsername] = useState("");
+  const [username] = useState(() => {
+    try { return getLocalStorage("userName") || ""; } catch { return ""; }
+  });
 
-  useEffect(() => {
-    // only one render trigger
-    setMounted(true);
-
-    // safe client-only logic
+  const [role] = useState(() => {
     try {
-      const storedProject = getLocalStorage("projectInfo");
-      const storedUser = getLocalStorage("userName") || "";
       const storedRole = getCookie("role") || "";
-
-      if (storedProject) {
-        const parsed =
-          typeof storedProject === "string"
-            ? JSON.parse(storedProject)
-            : storedProject;
-        setProjectInfo(parsed);
-      }
-
-      if (storedUser) {
-        setUsername(storedUser);
-      }
-      if (storedRole) {
-        setRole(roleMap[storedRole] || storedRole);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
+      return roleMap[storedRole] || storedRole;
+    } catch { return ""; }
+  });
 
   // Attach listener only when dropdown is open — avoids stale closure with []
   useEffect(() => {
@@ -152,9 +132,6 @@ export default function AppNavbar() {
 
     toast.success("Logged out");
   };
-
-  //prevents hydration mismatch
-  if (!mounted) return null;
 
   return (
     <div className="w-full border border-[#c4d1df] bg-[#efefef]">
