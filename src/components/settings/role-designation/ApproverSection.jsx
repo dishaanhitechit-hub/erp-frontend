@@ -30,8 +30,6 @@ import {
 
 // ---------------------------------------------------------------------------
 // Build flat row list from sidebarConfig — runs once at module level
-// Same traversal logic as MapUserModal's renderPermissionTree
-// Adds serialNo (e.g. "1", "1.2", "1.2.3") and depth for indent/colour
 // ---------------------------------------------------------------------------
 
 function buildAllRows() {
@@ -47,14 +45,12 @@ function buildAllRows() {
 
       if (item.children?.length > 0) {
         if (item.showChildrenInPermission === false) {
-          // Collapsed children → single leaf row
           const key =
             item.permissionKey ||
             item.children.find((c) => c.permissionKey)?.permissionKey;
           if (key)
             rows.push({ rowId, moduleCode: key, title: item.title, depth, isLeaf: true, serialNo });
         } else {
-          // Group header (no selects)
           rows.push({ rowId, moduleCode: null, title: item.title, depth, isLeaf: false, serialNo });
           recurse(item.children, depth + 1, currentPath, currentSerial);
         }
@@ -74,9 +70,17 @@ function buildAllRows() {
 }
 
 const ALL_ROWS = buildAllRows();
+const LEAF_ROWS = ALL_ROWS.filter((r) => r.isLeaf && r.moduleCode);
 const MODULE_ROW_MAP = Object.fromEntries(
-  ALL_ROWS.filter((r) => r.isLeaf && r.moduleCode).map((r) => [r.moduleCode, r.rowId])
+  LEAF_ROWS.map((r) => [r.moduleCode, r.rowId])
 );
+
+// Default rowLevels: all leaf rows start with 2 levels
+function defaultRowLevels() {
+  const init = {};
+  LEAF_ROWS.forEach((r) => { init[r.rowId] = 2; });
+  return init;
+}
 
 // ---------------------------------------------------------------------------
 // Row style helpers
@@ -93,13 +97,12 @@ function groupStyle(depth) {
 }
 
 // ---------------------------------------------------------------------------
-// Creator popover — positioned near the trigger button via getBoundingClientRect
+// Creator popover
 // ---------------------------------------------------------------------------
 
 function CreatorPopover({ users, anchorRect, onClose }) {
   const ref = useRef(null);
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) onClose();
@@ -110,15 +113,12 @@ function CreatorPopover({ users, anchorRect, onClose }) {
 
   if (!anchorRect) return null;
 
-  // Position near the button, keep within viewport
   const GAP = 6;
   const W = 260;
   let left = anchorRect.left;
   let top = anchorRect.bottom + GAP;
 
-  // Flip left if overflows right edge
   if (left + W > window.innerWidth - 8) left = window.innerWidth - W - 8;
-  // Flip up if overflows bottom
   const maxH = 240;
   if (top + maxH > window.innerHeight - 8) top = anchorRect.top - maxH - GAP;
 
@@ -128,7 +128,6 @@ function CreatorPopover({ users, anchorRect, onClose }) {
       className="fixed z-[99999] bg-white border border-[#b5b5b5] rounded-sm shadow-xl overflow-hidden"
       style={{ top, left, width: W }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-[#f0f7ff] border-b border-[#c8d8ea]">
         <span className="text-[12px] font-semibold text-gray-700">Creator Users</span>
         <button
@@ -139,7 +138,6 @@ function CreatorPopover({ users, anchorRect, onClose }) {
           <X size={12} />
         </button>
       </div>
-      {/* List */}
       <div className="max-h-[200px] overflow-y-auto p-2 space-y-1">
         {users.length === 0 ? (
           <p className="text-[11px] text-gray-400 px-1">No users</p>
@@ -159,7 +157,7 @@ function CreatorPopover({ users, anchorRect, onClose }) {
 }
 
 // ---------------------------------------------------------------------------
-// Creator cell — inline, triggers popover
+// Creator cell
 // ---------------------------------------------------------------------------
 
 function CreatorCell({ userIds, allUsers, onShowMore }) {
@@ -203,21 +201,32 @@ export default function ApproverSection({ projectCode, projectData }) {
   const [projectUsers, setProjectUsers] = useState([]);
   // `${rowId}_${levelKey}` → [userId] | `${rowId}_creator` → [userId, ...]
   const [selectedUsers, setSelectedUsers] = useState({});
-  const [levels, setLevels] = useState(["Level1", "Level2"]);
-  // Popover state: { users, anchorRect }
+  // Per-row level counts: { [rowId]: number }
+  const [rowLevels, setRowLevels] = useState(defaultRowLevels);
   const [creatorPopover, setCreatorPopover] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
   const [confirmSave, setConfirmSave] = useState(false);
 
+  // Max levels across all rows — drives column count
+  const maxLevels = useMemo(() => {
+    const vals = Object.values(rowLevels);
+    return vals.length > 0 ? Math.max(1, ...vals) : 1;
+  }, [rowLevels]);
+
+  const levelKeys = useMemo(
+    () => Array.from({ length: maxLevels }, (_, i) => `Level${i + 1}`),
+    [maxLevels]
+  );
+
   // ---------------------------------------------------------------------------
-  // Load all data in parallel on project change
+  // Load data
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
     if (!projectCode) {
       setProjectUsers([]);
       setSelectedUsers({});
-      setLevels(["Level1", "Level2"]);
+      setRowLevels(defaultRowLevels());
       return;
     }
 
@@ -245,8 +254,8 @@ export default function ApproverSection({ projectCode, projectData }) {
         setProjectUsers(Array.isArray(usersRes?.data) ? usersRes.data : []);
 
         const restored = {};
+        const initRowLevels = defaultRowLevels();
 
-        // Restore approver levels + initial creator list from approval-path list
         const approvalData = Array.isArray(approvalRes?.data)
           ? approvalRes.data[0]
           : approvalRes?.data;
@@ -259,16 +268,14 @@ export default function ApproverSection({ projectCode, projectData }) {
           (mod.approverUsers || []).forEach((u) => {
             restored[`${rowId}_Level${u.level}`] = [Number(u.userId)];
           });
+          // Restore per-row level count from saved data
+          const savedMaxLevel = Math.max(0, ...(mod.approverUsers || []).map((u) => Number(u.level)));
+          if (savedMaxLevel > 0) initRowLevels[rowId] = Math.max(2, savedMaxLevel);
         });
 
-        // Determine max level and set levels state
-        const maxLevel = modules.reduce((max, m) => {
-          const mMax = Math.max(0, ...(m.approverUsers || []).map((u) => Number(u.level)));
-          return Math.max(max, mMax);
-        }, 2);
-        setLevels(Array.from({ length: maxLevel }, (_, i) => `Level${i + 1}`));
+        setRowLevels(initRowLevels);
 
-        // Overwrite creator from edit-users (authoritative source)
+        // Overwrite creator from edit-users (authoritative)
         const editUsersData = creatorRes?.data || {};
         Object.entries(editUsersData).forEach(([key, users]) => {
           const [moduleCode, permission] = key.split(".");
@@ -292,28 +299,26 @@ export default function ApproverSection({ projectCode, projectData }) {
   }, [projectCode]);
 
   // ---------------------------------------------------------------------------
-  // Level management
+  // Per-row level management
   // ---------------------------------------------------------------------------
 
-  const addLevel = useCallback(() => {
-    setLevels((prev) => [...prev, `Level${prev.length + 1}`]);
+  const addRowLevel = useCallback((rowId) => {
+    setRowLevels((prev) => ({ ...prev, [rowId]: (prev[rowId] ?? 2) + 1 }));
   }, []);
 
-  const removeLevel = useCallback(() => {
-    if (levels.length <= 2) {
-      toast.warning("Minimum 2 levels required");
-      return;
-    }
-    const last = levels[levels.length - 1];
-    setSelectedUsers((prev) => {
-      const updated = { ...prev };
-      Object.keys(updated).forEach((k) => {
-        if (k.endsWith(`_${last}`)) delete updated[k];
+  const removeRowLevel = useCallback((rowId) => {
+    setRowLevels((prev) => {
+      const cur = prev[rowId] ?? 2;
+      if (cur <= 1) return prev;
+      const lastKey = `${rowId}_Level${cur}`;
+      setSelectedUsers((su) => {
+        const updated = { ...su };
+        delete updated[lastKey];
+        return updated;
       });
-      return updated;
+      return { ...prev, [rowId]: cur - 1 };
     });
-    setLevels((prev) => prev.slice(0, -1));
-  }, [levels]);
+  }, []);
 
   const handleLevelChange = useCallback((rowId, levelKey, value) => {
     setSelectedUsers((prev) => ({
@@ -327,16 +332,15 @@ export default function ApproverSection({ projectCode, projectData }) {
   // ---------------------------------------------------------------------------
 
   const buildPayload = () => {
-    const leafRows = ALL_ROWS.filter((r) => r.isLeaf && r.moduleCode);
-    const modules = leafRows
+    const modules = LEAF_ROWS
       .map((row) => {
-        const approverUsers = levels
-          .map((lk, i) => {
-            const val = selectedUsers[`${row.rowId}_${lk}`];
-            const userId = Array.isArray(val) ? val[0] : val;
-            return userId ? { userId: Number(userId), level: i + 1 } : null;
-          })
-          .filter(Boolean);
+        const rowLevelCount = rowLevels[row.rowId] ?? 2;
+        const approverUsers = Array.from({ length: rowLevelCount }, (_, i) => {
+          const lk = `Level${i + 1}`;
+          const val = selectedUsers[`${row.rowId}_${lk}`];
+          const userId = Array.isArray(val) ? val[0] : val;
+          return userId ? { userId: Number(userId), level: i + 1 } : null;
+        }).filter(Boolean);
 
         const rawCreators = selectedUsers[`${row.rowId}_creator`] || [];
         const creatorUsers = [...new Set(rawCreators.map(Number))].map((id) => ({ userId: id }));
@@ -348,7 +352,6 @@ export default function ApproverSection({ projectCode, projectData }) {
     return { projectCode, modules };
   };
 
-  // Opens the confirmation dialog
   const handleSaveRequest = () => {
     if (!projectCode) { toast.error("No project selected"); return; }
     const payload = buildPayload();
@@ -359,7 +362,6 @@ export default function ApproverSection({ projectCode, projectData }) {
     setConfirmSave(true);
   };
 
-  // Called only after user confirms
   const handleSaveConfirmed = async () => {
     setConfirmSave(false);
     const payload = buildPayload();
@@ -381,7 +383,7 @@ export default function ApproverSection({ projectCode, projectData }) {
   };
 
   // ---------------------------------------------------------------------------
-  // Memoised user options for SearchableSelect
+  // User options
   // ---------------------------------------------------------------------------
 
   const userOptions = useMemo(
@@ -401,7 +403,6 @@ export default function ApproverSection({ projectCode, projectData }) {
 
   return (
     <>
-      {/* Save confirmation — shadcn AlertDialog */}
       <AlertDialog open={confirmSave} onOpenChange={setConfirmSave}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
@@ -415,9 +416,7 @@ export default function ApproverSection({ projectCode, projectData }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-[12px] h-8">
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel className="text-[12px] h-8">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSaveConfirmed}
               className="text-[12px] h-8 bg-blue-600 hover:bg-blue-700"
@@ -428,7 +427,6 @@ export default function ApproverSection({ projectCode, projectData }) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Creator popover (rendered outside the overflow container) */}
       {creatorPopover && (
         <CreatorPopover
           users={creatorPopover.users}
@@ -438,9 +436,8 @@ export default function ApproverSection({ projectCode, projectData }) {
       )}
 
       <div className="mt-4 border border-[#b5b5b5] rounded-sm overflow-hidden">
-        {/* ── Header: toggle + action buttons always visible ─────────────── */}
+        {/* Header */}
         <div className="flex items-center justify-between bg-[#d6e6f2] border-b border-[#b5b5b5] px-3 py-1.5">
-          {/* Left: title + collapse */}
           <button
             type="button"
             onClick={() => setCollapsed((v) => !v)}
@@ -459,36 +456,14 @@ export default function ApproverSection({ projectCode, projectData }) {
             }
           </button>
 
-          {/* Right: action buttons — always visible, stopPropagation so they don't toggle */}
           <div
             className="flex items-center gap-1.5 ml-3 shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
-              onClick={removeLevel}
-              disabled={disabled || levels.length <= 2}
-              title="Remove last level"
-              className="flex items-center gap-0.5 px-2 py-1 text-[11px] border border-[#9ab0c0] rounded-sm bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              <Minus size={10} />
-              <span className="hidden sm:inline">Level</span>
-            </button>
-            <button
-              type="button"
-              onClick={addLevel}
-              disabled={disabled}
-              title="Add level"
-              className="flex items-center gap-0.5 px-2 py-1 text-[11px] border border-[#9ab0c0] rounded-sm bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors"
-            >
-              <Plus size={10} />
-              <span className="hidden sm:inline">Level</span>
-            </button>
-            <button
-              type="button"
               onClick={handleSaveRequest}
               disabled={disabled}
-              title="Save approval path"
               className="flex items-center gap-1 px-2.5 py-1 text-[11px] bg-blue-600 text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 transition-colors border border-blue-700"
             >
               {saving ? <Loader2 size={10} className="animate-spin" /> : <Save size={10} />}
@@ -497,25 +472,21 @@ export default function ApproverSection({ projectCode, projectData }) {
           </div>
         </div>
 
-        {/* ── Collapsed state: info bar ──────────────────────────────────── */}
         {collapsed && (
           <div className="px-3 py-1.5 text-[11px] text-gray-400 bg-[#fafafa]">
-            {levels.length} level{levels.length !== 1 ? "s" : ""}
+            Per-module levels
             {projectUsers.length > 0 && ` · ${projectUsers.length} users`}
             {" — click title to expand"}
           </div>
         )}
 
-        {/* ── Expanded content ───────────────────────────────────────────── */}
         {!collapsed && (
           <div className="bg-white">
-            {/* Info bar */}
             <div className="px-3 py-1 border-b border-[#ececec] bg-[#f7f7f7] text-[11px] text-gray-400">
-              {levels.length} level{levels.length !== 1 ? "s" : ""}
+              Use <Plus size={9} className="inline mx-0.5" /> / <Minus size={9} className="inline mx-0.5" /> per row to set each module&apos;s level count
               {projectUsers.length > 0 && ` · ${projectUsers.length} project users`}
             </div>
 
-            {/* Table — bounded height enables in-component scroll for both axes */}
             {loading ? (
               <div className="flex items-center justify-center h-[100px] gap-2 text-[12px] text-gray-400">
                 <Loader2 size={14} className="animate-spin" />
@@ -528,9 +499,8 @@ export default function ApproverSection({ projectCode, projectData }) {
               >
                 <table
                   className="w-full border-collapse text-[12px]"
-                  style={{ minWidth: `${240 + 160 + levels.length * 155}px` }}
+                  style={{ minWidth: `${240 + 160 + maxLevels * 155 + 72}px` }}
                 >
-                  {/* Sticky header */}
                   <thead className="sticky top-0 z-10">
                     <tr className="bg-[#d9d9d9]">
                       <th
@@ -545,7 +515,7 @@ export default function ApproverSection({ projectCode, projectData }) {
                       >
                         Creator
                       </th>
-                      {levels.map((lk) => (
+                      {levelKeys.map((lk) => (
                         <th
                           key={lk}
                           className="border border-[#b5b5b5] px-2 py-1.5 text-center font-semibold"
@@ -554,6 +524,13 @@ export default function ApproverSection({ projectCode, projectData }) {
                           {lk}
                         </th>
                       ))}
+                      <th
+                        className="border border-[#b5b5b5] px-1 py-1.5 text-center font-semibold"
+                        style={{ minWidth: 72 }}
+                        title="Add or remove levels per module"
+                      >
+                        Levels
+                      </th>
                     </tr>
                   </thead>
 
@@ -561,12 +538,11 @@ export default function ApproverSection({ projectCode, projectData }) {
                     {ALL_ROWS.map((row) => {
                       const isGroup = !row.isLeaf;
                       const gStyle = isGroup ? groupStyle(row.depth) : "";
-                      // Leaf rows alternate white / very-light-gray
-                      const leafBg = row.isLeaf ? "" : "";
+                      const rowLevelCount = rowLevels[row.rowId] ?? 2;
 
                       return (
-                        <tr key={row.rowId} className={leafBg}>
-                          {/* Module / Sub Module name */}
+                        <tr key={row.rowId}>
+                          {/* Module name */}
                           <td
                             className={`border border-[#b5b5b5] py-1.5 ${
                               isGroup ? gStyle : "bg-white text-gray-800 text-[12px]"
@@ -579,7 +555,7 @@ export default function ApproverSection({ projectCode, projectData }) {
                             {row.title}
                           </td>
 
-                          {/* Creator — read-only */}
+                          {/* Creator */}
                           <td
                             className={`border border-[#b5b5b5] ${
                               isGroup ? gStyle : "bg-[#f9fafb]"
@@ -597,7 +573,9 @@ export default function ApproverSection({ projectCode, projectData }) {
                           </td>
 
                           {/* Level columns */}
-                          {levels.map((lk) => {
+                          {levelKeys.map((lk, colIdx) => {
+                            const colLevelNum = colIdx + 1;
+                            const isActiveForRow = row.isLeaf && colLevelNum <= rowLevelCount;
                             const val = selectedUsers[`${row.rowId}_${lk}`];
                             const currentVal =
                               Array.isArray(val) && val[0] ? String(val[0]) : "";
@@ -606,10 +584,14 @@ export default function ApproverSection({ projectCode, projectData }) {
                               <td
                                 key={lk}
                                 className={`border border-[#b5b5b5] p-0 ${
-                                  isGroup ? gStyle : ""
+                                  isGroup
+                                    ? gStyle
+                                    : !isActiveForRow
+                                    ? "bg-[#f3f3f3]"
+                                    : ""
                                 }`}
                               >
-                                {row.isLeaf && (
+                                {isActiveForRow && (
                                   <SearchableSelect
                                     options={userOptions}
                                     value={currentVal}
@@ -625,6 +607,39 @@ export default function ApproverSection({ projectCode, projectData }) {
                               </td>
                             );
                           })}
+
+                          {/* Per-row level controls */}
+                          <td
+                            className={`border border-[#b5b5b5] px-1 py-0.5 ${
+                              isGroup ? gStyle : "bg-[#fafafa]"
+                            }`}
+                          >
+                            {row.isLeaf && (
+                              <div className="flex items-center justify-center gap-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => removeRowLevel(row.rowId)}
+                                  disabled={disabled || rowLevelCount <= 1}
+                                  title="Remove last level"
+                                  className="w-5 h-5 flex items-center justify-center rounded-sm border border-[#c0c0c0] bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-gray-600"
+                                >
+                                  <Minus size={9} />
+                                </button>
+                                <span className="text-[10px] text-gray-600 w-4 text-center font-medium select-none">
+                                  {rowLevelCount}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => addRowLevel(row.rowId)}
+                                  disabled={disabled}
+                                  title="Add level"
+                                  className="w-5 h-5 flex items-center justify-center rounded-sm border border-[#c0c0c0] bg-white hover:bg-gray-100 disabled:opacity-30 transition-colors text-gray-600"
+                                >
+                                  <Plus size={9} />
+                                </button>
+                              </div>
+                            )}
+                          </td>
                         </tr>
                       );
                     })}
