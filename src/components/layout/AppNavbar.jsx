@@ -18,6 +18,23 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { User, LogOut } from "lucide-react";
 import { ROLE, roleMap } from "@/config/role.config";
 
+function NavTooltip({ label, children }) {
+  return (
+    <div className="relative group flex items-center justify-center">
+      {children}
+      <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[9999]
+        opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <div className="bg-[#1e2a3a] text-white text-[11px] font-medium px-2.5 py-1.5 rounded-md
+          whitespace-nowrap shadow-lg border border-[#2d3d52]">
+          {label}
+        </div>
+        {/* Arrow */}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2a3a]" />
+      </div>
+    </div>
+  );
+}
+
 export default function AppNavbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -170,63 +187,69 @@ export default function AppNavbar() {
           <div className="mt-4 flex items-center flex-wrap gap-4">
             {/* LEFT ICONS */}
             <div className="flex items-center gap-2 h-[32px]">
-              <button
-                className="cursor-pointer"
-                onClick={() => router.push("/dashboard")}
-              >
-                <Image
-                  src="/assets/icons/computer-monitor.png"
-                  alt=""
-                  width={32}
-                  height={32}
-                />
-                
-              </button>
-              <button
-                className="cursor-pointer"
-                onClick={() => router.push("/master/ledger-code")}
-              >
-                <Image
-                  src="/assets/icons/database.png"
-                  alt="Master"
-                  width={32}
-                  height={32}
-                />
-              </button>
-              <button
-                className="cursor-pointer"
-                onClick={() => {
-                  if (role === roleMap.super_admin) {
-                    router.push("/settings/company-details");
-                  }
-                }}
-              >
-                <Image
-                  src="/assets/icons/settings.png"
-                  alt="Settings"
-                  width={32}
-                  height={32}
-                />
-              </button>
-              <div
-                className="relative flex items-center h-[32px]"
-              >
+              <NavTooltip label="Dashboard">
                 <button
-                  className="cursor-pointer flex items-center justify-center h-[32px]"
-                  onClick={() => {
-                  if (role === roleMap.user) {
-                    router.push("/");
-                  }
-                }}
+                  className="cursor-pointer"
+                  onClick={() => router.push("/dashboard")}
                 >
                   <Image
-                    src="/assets/icons/project-list.png"
-                    alt=""
+                    src="/assets/icons/computer-monitor.png"
+                    alt="Dashboard"
                     width={32}
                     height={32}
                   />
                 </button>
-              </div>
+              </NavTooltip>
+
+              <NavTooltip label="Master">
+                <button
+                  className="cursor-pointer"
+                  onClick={() => router.push("/master/ledger-code")}
+                >
+                  <Image
+                    src="/assets/icons/database.png"
+                    alt="Master Data"
+                    width={32}
+                    height={32}
+                  />
+                </button>
+              </NavTooltip>
+
+              <NavTooltip label="Settings">
+                <button
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (role === roleMap.super_admin) {
+                      router.push("/settings/company-details");
+                    }
+                  }}
+                >
+                  <Image
+                    src="/assets/icons/settings.png"
+                    alt="Settings"
+                    width={32}
+                    height={32}
+                  />
+                </button>
+              </NavTooltip>
+
+              <NavTooltip label="Project List">
+                <button
+                  className="cursor-pointer flex items-center justify-center h-[32px]"
+                  onClick={() => {
+                    if (role === roleMap.user) {
+                      router.push("/");
+                    }
+                  }}
+                >
+                  <Image
+                    src="/assets/icons/project-list.png"
+                    alt="Project List"
+                    width={32}
+                    height={32}
+                  />
+                </button>
+              </NavTooltip>
             </div>
 
             {/* SPACE BETWEEN ICONS AND TCODE */}
