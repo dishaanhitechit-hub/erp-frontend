@@ -198,17 +198,17 @@ export const sidebarConfig = [
         children: [
           {
             title: "Bill Receive Register(GRN)",
-            path: "/resource-management/sub-contractor-billing/grn", //need path change
+            path: "/resource-management/sub-contractor-billing/grn", 
             permissionKey: "billing_by_grn",
           },
           {
             title: "Bill Receive Register(SRN)",
-            path: "/resource-management/sub-contractor-billing/srn", //need path change
+            path: "/resource-management/sub-contractor-billing/srn", 
             permissionKey: "billing_by_srn",
           },
           {
             title: "e-reconcile Bill",
-            path: "/resource-management/sub-contractor-billing/e-reconcile-bill", //need path change
+            path: "/resource-management/sub-contractor-billing/e-reconcile-bill", 
             permissionKey: "e_reconcile_bill", //need to be added in backend
           },
           {
@@ -217,7 +217,7 @@ export const sidebarConfig = [
             permissionKey: "payment_request",
           },
         ],
-      },//upto this done
+      },
       {
         title: "Contact Dairy",
         children: [
@@ -341,17 +341,17 @@ export const sidebarConfig = [
         children: [
           {
             title: "Sale Bill - Claim",
-            path: "/project-management/customer-billing/certified",
+            path: "/project-management/customer-billing/sale-bill-claim",
             permissionKey: "sale_claim_bill",
           },
           {
             title: " Sale Bill - Certified",
-            path: "/project-management/customer-billing/pending",
-            permissionKey: "certified_sale",
+            path: "/project-management/customer-billing/sale-bill-certified",
+            permissionKey: "sale_certified_bill",
           },
           {
             title: "Uncertified Statement",
-            path: "/project-management/customer-billing/wip",
+            path: "/project-management/customer-billing/uncertified-statement",
             permissionKey: "uncertified_statement",
           },
         ],
@@ -372,7 +372,7 @@ export const sidebarConfig = [
       },
       {
         title: "Asset Inventory",
-        path: "/asset-management/stock-report",
+        path: "/asset-management/asset-inventory",
         permissionKey: "asset_inventory",
       },
       {
@@ -624,7 +624,7 @@ export const sidebarConfig = [
     children: [
       {
         title: "Task Tracker",
-        path: "/task-management/new",
+        path: "/task-management/task-tracker",
         permissionKey: "task_tracker",
       },
       {
@@ -634,7 +634,7 @@ export const sidebarConfig = [
       },
       {
         title: "Schedule Compliance",
-        path: "/task-management/closing",
+        path: "/task-management/schedule-compliance",
         permissionKey: "schedule_compliance",
       },
       

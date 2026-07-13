@@ -180,6 +180,7 @@ export default function AppNavbar() {
                   width={32}
                   height={32}
                 />
+                
               </button>
               <button
                 className="cursor-pointer"
@@ -187,7 +188,7 @@ export default function AppNavbar() {
               >
                 <Image
                   src="/assets/icons/database.png"
-                  alt=""
+                  alt="Master"
                   width={32}
                   height={32}
                 />
@@ -195,33 +196,23 @@ export default function AppNavbar() {
               <button
                 className="cursor-pointer"
                 onClick={() => {
-                  if (role?.toLowerCase() === ROLE.SUPER_ADMIN) {
+                  if (role === roleMap.super_admin) {
                     router.push("/settings/company-details");
                   }
                 }}
               >
                 <Image
                   src="/assets/icons/settings.png"
-                  alt=""
+                  alt="Settings"
                   width={32}
                   height={32}
                 />
               </button>
               <div
-                // ref={projectRef}
                 className="relative flex items-center h-[32px]"
               >
                 <button
                   className="cursor-pointer flex items-center justify-center h-[32px]"
-                  // onClick={async () => {
-                  //   const nextState = !showProjectSelect;
-
-                  //   setShowProjectSelect(nextState);
-
-                  //   if (nextState && projectList.length === 0) {
-                  //     await fetchProjects();
-                  //   }
-                  // }}
                   onClick={() => {
                   if (role === roleMap.user) {
                     router.push("/");
@@ -235,32 +226,6 @@ export default function AppNavbar() {
                     height={32}
                   />
                 </button>
-
-                {/* {showProjectSelect && (
-                  <div
-                    className="
-                              absolute
-                              top-11
-                              left-0
-                              z-50
-                              w-[280px]
-                              sm:w-[320px]
-                              md:w-[350px]
-                            "
-                  >
-                    <SearchableSelect
-                      options={projectList}
-                      value={projectInfo.projectId}
-                      onChange={handleProjectSelect}
-                      placeholder={
-                        loadingProjects ? "Loading..." : "SingleSelect Project"
-                      }
-                      labelKey={["projectCode", "projectName"]}
-                      valueKey="id"
-                      searchKeys={["projectName", "projectCode"]}
-                    />
-                  </div>
-                )} */}
               </div>
             </div>
 
