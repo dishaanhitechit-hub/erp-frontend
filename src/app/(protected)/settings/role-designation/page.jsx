@@ -15,6 +15,7 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { toast } from "sonner";
 import { ChevronDown, Trash2, Link2, Loader2, X } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
+import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { useRouter } from "next/navigation";
 import { getPageActions } from "@/components/common/PageActionButtons";
 import MapUserModal from "@/components/common/MapUserModal";
@@ -525,9 +526,7 @@ export default function ProjectRolePage() {
   });
 
   return (
-      <>
-        <PageHeader actions={actions} />
-
+      <HeaderWrapper header={<PageHeader actions={actions} />}>
         <div className="p-4 space-y-2">
           {/* TOP ROW */}
           <div className="flex flex-wrap items-center gap-2">
@@ -825,6 +824,6 @@ export default function ProjectRolePage() {
             projectCode={projectCode}
             projectData={projectData}
         />
-      </>
+      </HeaderWrapper>
   );
 }
