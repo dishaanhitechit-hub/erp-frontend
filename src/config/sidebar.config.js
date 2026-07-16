@@ -37,11 +37,11 @@ export const sidebarConfig = [
         path: "/settings/role-designation",
         permissionKey: "roles_and_user_assignment",
       },
-      {
-        title: "Approval Path Line & User",
-        path: "/settings/approval-path",
-        permissionKey: "approval_path_line_user",
-      },
+      // {
+      //   title: "Approval Path Line & User",
+      //   path: "/settings/approval-path",
+      //   permissionKey: "approval_path_line_user",
+      // },
     ],
   },
 
