@@ -10,8 +10,7 @@ import SupplierForm from "@/components/contact-dairy/SupplierForm";
 
 export default function Page() {
   const router = useRouter();
-  // const access = getPageAccess({ pageCode: "contact_dairy_plant_machinery", pageType: "ADD" });
-  const access = getPageAccess({ pageCode: "order", pageType: "ADD" });
+  const access = getPageAccess({ pageCode: "contact_dairy_plant_machinery", pageType: "ADD" });
   if (!access.allowed) return <PageNotAvailable />;
 
   const actions = getPageActions({ router });

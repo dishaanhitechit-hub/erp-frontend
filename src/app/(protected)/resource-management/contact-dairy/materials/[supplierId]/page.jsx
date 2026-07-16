@@ -18,8 +18,7 @@ export default function Page() {
   const router = useRouter();
   const [data, setData] = useState(null);
 
-  // const access = getPageAccess({ pageCode: "contact_dairy_materials", pageType: "EDIT" });
-  const access = getPageAccess({ pageCode: "order", pageType: "EDIT" });
+  const access = getPageAccess({ pageCode: "contact_dairy_materials", pageType: "EDIT" });
 
   useEffect(() => {
     if (!supplierId || !access.allowed) return;
