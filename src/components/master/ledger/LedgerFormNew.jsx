@@ -26,7 +26,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass } from "@/lib/formStyles";
 import { getStateCodeByName, INDIAN_STATES } from "@/config/indianStates.config";
-import { TYPE_LABEL, TYPE_BADGE_COLOR } from "@/components/contact-dairy/NatureOfServiceSelect";
+import NatureOfServiceSelect, { TYPE_LABEL, TYPE_BADGE_COLOR } from "@/components/contact-dairy/NatureOfServiceSelect";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -37,12 +37,6 @@ const ALL_TYPES = [
   { value: "Others",          label: "Others" },
 ];
 
-const LEDGER_CATEGORIES = [
-  { value: "Material_Supplier",                label: "Material Supplier" },
-  { value: "Service_Provider_Manpower",        label: "Service Provider (Manpower)" },
-  { value: "Service_Provider_Plant_Machinery", label: "Service Provider (Plant & Machinery)" },
-  { value: "Others",                           label: "Others" },
-];
 
 // ─── Validation schema ────────────────────────────────────────────────────────
 
@@ -183,10 +177,10 @@ export default function LedgerFormNew({
   const [pendingSupplierSelect, setPendingSupplierSelect] = useState(null);
 
   // ── Supplier type badges ───────────────────────────────────────────────────
-  const [supplierTypes, setSupplierTypes]           = useState([]);
-  const [ledgerCategories, setLedgerCategories]     = useState([]);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const categoryDropdownRef = useRef(null);
+  const [supplierTypes, setSupplierTypes]               = useState([]);
+  const [natureOfService, setNatureOfService]           = useState([]);
+  const [typeDropdownOpen, setTypeDropdownOpen]         = useState(false);
+  const typeDropdownRef = useRef(null);
 
   // ── Name suggestion state ─────────────────────────────────────────────────
   const [nameQuery, setNameQuery]             = useState("");
@@ -239,16 +233,16 @@ export default function LedgerFormNew({
       .finally(() => setSupplierListLoading(false));
   }, []);
 
-  // ── Close category dropdown on outside click ──────────────────────────────
+  // ── Close type dropdown on outside click ─────────────────────────────────
   useEffect(() => {
-    if (!categoryDropdownOpen) return;
+    if (!typeDropdownOpen) return;
     const handler = (e) => {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target))
-        setCategoryDropdownOpen(false);
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target))
+        setTypeDropdownOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [categoryDropdownOpen]);
+  }, [typeDropdownOpen]);
 
   // ── Populate from initialData ─────────────────────────────────────────────
   useEffect(() => {
@@ -273,7 +267,7 @@ export default function LedgerFormNew({
     setLedgerCode(initialData.ledgerCode || "");
     setNameQuery(initialData.ledgerName || "");
     setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
-    setLedgerCategories(Array.isArray(initialData.ledgerCategory) ? initialData.ledgerCategory : []);
+    setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
     setLinkedSupplierId(initialData.supplierId ? String(initialData.supplierId) : null);
     setSelectedSupplierId(initialData.supplierId ? String(initialData.supplierId) : "");
     setFileUrls({
@@ -320,6 +314,7 @@ export default function LedgerFormNew({
     }));
     setNameQuery(s.supplierName || "");
     setSupplierTypes(Array.isArray(s.supplierTypes) ? s.supplierTypes : []);
+    setNatureOfService(Array.isArray(s.natureOfService) ? s.natureOfService : s.natureOfService ? [s.natureOfService] : []);
     setLinkedSupplierId(String(s.supplierId));
     setSelectedSupplierId(String(s.supplierId));
     setShowSuggestions(false);
@@ -362,7 +357,7 @@ export default function LedgerFormNew({
     reset({ ...initialData });
     setNameQuery(initialData.ledgerName || "");
     setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
-    setLedgerCategories(Array.isArray(initialData.ledgerCategory) ? initialData.ledgerCategory : []);
+    setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
     setFileUrls({ trade: initialData.tradeLicenceFile, pan: initialData.panFile, gstn: initialData.gstnFile, bank: initialData.bankDetailsFile });
     setFiles({}); setFileNames({});
     if (tradeRef.current) tradeRef.current.value = "";
@@ -388,7 +383,7 @@ export default function LedgerFormNew({
       // Supplier-linked fields
       if (linkedSupplierId) formData.append("supplierId", linkedSupplierId);
       supplierTypes.forEach((t) => formData.append("supplierTypes[]", t));
-      ledgerCategories.forEach((c) => formData.append("ledgerCategory[]", c));
+      natureOfService.forEach((n) => formData.append("natureOfService[]", n));
 
       if (files.trade) formData.append("tradeLicenceFile", files.trade);
       if (files.pan)   formData.append("panFile",          files.pan);
@@ -484,67 +479,65 @@ export default function LedgerFormNew({
           </Row>
         </Section>
 
-        {/* ── Supplier types ──────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2 mb-4 px-1">
-          {ALL_TYPES.map((t) => {
-            const checked = supplierTypes.includes(t.value);
-            return (
-              <label key={t.value} className={`flex items-center gap-1.5 select-none ${fieldDisabled ? "cursor-default" : "cursor-pointer"}`}>
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  disabled={fieldDisabled}
-                  onChange={() => toggleType(t.value)}
-                  className="w-3.5 h-3.5 accent-blue-600"
-                />
-                <span className={`text-[11px] px-2 py-0.5 rounded border font-medium transition-opacity ${TYPE_BADGE_COLOR[t.value] || "bg-gray-100 text-gray-600 border-gray-200"} ${!checked ? "opacity-40" : ""}`}>
-                  {TYPE_LABEL[t.value] || t.label}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-
         {/* ── Ledger Code ─────────────────────────────────────────────── */}
         <div className="flex items-center gap-2 mb-4">
           <div className={labelCls}>Ledger Code</div>
           <Input value={ledgerCode} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-40 font-mono`} />
         </div>
 
-        {/* ── Ledger Category (multi-select dropdown) ─────────────────── */}
+        {/* ── Supplier Types (multi-select dropdown) ──────────────────── */}
         <div className="flex items-center gap-2 mb-4">
-          <div className={labelCls}>Ledger Category</div>
-          <div ref={categoryDropdownRef} className="relative flex-1">
+          <div className={labelCls}>Supplier Type</div>
+          <div ref={typeDropdownRef} className="relative flex-1">
             <button
               type="button"
               disabled={fieldDisabled}
-              onClick={() => !fieldDisabled && setCategoryDropdownOpen((p) => !p)}
-              className={`${getInputClass(false, fieldDisabled)} w-full h-[30px] px-3 flex items-center justify-between text-[13px]`}
+              onClick={() => !fieldDisabled && setTypeDropdownOpen((p) => !p)}
+              className={`${getInputClass(false, fieldDisabled)} w-full min-h-[30px] px-3 flex items-center justify-between gap-2 text-[13px]`}
             >
-              <span className={`truncate ${!ledgerCategories.length ? "text-gray-400" : ""}`}>
-                {ledgerCategories.length
-                  ? LEDGER_CATEGORIES.filter((c) => ledgerCategories.includes(c.value)).map((c) => c.label).join(", ")
-                  : "Select categories"}
-              </span>
+              <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+                {supplierTypes.length > 0 ? (
+                  supplierTypes.map((t) => (
+                    <span key={t} className={`text-[11px] px-2 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+                      {TYPE_LABEL[t] || t}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-gray-400">Select supplier types</span>
+                )}
+              </div>
               <ChevronDown size={14} className="shrink-0 ml-1 text-gray-500" />
             </button>
-            {categoryDropdownOpen && (
+            {typeDropdownOpen && (
               <div className="absolute top-full left-0 z-50 mt-1 w-full bg-white border border-gray-200 rounded-sm shadow-lg overflow-hidden">
-                {LEDGER_CATEGORIES.map((c) => {
-                  const checked = ledgerCategories.includes(c.value);
+                {ALL_TYPES.map((t) => {
+                  const checked = supplierTypes.includes(t.value);
                   return (
                     <div
-                      key={c.value}
-                      onClick={() => setLedgerCategories((prev) => checked ? prev.filter((v) => v !== c.value) : [...prev, c.value])}
+                      key={t.value}
+                      onMouseDown={(e) => { e.preventDefault(); toggleType(t.value); }}
                       className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer"
                     >
-                      <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer" />
-                      <span className="text-[13px] text-gray-700">{c.label}</span>
+                      <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer w-3.5 h-3.5" />
+                      <span className={`text-[13px] ${checked ? "text-blue-700 font-medium" : "text-gray-700"}`}>{t.label}</span>
                     </div>
                   );
                 })}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* ── Nature of Service ────────────────────────────────────────── */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className={labelCls}>Nature of Service</div>
+          <div className="flex-1">
+            <NatureOfServiceSelect
+              selectedTypes={supplierTypes}
+              value={natureOfService}
+              onChange={setNatureOfService}
+              disabled={fieldDisabled}
+            />
           </div>
         </div>
 
