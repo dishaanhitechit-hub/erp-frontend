@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass } from "@/lib/formStyles";
@@ -98,7 +99,7 @@ export default function ServiceOrderBasicSection({
     const fetchLedgers = async () => {
       try {
         const res = await apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_LEDGER, method: "GET" });
-        setLedgerList(res.data || []);
+        setLedgerList((res.data || []).slice().sort((a, b) => (a.ledgerName || "").localeCompare(b.ledgerName || "")));
       } catch {
         toast.error("Failed to load vendors");
       }
@@ -320,9 +321,10 @@ export default function ServiceOrderBasicSection({
               control={control}
               name="vendorId"
               render={({ field }) => (
-                <Select
+                <SearchableSelect
+                  options={ledgerList}
                   value={field.value ? String(field.value) : ""}
-                  onValueChange={(val) => {
+                  onChange={(val) => {
                     field.onChange(val);
                     if (!val) {
                       setValue("partyAddress", ""); setValue("gstn", "");
@@ -334,18 +336,12 @@ export default function ServiceOrderBasicSection({
                     setValue("gstn",         vendor.gstin            || "");
                   }}
                   disabled={disabled}
-                >
-                  <SelectTrigger className={`${getInputClass(errors.vendorId, disabled)} w-full h-[36px]`}>
-                    <SelectValue placeholder="Filter from Vendor List" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ledgerList.map((ledger) => (
-                      <SelectItem key={ledger.ledgerId} value={String(ledger.ledgerId)}>
-                        {ledger.ledgerName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Filter from Vendor List"
+                  labelKey="ledgerName"
+                  valueKey="ledgerId"
+                  searchKeys={["ledgerName"]}
+                  className={errors.vendorId ? "border-red-500" : ""}
+                />
               )}
             />
           </div>
