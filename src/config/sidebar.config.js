@@ -88,6 +88,27 @@ export const sidebarConfig = [
         path: "/master/bank-cash",
         permissionKey: "bank_cash",
       },
+      {
+        title: "Contact Dairy",
+        key: "master_contact_dairy",
+        children: [
+          {
+            title: "Materials",
+            path: "/master/contact-dairy/materials",
+            permissionKey: "master_contact_dairy_materials",
+          },
+          {
+            title: "Work Force",
+            path: "/master/contact-dairy/work-force",
+            permissionKey: "master_contact_dairy_work_force",
+          },
+          {
+            title: "Plant & Machinery",
+            path: "/master/contact-dairy/plant-machinery",
+            permissionKey: "master_contact_dairy_plant_machinery",
+          },
+        ],
+      },
     ],
   },
 

@@ -248,6 +248,7 @@ export const API_ENDPOINTS = {
     LINK_LEDGER:        "/master/supplier",                  // POST /<supplierId>/link-ledger
     UNLINK_LEDGER:      "/master/supplier",                  // DELETE /<supplierId>/unlink-ledger/<ledgerId>
     NATURE_OF_SERVICE:  "/master/supplier/nature-of-service",// GET  /<supplierType>
+    BULK_ASSIGN_PROJECTS: "/master/supplier/bulk-assign-projects", // POST
   },
 
   //project-management/register/concrete
