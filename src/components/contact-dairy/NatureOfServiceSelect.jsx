@@ -60,12 +60,14 @@ export default function NatureOfServiceSelect({
     });
   }, [selectedTypes.join(",")]); // eslint-disable-line
 
-  // When a type is deselected, remove its options from value
+  // When a type is deselected, remove its options from value — but only touch
+  // values that belong to THIS instance's option pool (leave other instances' values alone)
   useEffect(() => {
     if (!value.length) return;
     const allValid = new Set(selectedTypes.flatMap((t) => optionsByType[t] || []));
-    if (!allValid.size) return;
-    const filtered = value.filter((v) => allValid.has(v));
+    const myPool   = new Set(Object.values(optionsByType).flat());
+    if (!myPool.size) return;
+    const filtered = value.filter((v) => !myPool.has(v) || allValid.has(v));
     if (filtered.length !== value.length) onChange?.(filtered);
   }, [selectedTypes.join(","), Object.keys(optionsByType).join(",")]); // eslint-disable-line
 

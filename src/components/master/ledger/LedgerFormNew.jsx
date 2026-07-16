@@ -177,10 +177,8 @@ export default function LedgerFormNew({
   const [pendingSupplierSelect, setPendingSupplierSelect] = useState(null);
 
   // ── Supplier type badges ───────────────────────────────────────────────────
-  const [supplierTypes, setSupplierTypes]               = useState([]);
-  const [natureOfService, setNatureOfService]           = useState([]);
-  const [typeDropdownOpen, setTypeDropdownOpen]         = useState(false);
-  const typeDropdownRef = useRef(null);
+  const [supplierTypes, setSupplierTypes]     = useState([]);
+  const [natureOfService, setNatureOfService] = useState([]);
 
   // ── Name suggestion state ─────────────────────────────────────────────────
   const [nameQuery, setNameQuery]             = useState("");
@@ -233,16 +231,6 @@ export default function LedgerFormNew({
       .finally(() => setSupplierListLoading(false));
   }, []);
 
-  // ── Close type dropdown on outside click ─────────────────────────────────
-  useEffect(() => {
-    if (!typeDropdownOpen) return;
-    const handler = (e) => {
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target))
-        setTypeDropdownOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [typeDropdownOpen]);
 
   // ── Populate from initialData ─────────────────────────────────────────────
   useEffect(() => {
@@ -485,61 +473,49 @@ export default function LedgerFormNew({
           <Input value={ledgerCode} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-40 font-mono`} />
         </div>
 
-        {/* ── Supplier Types (multi-select dropdown) ──────────────────── */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className={labelCls}>Supplier Type</div>
-          <div ref={typeDropdownRef} className="relative flex-1">
-            <button
-              type="button"
-              disabled={fieldDisabled}
-              onClick={() => !fieldDisabled && setTypeDropdownOpen((p) => !p)}
-              className={`${getInputClass(false, fieldDisabled)} w-full min-h-[30px] px-3 flex items-center justify-between gap-2 text-[13px]`}
-            >
-              <div className="flex flex-wrap gap-1 flex-1 min-w-0">
-                {supplierTypes.length > 0 ? (
-                  supplierTypes.map((t) => (
-                    <span key={t} className={`text-[11px] px-2 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
-                      {TYPE_LABEL[t] || t}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-gray-400">Select supplier types</span>
-                )}
-              </div>
-              <ChevronDown size={14} className="shrink-0 ml-1 text-gray-500" />
-            </button>
-            {typeDropdownOpen && (
-              <div className="absolute top-full left-0 z-50 mt-1 w-full bg-white border border-gray-200 rounded-sm shadow-lg overflow-hidden">
-                {ALL_TYPES.map((t) => {
-                  const checked = supplierTypes.includes(t.value);
-                  return (
-                    <div
-                      key={t.value}
-                      onMouseDown={(e) => { e.preventDefault(); toggleType(t.value); }}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer"
-                    >
-                      <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer w-3.5 h-3.5" />
-                      <span className={`text-[13px] ${checked ? "text-blue-700 font-medium" : "text-gray-700"}`}>{t.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+        {/* ── Supplier Types (badges) ──────────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-2 mb-3 px-1">
+          {ALL_TYPES.map((t) => {
+            const checked = supplierTypes.includes(t.value);
+            return (
+              <label key={t.value} className={`flex items-center gap-1.5 select-none ${fieldDisabled ? "cursor-default" : "cursor-pointer"}`}>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={fieldDisabled}
+                  onChange={() => toggleType(t.value)}
+                  className="w-3.5 h-3.5 accent-blue-600"
+                />
+                <span className={`text-[11px] px-2 py-0.5 rounded border font-medium transition-opacity ${TYPE_BADGE_COLOR[t.value] || "bg-gray-100 text-gray-600 border-gray-200"} ${!checked ? "opacity-40" : ""}`}>
+                  {TYPE_LABEL[t.value] || t.label}
+                </span>
+              </label>
+            );
+          })}
         </div>
 
-        {/* ── Nature of Service ────────────────────────────────────────── */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className={labelCls}>Nature of Service</div>
-          <div className="flex-1">
-            <NatureOfServiceSelect
-              selectedTypes={supplierTypes}
-              value={natureOfService}
-              onChange={setNatureOfService}
-              disabled={fieldDisabled}
-            />
+        {/* ── Nature of Service (one select per type) ──────────────────── */}
+        {supplierTypes.length > 0 && (
+          <div className="flex flex-col gap-2 mb-4">
+            {supplierTypes.map((t) => (
+              <div key={t} className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                <div className={`${labelCls} shrink-0`}>
+                  <span className={`text-[11px] px-2 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+                    {TYPE_LABEL[t] || t}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <NatureOfServiceSelect
+                    selectedTypes={[t]}
+                    value={natureOfService}
+                    onChange={setNatureOfService}
+                    disabled={fieldDisabled}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
 
         {/* ── Supplier Details ─────────────────────────────────────────── */}
         <Section title="Supplier Details">
