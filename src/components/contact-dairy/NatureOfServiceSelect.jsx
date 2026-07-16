@@ -91,7 +91,8 @@ export default function NatureOfServiceSelect({
   };
 
   const hasOptions = selectedTypes.some((t) => (optionsByType[t] || []).length > 0);
-  const displayLabel = value.length ? value.join(", ") : "Select nature of service";
+  const myPool = new Set(selectedTypes.flatMap((t) => optionsByType[t] || []));
+  const mySelected = value.filter((v) => myPool.has(v));
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -106,10 +107,10 @@ export default function NatureOfServiceSelect({
             : "border-[#8f8f8f] bg-white hover:border-blue-400 cursor-pointer"
           }`}
       >
-        {/* Selected tags or placeholder */}
+        {/* Selected tags or placeholder — only show this instance's selections */}
         <div className="flex flex-wrap gap-1 flex-1 min-w-0">
-          {value.length > 0 ? (
-            value.map((v) => (
+          {mySelected.length > 0 ? (
+            mySelected.map((v) => (
               <span key={v} className="inline-flex items-center gap-0.5 text-[11px] bg-blue-50 text-blue-700 border border-blue-200 rounded px-1.5 py-0.5 max-w-[180px] truncate">
                 <span className="truncate">{v}</span>
                 {!disabled && (
@@ -120,7 +121,7 @@ export default function NatureOfServiceSelect({
               </span>
             ))
           ) : (
-            <span className="text-gray-400">{displayLabel}</span>
+            <span className="text-gray-400">Select nature of service</span>
           )}
         </div>
         <ChevronDown size={14} className={`text-gray-500 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />

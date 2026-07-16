@@ -325,16 +325,32 @@ export default function LedgerFormNew({
     setFileNames((p) => ({ ...p, [key]: `${file.name} (${(file.size / 1024).toFixed(1)} KB)` }));
   };
 
+  const openFilePicker = (key, ref) => {
+    ref.current?.click();
+    const onFocus = () => {
+      window.removeEventListener("focus", onFocus);
+      setTimeout(() => {
+        if (!ref.current?.files?.[0]) {
+          setFiles((p) => ({ ...p, [key]: null }));
+          setFileNames((p) => ({ ...p, [key]: "" }));
+          if (ref.current) ref.current.value = "";
+        }
+      }, 200);
+    };
+    window.addEventListener("focus", onFocus);
+  };
+
   const renderFile = (key, ref, labelText) => (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <div className="px-3 py-1 bg-[#8e7cc3] text-white min-w-[120px] rounded-sm text-[13px]">{labelText}</div>
       {isEditing && (
-        <button type="button" onClick={() => ref.current?.click()} className="bg-[#f6c85f] px-3 py-1 rounded-sm cursor-pointer text-[13px]" disabled={isSubmitting}>@</button>
+        <button type="button" onClick={() => openFilePicker(key, ref)} className="bg-[#f6c85f] px-3 py-1 rounded-sm cursor-pointer text-[13px]" disabled={isSubmitting}>@</button>
       )}
-      {isEditing
-        ? fileNames[key] && <span className="text-[11px] text-gray-600">{fileNames[key]}</span>
-        : fileUrls[key] && <button type="button" onClick={() => window.open(fileUrls[key])} className="text-blue-500 underline text-[11px]">Download</button>
-      }
+      {fileNames[key] ? (
+        <span className="text-[11px] text-gray-600 italic">{fileNames[key]}</span>
+      ) : fileUrls[key] ? (
+        <button type="button" onClick={() => window.open(fileUrls[key])} className="text-blue-500 underline text-[11px]">Download</button>
+      ) : null}
       <input type="file" hidden ref={ref} onChange={(e) => handleFileChange(key, e.target.files[0])} />
     </div>
   );
@@ -387,7 +403,8 @@ export default function LedgerFormNew({
 
       const d = Array.isArray(res?.data) ? res.data[0] : res?.data;
       if (d?.ledgerCode) setLedgerCode(d.ledgerCode);
-      setFileUrls({ trade: d?.tradeLicenceUrl, pan: d?.panUrl, gstn: d?.gstnUrl, bank: d?.bankDetailsUrl });
+      setFileUrls({ trade: d?.tradeLicenceFile, pan: d?.panFile, gstn: d?.gstnFile, bank: d?.bankDetailsFile });
+      setFiles({}); setFileNames({});
       setIsEditing(false);
       toast.success(mode === "create" ? "Created" : "Updated", { id: toastId });
     } catch (err) {
