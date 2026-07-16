@@ -50,10 +50,14 @@ export const apiRequest = async ({
   }
 
   if (!res.ok) {
-    // Fixed - only redirect on 401 if this is an authenticated request
     if (res.status === 401 && requireAuth && typeof window !== "undefined") {
       clearAuthCookies();
       window.location.href = "/login";
+    }
+    if (res.status === 403 && typeof window !== "undefined") {
+      import("sonner").then(({ toast }) => {
+        toast.error("You don't have permission to perform this action");
+      });
     }
     let msg = result?.message || result?.msg;
     throw new Error(msg || "API Error");

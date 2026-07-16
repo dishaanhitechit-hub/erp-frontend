@@ -239,6 +239,17 @@ export const API_ENDPOINTS = {
       },
     },
   },
+  SUPPLIER: {
+    LIST:               "/master/supplier/list",             // GET ?supplierType= ?supplierName=
+    CREATE:             "/master/supplier/create",           // POST
+    GET_BY_ID:          "/master/supplier",                  // GET  /<supplierId>
+    UPDATE:             "/master/supplier/update",           // PUT  /<supplierId>
+    DELETE:             "/master/supplier/delete",           // DELETE /<supplierId>
+    LINK_LEDGER:        "/master/supplier",                  // POST /<supplierId>/link-ledger
+    UNLINK_LEDGER:      "/master/supplier",                  // DELETE /<supplierId>/unlink-ledger/<ledgerId>
+    NATURE_OF_SERVICE:  "/master/supplier/nature-of-service",// GET  /<supplierType>
+  },
+
   //project-management/register/concrete
   PROJECT: {
     REGISTER: {
