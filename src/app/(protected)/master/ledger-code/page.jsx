@@ -12,6 +12,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { isMasterEditable } from "@/helper/getMasterAccess";
+import { TYPE_LABEL } from "@/components/contact-dairy/NatureOfServiceSelect";
 
 export default function Page() {
   const router = useRouter();
@@ -36,14 +37,20 @@ export default function Page() {
 
         const ledgers = res.data || [];
 
-        const formatted = ledgers.map((p, index) => ({
-          ledgerId: p.ledgerId,
-          sl: index + 1,
-          ledgerCode: p.ledgerCode,
-          ledgerName: p.ledgerName,
-          categoryName: p.categoryName,
-          whatsappNumber: p.whatsappNumber,
-        }));
+        const formatted = ledgers.map((p, index) => {
+          const types = Array.isArray(p.supplierTypes) ? p.supplierTypes : [];
+          const categoryDisplay = types.length
+            ? types.map((t) => TYPE_LABEL[t] || t).join(", ")
+            : p.categoryName || "—";
+          return {
+            ledgerId: p.ledgerId,
+            sl: index + 1,
+            ledgerCode: p.ledgerCode,
+            ledgerName: p.ledgerName,
+            categoryName: categoryDisplay,
+            whatsappNumber: p.whatsappNumber,
+          };
+        });
 
         setData(formatted);
         setFilteredData(formatted);
