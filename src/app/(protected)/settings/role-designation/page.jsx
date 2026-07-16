@@ -57,6 +57,7 @@ export default function ProjectRolePage() {
   const [deleteItem, setDeleteItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [searchSuccess, setSearchSuccess] = useState(false);
+  const [approverRefetchKey, setApproverRefetchKey] = useState(0);
   const [searching, setSearching] = useState(false);
 
   const [openLocationModal, setOpenLocationModal] = useState(false);
@@ -428,6 +429,7 @@ export default function ProjectRolePage() {
       toast.success("Saved successfully", { id: toastId });
       setIsEditing(false);
       setLoading(false);
+      setApproverRefetchKey((k) => k + 1);
     } catch (err) {
       toast.error("Failed", { id: toastId });
       setLoading(false);
@@ -714,6 +716,7 @@ export default function ProjectRolePage() {
             <ApproverSection
               projectCode={projectCode}
               projectData={projectData}
+              refetchKey={approverRefetchKey}
             />
           </div>
 

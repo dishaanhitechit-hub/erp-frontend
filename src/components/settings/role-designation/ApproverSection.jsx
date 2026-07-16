@@ -195,7 +195,7 @@ function CreatorCell({ userIds, allUsers, onShowMore }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function ApproverSection({ projectCode, projectData }) {
+export default function ApproverSection({ projectCode, projectData, refetchKey = 0 }) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [projectUsers, setProjectUsers] = useState([]);
@@ -296,7 +296,7 @@ export default function ApproverSection({ projectCode, projectData }) {
     };
 
     load();
-  }, [projectCode]);
+  }, [projectCode, refetchKey]);
 
   // ---------------------------------------------------------------------------
   // Per-row level management

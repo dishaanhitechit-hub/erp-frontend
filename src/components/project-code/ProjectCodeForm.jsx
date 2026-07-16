@@ -601,8 +601,8 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
       <div>
         {/* ADDRESS BLOCK */}
         {[
-          ["BADD", "Billing Address", "billingAddress"],
-          ["CBADD", "Company Billing Address", "companyBillingAddress"],
+          ["BADD", "Sale Billing Address", "billingAddress"],
+          ["CBADD", "Purchase Billing Address", "companyBillingAddress"],
           ["SHP1", "Shipping Address 1", "shippingAddress"],
           ["SHP2", "Shipping Address 2", "shippingAddress2"],
           ["SHP3", "Shipping Address 3", "shippingAddress3"],
