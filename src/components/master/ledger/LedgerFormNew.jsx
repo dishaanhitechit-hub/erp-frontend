@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -192,6 +192,17 @@ export default function LedgerFormNew({
   // ── Ledger code ───────────────────────────────────────────────────────────
   const [ledgerCode, setLedgerCode] = useState("");
 
+  // ── Phone fields (formatted display, raw digits stored) ──────────────────
+  const [contactNumber, setContactNumber] = useState("");
+  const [whatsappNum,   setWhatsappNum]   = useState("");
+
+  const formatPhone = (raw) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 5) return digits;
+    return `${digits.slice(0, 5)} ${digits.slice(5)}`;
+  };
+  const rawPhone = (formatted) => formatted.replace(/\D/g, "").slice(0, 10);
+
   // ── Files ─────────────────────────────────────────────────────────────────
   const [fileNames, setFileNames] = useState({});
   const [fileUrls,  setFileUrls]  = useState({});
@@ -252,19 +263,24 @@ export default function LedgerFormNew({
       branchName:           initialData.branchName           || "",
       ifscCode:             initialData.ifscCode             || "",
     });
-    setLedgerCode(initialData.ledgerCode || "");
-    setNameQuery(initialData.ledgerName || "");
-    setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
-    setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
-    setLinkedSupplierId(initialData.supplierId ? String(initialData.supplierId) : null);
-    setSelectedSupplierId(initialData.supplierId ? String(initialData.supplierId) : "");
-    setFileUrls({
-      trade: initialData.tradeLicenceFile,
-      pan:   initialData.panFile,
-      gstn:  initialData.gstnFile,
-      bank:  initialData.bankDetailsFile,
+    startTransition(() => {
+      setLedgerCode(initialData.ledgerCode || "");
+      setNameQuery(initialData.ledgerName || "");
+      setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
+      setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
+      setLinkedSupplierId(initialData.supplierId ? String(initialData.supplierId) : null);
+      setSelectedSupplierId(initialData.supplierId ? String(initialData.supplierId) : "");
+      setFileUrls({
+        trade: initialData.tradeLicenceFile,
+        pan:   initialData.panFile,
+        gstn:  initialData.gstnFile,
+        bank:  initialData.bankDetailsFile,
+      });
+      const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
+      setContactNumber(formatPhone(stripPrefix(initialData.primaryContactNumber || "")));
+      setWhatsappNum(formatPhone(stripPrefix(initialData.whatsappNumber || "")));
+      setPageLoading(false);
     });
-    setPageLoading(false);
   }, [initialData, categories]);
 
   // ── Outside-click close for suggestion dropdown ───────────────────────────
@@ -305,6 +321,9 @@ export default function LedgerFormNew({
     setNatureOfService(Array.isArray(s.natureOfService) ? s.natureOfService : s.natureOfService ? [s.natureOfService] : []);
     setLinkedSupplierId(String(s.supplierId));
     setSelectedSupplierId(String(s.supplierId));
+    const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
+    setContactNumber(formatPhone(stripPrefix(s.mobileNumber || "")));
+    setWhatsappNum(formatPhone(stripPrefix(s.whatsappNumber || "")));
     setShowSuggestions(false);
     setSuggestions([]);
     setPendingSuggestion(null);
@@ -363,6 +382,9 @@ export default function LedgerFormNew({
     setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
     setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
     setFileUrls({ trade: initialData.tradeLicenceFile, pan: initialData.panFile, gstn: initialData.gstnFile, bank: initialData.bankDetailsFile });
+    const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
+    setContactNumber(formatPhone(stripPrefix(initialData.primaryContactNumber || "")));
+    setWhatsappNum(formatPhone(stripPrefix(initialData.whatsappNumber || "")));
     setFiles({}); setFileNames({});
     if (tradeRef.current) tradeRef.current.value = "";
     if (panRef.current)   panRef.current.value   = "";
@@ -381,8 +403,12 @@ export default function LedgerFormNew({
     try {
       toastId = toast.loading("Saving...");
       const formData = new FormData();
-      const allowed = ["ledgerName","registeredAddress","corporateAddress","pan","gstin","stateCode","stateName","primaryContactPerson","primaryContactNumber","designation","whatsappNumber","bankAccountNumber","bankName","branchName","ifscCode"];
+      const allowed = ["ledgerName","registeredAddress","corporateAddress","pan","gstin","stateCode","stateName","primaryContactPerson","designation","bankAccountNumber","bankName","branchName","ifscCode"];
       allowed.forEach((k) => formData.append(k, data[k] ?? ""));
+      const digits1 = rawPhone(contactNumber);
+      const digits2 = rawPhone(whatsappNum);
+      formData.append("primaryContactNumber", digits1 ? `+91${digits1}` : "");
+      formData.append("whatsappNumber",       digits2 ? `+91${digits2}` : "");
 
       // Supplier-linked fields
       if (linkedSupplierId) formData.append("supplierId", linkedSupplierId);
@@ -590,10 +616,34 @@ export default function LedgerFormNew({
             <Input {...register("primaryContactPerson")} disabled={fieldDisabled} placeholder="Contact person name" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
           </Row>
           <Row label="Contact Number">
-            <Input {...register("primaryContactNumber")} disabled={fieldDisabled} placeholder="Primary contact number" className={`w-52 ${getInputClass(false, fieldDisabled)}`} />
+            <div className={`flex items-center w-52 h-[30px] rounded-sm border ${fieldDisabled ? "border-[#7fa37f] bg-[#edf8ed]" : "border-[#8f8f8f] bg-white"}`}>
+              <span className={`px-2 text-[13px] select-none border-r ${fieldDisabled ? "border-[#7fa37f] text-gray-500" : "border-[#8f8f8f] text-gray-500"}`}>+91</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                disabled={fieldDisabled}
+                value={contactNumber}
+                onChange={(e) => setContactNumber(formatPhone(e.target.value))}
+                placeholder="00000 00000"
+                maxLength={11}
+                className={`flex-1 bg-transparent outline-none text-[13px] px-2 ${fieldDisabled ? "text-gray-500 cursor-default" : ""}`}
+              />
+            </div>
           </Row>
           <Row label="WhatsApp Number">
-            <Input {...register("whatsappNumber")} disabled={fieldDisabled} placeholder="WhatsApp number" className={`w-52 ${getInputClass(false, fieldDisabled)}`} />
+            <div className={`flex items-center w-52 h-[30px] rounded-sm border ${fieldDisabled ? "border-[#7fa37f] bg-[#edf8ed]" : "border-[#8f8f8f] bg-white"}`}>
+              <span className={`px-2 text-[13px] select-none border-r ${fieldDisabled ? "border-[#7fa37f] text-gray-500" : "border-[#8f8f8f] text-gray-500"}`}>+91</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                disabled={fieldDisabled}
+                value={whatsappNum}
+                onChange={(e) => setWhatsappNum(formatPhone(e.target.value))}
+                placeholder="00000 00000"
+                maxLength={11}
+                className={`flex-1 bg-transparent outline-none text-[13px] px-2 ${fieldDisabled ? "text-gray-500 cursor-default" : ""}`}
+              />
+            </div>
           </Row>
           <Row label="Designation">
             <Input {...register("designation")} disabled={fieldDisabled} placeholder="Designation" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
@@ -607,10 +657,22 @@ export default function LedgerFormNew({
           <div>
             <Section title="Trade Document">
               <Row label="PAN">
-                <Input {...register("pan")} disabled={fieldDisabled} placeholder="e.g. ABCDE1234F" className={`flex-1 ${getInputClass(!!errors.pan, fieldDisabled)}`} />
+                <Input
+                  {...register("pan")}
+                  disabled={fieldDisabled}
+                  placeholder="e.g. ABCDE1234F"
+                  className={`flex-1 ${getInputClass(!!errors.pan, fieldDisabled)}`}
+                  onChange={(e) => setValue("pan", e.target.value.toUpperCase(), { shouldValidate: true })}
+                />
               </Row>
               <Row label="GSTN">
-                <Input {...register("gstin")} disabled={fieldDisabled} placeholder="e.g. 22AAAAA0000A1Z5" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
+                <Input
+                  {...register("gstin")}
+                  disabled={fieldDisabled}
+                  placeholder="e.g. 22AAAAA0000A1Z5"
+                  className={`flex-1 ${getInputClass(false, fieldDisabled)}`}
+                  onChange={(e) => setValue("gstin", e.target.value.toUpperCase(), { shouldValidate: false })}
+                />
               </Row>
               <Row label="State Name">
                 <select
@@ -642,7 +704,13 @@ export default function LedgerFormNew({
                 <Input {...register("branchName")} disabled={fieldDisabled} placeholder="Branch name" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
               </Row>
               <Row label="IFSC Code">
-                <Input {...register("ifscCode")} disabled={fieldDisabled} placeholder="IFSC code" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
+                <Input
+                  {...register("ifscCode")}
+                  disabled={fieldDisabled}
+                  placeholder="IFSC code"
+                  className={`flex-1 ${getInputClass(false, fieldDisabled)}`}
+                  onChange={(e) => setValue("ifscCode", e.target.value.toUpperCase())}
+                />
               </Row>
             </Section>
           </div>
