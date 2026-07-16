@@ -128,6 +128,43 @@ export const routeMetaConfig = [
     basePath: "/master/bank-cash/[id]",
     breadcrumbs: ["Master", "Bank & Cash ID", "Edit"],
   },
+  //contact dairy for master
+  {
+    basePath: "/master/contact-dairy/materials",
+    breadcrumbs: ["Master", "Contact Dairy","Materials","List"],
+  },
+  // {
+  //   basePath: "/master/contact-dairy/materials/new",
+  //   breadcrumbs: ["Master", "Contact Dairy","Materials","New"],
+  // },
+  {
+    basePath: "/master/contact-dairy/materials/[id]",
+    breadcrumbs: ["Master", "Contact Dairy","Materials","Edit"],
+  },
+  {
+    basePath: "/master/contact-dairy/work-force",
+    breadcrumbs: ["Master", "Contact Dairy","Work Force","List"],
+  },
+  // {
+  //   basePath: "/master/contact-dairy/work-force/new",
+  //   breadcrumbs: ["Master", "Contact Dairy","Work Force","New"],
+  // },
+  {
+    basePath: "/master/contact-dairy/work-force/[id]",
+    breadcrumbs: ["Master", "Contact Dairy","Work Force","Edit"],
+  },
+  {
+    basePath: "/master/contact-dairy/plant-machinery",
+    breadcrumbs: ["Master", "Contact Dairy","Plant & Machinery","List"],
+  },
+  // {
+  //   basePath: "/master/contact-dairy/plant-machinery/new",
+  //   breadcrumbs: ["Master", "Contact Dairy","Plant & Machinery","New"],
+  // },
+  {
+    basePath: "/master/contact-dairy/plant-machinery/[id]",
+    breadcrumbs: ["Master", "Contact Dairy","Plant & Machinery","Edit"],
+  },
   //resource-management/procurement
   //indent
   {
@@ -275,6 +312,43 @@ export const routeMetaConfig = [
   {
     basePath: "/logistics/delivery-challan/[id]",
     breadcrumbs: ["Logistics","Delivery Challan","Edit"],
+  },
+  //contact dairy
+  {
+    basePath: "/resource-management/contact-dairy/materials",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Materials","List"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/materials/new",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Materials","New"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/materials/[id]",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Materials","Edit"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/work-force",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Work Force","List"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/work-force/new",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Work Force","New"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/work-force/[id]",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Work Force","Edit"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/plant-machinery",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Plant & Machinery","List"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/plant-machinery/new",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Plant & Machinery","New"],
+  },
+  {
+    basePath: "/resource-management/contact-dairy/plant-machinery/[id]",
+    breadcrumbs: ["Resource Management", "Contact Dairy","Plant & Machinery","Edit"],
   },
   //project management
   {

@@ -55,7 +55,7 @@ export default function SupplierListPage({ pageType, basePath, pageLabel, canAdd
               ? s.serviceDescription.slice(0, 40) + "…"
               : s.serviceDescription
             : "—",
-          natureOfService: s.natureOfService || "—",
+          natureOfService: Array.isArray(s.natureOfService) ? s.natureOfService.join(", ") || "—" : s.natureOfService || "—",
         }));
         setData(formatted);
         setFiltered(formatted);

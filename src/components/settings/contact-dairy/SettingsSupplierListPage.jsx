@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeftRight } from "lucide-react";
 import { toast } from "sonner";
 
 import DataTable from "@/components/common/DataTable";
@@ -51,7 +51,7 @@ export default function SettingsSupplierListPage({ pageType, pageLabel }) {
               ? s.serviceDescription.slice(0, 40) + "…"
               : s.serviceDescription
             : "—",
-          natureOfService: s.natureOfService || "—",
+          natureOfService: Array.isArray(s.natureOfService) ? s.natureOfService.join(", ") || "—" : s.natureOfService || "—",
         }));
         setData(formatted);
         setFiltered(formatted);
@@ -88,7 +88,7 @@ export default function SettingsSupplierListPage({ pageType, pageLabel }) {
       <div className="p-3">
         <SearchSection
           onSearch={handleSearch}
-          actions={[{ label: "Migration", onClick: () => setMigration(true) }]}
+          actions={[{ label: <span className="flex items-center gap-1.5"><ArrowLeftRight size={13} />Migration</span>, onClick: () => setMigration(true) }]}
         />
 
         <DataTable
