@@ -88,7 +88,7 @@ function useSuggestionFetch({ query, pageType, minLen = 2, delay = 600, onResult
           url: API_ENDPOINTS.SUPPLIER.LIST,
           method: "GET",
           // TODO: Remove supplierType param from suggestion query once backend no longer needs it
-          params: { search: q, supplierType: pageType },
+          params: { search: q},
         });
         if (cancelRef.current) return;
         const list = Array.isArray(res?.data) ? res.data : [];
@@ -114,23 +114,22 @@ function SuggestionItem({ supplier, onClick }) {
     <button
       type="button"
       onMouseDown={(e) => { e.preventDefault(); onClick(); }}
-      className="w-full text-left px-3 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
+      className="w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-semibold text-gray-800 group-hover:text-blue-700 truncate">
-          {supplier.supplierName}
-        </span>
-        <span className="text-[10px] text-gray-400 shrink-0 font-mono">{supplier.supplierCode}</span>
-      </div>
-      <div className="mt-0.5 flex flex-wrap gap-1">
-        {(supplier.supplierTypes || []).map((t) => (
-          <span
-            key={t}
-            className={`text-[9px] px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}
-          >
-            {TYPE_LABEL[t] || t}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-[13px] font-semibold text-gray-800 group-hover:text-blue-700 truncate">
+            {supplier.supplierName}
           </span>
-        ))}
+          <span className="text-[10px] text-gray-400 shrink-0 font-mono">{supplier.supplierCode}</span>
+        </div>
+        <div className="flex flex-wrap gap-1 md:shrink-0">
+          {(supplier.supplierTypes || []).map((t) => (
+            <span key={t} className={`text-[9px] px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+              {TYPE_LABEL[t] || t}
+            </span>
+          ))}
+        </div>
       </div>
     </button>
   );
@@ -169,7 +168,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
   const [supplierCode, setSupplierCode] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [supplierTypes, setSupplierTypes] = useState([pageType]);
-  const [natureOfService, setNatureOfService] = useState("");
+  const [natureOfService, setNatureOfService] = useState([]);
 
   // ── Suggestions ────────────────────────────────────────────────────────────
   const [nameQuery, setNameQuery] = useState("");
@@ -177,8 +176,20 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [pendingSuggestion, setPendingSuggestion] = useState(null);
+  const suggestionWrapperRef = useRef(null);
+  const suppressSuggestRef = useRef(false);
 
   const fieldDisabled = !isEditing || saving;
+
+  // ── Close suggestions on outside click ────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (suggestionWrapperRef.current && !suggestionWrapperRef.current.contains(e.target))
+        setShowSuggestions(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // ── Populate from initialData (edit/view mode) ─────────────────────────────
   useEffect(() => {
@@ -199,7 +210,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
     setServiceDescription(d.serviceDescription || "");
     const existingTypes = Array.isArray(d.supplierTypes) ? d.supplierTypes : [];
     setSupplierTypes(existingTypes.includes(pageType) ? existingTypes : [pageType, ...existingTypes]);
-    setNatureOfService(d.natureOfService || "");
+    setNatureOfService(Array.isArray(d.natureOfService) ? d.natureOfService : d.natureOfService ? [d.natureOfService] : []);
   }, [initialData]);
 
   // ── Suggestion fetch (debounced, deduped, empty-safe) ──────────────────────
@@ -207,6 +218,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
     query: nameQuery,
     pageType,
     onResult: (list) => {
+      if (suppressSuggestRef.current) { suppressSuggestRef.current = false; return; }
       setSuggestions(list);
       setShowSuggestions(list.length > 0);
     },
@@ -230,10 +242,11 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
     setServiceDescription(s.serviceDescription || "");
     const existing = Array.isArray(s.supplierTypes) ? s.supplierTypes : [];
     setSupplierTypes(existing.includes(pageType) ? existing : [pageType, ...existing]);
-    setNatureOfService(s.natureOfService || "");
+    setNatureOfService(Array.isArray(s.natureOfService) ? s.natureOfService : s.natureOfService ? [s.natureOfService] : []);
     setResolvedId(String(s.supplierId));
     setShowSuggestions(false);
     setSuggestions([]);
+    suppressSuggestRef.current = true;
     setPendingSuggestion(null);
     setIsEditing(true);
   }, [pageType]);
@@ -248,7 +261,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
 
   // ── Save ────────────────────────────────────────────────────────────────────
   const onSubmit = async (data) => {
-    const payload = { ...data, supplierTypes, natureOfService, serviceDescription };
+    const payload = { ...data, supplierTypes, natureOfService: natureOfService, serviceDescription };
     let tid;
     try {
       setSaving(true);
@@ -343,7 +356,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
         {/* ── Supplier Details ──────────────────────────────────────── */}
         <Section title="Supplier Details">
           {/* Supplier Name with suggestion */}
-          <div className="relative">
+          <div className="relative" ref={suggestionWrapperRef}>
             <FormRow label="Supplier Name" required>
               <div className="relative flex-1">
                 <Input
@@ -354,7 +367,6 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
                     setValue("supplierName", e.target.value, { shouldValidate: true });
                     if (!e.target.value.trim()) { setSuggestions([]); setShowSuggestions(false); }
                   }}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   disabled={fieldDisabled}
                   placeholder="Supplier / Concern name"
                   className={`${getInputClass(!!errors.supplierName, fieldDisabled)} pr-8`}

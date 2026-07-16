@@ -113,20 +113,22 @@ function SuggestionItem({ supplier, onClick }) {
     <button
       type="button"
       onMouseDown={(e) => { e.preventDefault(); onClick(); }}
-      className="w-full text-left px-3 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
+      className="w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-semibold text-gray-800 group-hover:text-blue-700 truncate">
-          {supplier.supplierName}
-        </span>
-        <span className="text-[10px] text-gray-400 shrink-0 font-mono">{supplier.supplierCode}</span>
-      </div>
-      <div className="mt-0.5 flex flex-wrap gap-1">
-        {(supplier.supplierTypes || []).map((t) => (
-          <span key={t} className={`text-[9px] px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
-            {TYPE_LABEL[t] || t}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-[13px] font-semibold text-gray-800 group-hover:text-blue-700 truncate">
+            {supplier.supplierName}
           </span>
-        ))}
+          <span className="text-[10px] text-gray-400 shrink-0 font-mono">{supplier.supplierCode}</span>
+        </div>
+        <div className="flex flex-wrap gap-1 md:shrink-0">
+          {(supplier.supplierTypes || []).map((t) => (
+            <span key={t} className={`text-[9px] px-1.5 py-0.5 rounded border font-medium ${TYPE_BADGE_COLOR[t] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+              {TYPE_LABEL[t] || t}
+            </span>
+          ))}
+        </div>
       </div>
     </button>
   );
@@ -192,6 +194,8 @@ export default function LedgerFormNew({
   const [suggestLoading, setSuggestLoading]   = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [pendingSuggestion, setPendingSuggestion] = useState(null);
+  const suggestionWrapperRef = useRef(null);
+  const suppressSuggestRef = useRef(false);
 
   // ── Ledger code ───────────────────────────────────────────────────────────
   const [ledgerCode, setLedgerCode] = useState("");
@@ -281,10 +285,24 @@ export default function LedgerFormNew({
     setPageLoading(false);
   }, [initialData, categories]);
 
+  // ── Outside-click close for suggestion dropdown ───────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (suggestionWrapperRef.current && !suggestionWrapperRef.current.contains(e.target))
+        setShowSuggestions(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   // ── Name suggestion hook ───────────────────────────────────────────────────
   useSuggestionFetch({
     query: nameQuery,
-    onResult: (list) => { setSuggestions(list); setShowSuggestions(list.length > 0); },
+    onResult: (list) => {
+      if (suppressSuggestRef.current) { suppressSuggestRef.current = false; return; }
+      setSuggestions(list);
+      setShowSuggestions(list.length > 0);
+    },
     onLoading: setSuggestLoading,
   });
 
@@ -308,6 +326,7 @@ export default function LedgerFormNew({
     setSuggestions([]);
     setPendingSuggestion(null);
     setPendingSupplierSelect(null);
+    suppressSuggestRef.current = true;
   }, [reset]);
 
   // ── Type toggle ────────────────────────────────────────────────────────────
@@ -532,7 +551,7 @@ export default function LedgerFormNew({
         {/* ── Supplier Details ─────────────────────────────────────────── */}
         <Section title="Supplier Details">
           {/* Ledger Name with suggestion */}
-          <div className="relative">
+          <div className="relative" ref={suggestionWrapperRef}>
             <Row label="Ledger Name">
               <div className="relative flex-1">
                 <Input
@@ -545,7 +564,7 @@ export default function LedgerFormNew({
                     // clear linked supplier if name manually changed
                     if (linkedSupplierId) { setLinkedSupplierId(null); setSelectedSupplierId(""); }
                   }}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
                   disabled={fieldDisabled}
                   placeholder="Ledger / Concern name"
                   className={`${getInputClass(!!errors.ledgerName, fieldDisabled)} pr-8`}

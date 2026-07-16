@@ -5,41 +5,52 @@ import { ChevronDown, X } from "lucide-react";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 
-const TYPE_LABEL = {
-  materials: "Materials",
-  work_force: "Work Force",
-  plant_machinery: "Plant & Machinery",
-  others: "Others",
+export const TYPE_LABEL = {
+  Materials:       "Materials",
+  Work_Force:      "Work Force",
+  Plant_Machinery: "Plant & Machinery",
+  Others:          "Others",
 };
 
-const TYPE_BADGE_COLOR = {
-  materials: "bg-green-100 text-green-800 border-green-200",
-  work_force: "bg-blue-100 text-blue-800 border-blue-200",
-  plant_machinery: "bg-orange-100 text-orange-800 border-orange-200",
-  others: "bg-gray-100 text-gray-700 border-gray-200",
+export const TYPE_BADGE_COLOR = {
+  Materials:       "bg-green-100 text-green-800 border-green-200",
+  Work_Force:      "bg-blue-100 text-blue-800 border-blue-200",
+  Plant_Machinery: "bg-orange-100 text-orange-800 border-orange-200",
+  Others:          "bg-gray-100 text-gray-700 border-gray-200",
 };
 
-// Fetches and caches nature-of-service lists per type.
-// Shows grouped options with type headings. Single-select (string value).
+const TYPE_HEADING_COLOR = {
+  Materials:       "bg-green-50 text-green-700 border-green-100",
+  Work_Force:      "bg-blue-50 text-blue-700 border-blue-100",
+  Plant_Machinery: "bg-orange-50 text-orange-700 border-orange-100",
+  Others:          "bg-gray-50 text-gray-600 border-gray-100",
+};
+
+/**
+ * Multi-select nature-of-service dropdown.
+ * selectedTypes: string[]  — active type badges (drives which groups to show)
+ * value: string[]          — selected nature-of-service values
+ * onChange: (newArray) => void
+ */
 export default function NatureOfServiceSelect({
   selectedTypes = [],
-  value = "",
+  value = [],
   onChange,
   disabled = false,
 }) {
   const [open, setOpen] = useState(false);
-  // { [type]: string[] }
   const [optionsByType, setOptionsByType] = useState({});
   const wrapperRef = useRef(null);
 
-  // Fetch options for each newly added type
+  // Fetch options per type (cached)
   useEffect(() => {
     selectedTypes.forEach(async (type) => {
-      if (optionsByType[type] !== undefined) return; // already cached
+      if (optionsByType[type] !== undefined) return;
       try {
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.SUPPLIER.NATURE_OF_SERVICE}/${type}`,
+          url: API_ENDPOINTS.SUPPLIER.NATURE_OF_SERVICE,
           method: "GET",
+          params: { types: type },
         });
         const list = Array.isArray(res?.data) ? res.data : [];
         setOptionsByType((prev) => ({ ...prev, [type]: list }));
@@ -49,26 +60,36 @@ export default function NatureOfServiceSelect({
     });
   }, [selectedTypes.join(",")]); // eslint-disable-line
 
-  // When a type is removed and current value was from that type — clear it
+  // When a type is deselected, remove its options from value
   useEffect(() => {
-    if (!value) return;
-    const allValid = selectedTypes.flatMap((t) => optionsByType[t] || []);
-    if (allValid.length > 0 && !allValid.includes(value)) {
-      onChange?.("");
-    }
+    if (!value.length) return;
+    const allValid = new Set(selectedTypes.flatMap((t) => optionsByType[t] || []));
+    if (!allValid.size) return;
+    const filtered = value.filter((v) => allValid.has(v));
+    if (filtered.length !== value.length) onChange?.(filtered);
   }, [selectedTypes.join(","), Object.keys(optionsByType).join(",")]); // eslint-disable-line
 
   // Close on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target))
-        setOpen(false);
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const toggle = (opt) => {
+    const next = value.includes(opt) ? value.filter((v) => v !== opt) : [...value, opt];
+    onChange?.(next);
+  };
+
+  const removeOne = (opt, e) => {
+    e.stopPropagation();
+    onChange?.(value.filter((v) => v !== opt));
+  };
+
   const hasOptions = selectedTypes.some((t) => (optionsByType[t] || []).length > 0);
+  const displayLabel = value.length ? value.join(", ") : "Select nature of service";
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -77,29 +98,30 @@ export default function NatureOfServiceSelect({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
-        className={`w-full flex items-center justify-between px-3 py-1.5 border rounded-sm text-sm text-left min-h-[30px] transition-colors
+        className={`w-full flex items-center justify-between gap-2 px-3 py-1 border rounded-sm text-[13px] text-left min-h-[30px] transition-colors
           ${disabled
             ? "border-[#7fa37f] bg-[#edf8ed] text-gray-500 cursor-default"
             : "border-[#8f8f8f] bg-white hover:border-blue-400 cursor-pointer"
           }`}
       >
-        <span className={value ? "text-gray-800" : "text-gray-400"}>
-          {value || "Select nature of service"}
-        </span>
-        <div className="flex items-center gap-1 shrink-0">
-          {value && !disabled && (
-            <span
-              onClick={(e) => { e.stopPropagation(); onChange?.(""); }}
-              className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-            >
-              <X size={12} />
-            </span>
+        {/* Selected tags or placeholder */}
+        <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+          {value.length > 0 ? (
+            value.map((v) => (
+              <span key={v} className="inline-flex items-center gap-0.5 text-[11px] bg-blue-50 text-blue-700 border border-blue-200 rounded px-1.5 py-0.5 max-w-[180px] truncate">
+                <span className="truncate">{v}</span>
+                {!disabled && (
+                  <span onMouseDown={(e) => removeOne(v, e)} className="cursor-pointer text-blue-400 hover:text-red-500 shrink-0">
+                    <X size={10} />
+                  </span>
+                )}
+              </span>
+            ))
+          ) : (
+            <span className="text-gray-400">{displayLabel}</span>
           )}
-          <ChevronDown
-            size={14}
-            className={`text-gray-500 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
-          />
         </div>
+        <ChevronDown size={14} className={`text-gray-500 shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown */}
@@ -107,9 +129,7 @@ export default function NatureOfServiceSelect({
         <div className="absolute z-[9999] mt-1 w-full min-w-[260px] bg-white border border-gray-200 rounded-sm shadow-xl max-h-[300px] overflow-y-auto">
           {!hasOptions ? (
             <p className="px-4 py-3 text-[12px] text-gray-400 text-center">
-              {selectedTypes.length === 0
-                ? "Select at least one supplier type first"
-                : "Loading options..."}
+              {selectedTypes.length === 0 ? "Select at least one supplier type first" : "Loading options..."}
             </p>
           ) : (
             selectedTypes.map((type) => {
@@ -117,21 +137,22 @@ export default function NatureOfServiceSelect({
               if (options.length === 0) return null;
               return (
                 <div key={type}>
-                  {/* Group heading */}
-                  <div className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border-b ${TYPE_BADGE_COLOR[type] || "bg-gray-50 text-gray-500 border-gray-100"}`}>
+                  <div className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border-b ${TYPE_HEADING_COLOR[type] || "bg-gray-50 text-gray-500 border-gray-100"}`}>
                     {TYPE_LABEL[type] || type}
                   </div>
-                  {options.map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => { onChange?.(opt); setOpen(false); }}
-                      className={`w-full text-left px-4 py-2 text-[12px] hover:bg-blue-50 transition-colors
-                        ${value === opt ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-700"}`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
+                  {options.map((opt) => {
+                    const checked = value.includes(opt);
+                    return (
+                      <div
+                        key={opt}
+                        onMouseDown={(e) => { e.preventDefault(); toggle(opt); }}
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                      >
+                        <input type="checkbox" readOnly checked={checked} className="accent-blue-500 cursor-pointer w-3.5 h-3.5" />
+                        <span className={`text-[12px] ${checked ? "text-blue-700 font-medium" : "text-gray-700"}`}>{opt}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })
@@ -141,5 +162,3 @@ export default function NatureOfServiceSelect({
     </div>
   );
 }
-
-export { TYPE_LABEL, TYPE_BADGE_COLOR };
