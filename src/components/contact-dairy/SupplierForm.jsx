@@ -45,8 +45,8 @@ const schema = z.object({
   corporateAddress:    z.string().optional(),
   contactPerson:       z.string().optional(),
   designation:         z.string().optional(),
-  mobileNumber:        z.string().refine((v) => !v || /^\d{10}$/.test(v), "Must be 10 digits").optional(),
-  whatsappNumber:      z.string().refine((v) => !v || /^\d{10}$/.test(v), "Must be 10 digits").optional(),
+  mobileNumber:        z.string().optional(),
+  whatsappNumber:      z.string().optional(),
   email:               z.string().refine((v) => !v || z.string().email().safeParse(v).success, "Invalid email").optional(),
 });
 
@@ -54,7 +54,7 @@ const schema = z.object({
 // Debounces on the TRIMMED value (spaces don't re-trigger), skips empty/short
 // queries, and skips if trimmed value hasn't changed since the last API call.
 
-function useSuggestionFetch({ query, pageType, minLen = 3, delay = 600, onResult, onLoading }) {
+function useSuggestionFetch({ query, pageType, minLen = 2, delay = 600, onResult, onLoading }) {
   const timerRef    = useRef(null);
   const lastFetched = useRef("");  // last trimmed value actually sent to API
   const cancelRef   = useRef(false);
@@ -113,7 +113,7 @@ function SuggestionItem({ supplier, onClick }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onMouseDown={(e) => { e.preventDefault(); onClick(); }}
       className="w-full text-left px-3 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
     >
       <div className="flex items-center justify-between gap-2">
@@ -354,7 +354,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
                     setValue("supplierName", e.target.value, { shouldValidate: true });
                     if (!e.target.value.trim()) { setSuggestions([]); setShowSuggestions(false); }
                   }}
-                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   disabled={fieldDisabled}
                   placeholder="Supplier / Concern name"
                   className={`${getInputClass(!!errors.supplierName, fieldDisabled)} pr-8`}
@@ -367,7 +367,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
 
             {/* Suggestion dropdown — stays visible on focus elsewhere */}
             {showSuggestions && suggestions.length > 0 && !fieldDisabled && (
-              <div className="absolute left-[calc(250px+12px)] right-0 z-[9999] bg-white border border-blue-200 rounded-sm shadow-2xl mt-0.5">
+              <div className="absolute left-0 md:left-[calc(250px+12px)] right-0 z-[9999] bg-white border border-blue-200 rounded-sm shadow-2xl mt-0.5">
                 <div className="flex items-center justify-between px-3 py-1.5 bg-blue-50 border-b border-blue-100">
                   <span className="text-[10px] font-semibold text-blue-700 uppercase tracking-wide flex items-center gap-1">
                     <Search size={10} /> Existing suppliers found
@@ -384,7 +384,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
                   <SuggestionItem
                     key={s.supplierId}
                     supplier={s}
-                    onClick={() => setPendingSuggestion(s)}
+                    onClick={() => { setShowSuggestions(false); setPendingSuggestion(s); }}
                   />
                 ))}
               </div>
@@ -432,7 +432,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
               {...register("mobileNumber")}
               disabled={fieldDisabled}
               placeholder="Mobile number"
-              className={`${getInputClass(!!errors.mobileNumber, fieldDisabled)} w-52`}
+              className={`${getInputClass(false, fieldDisabled)} w-52`}
             />
           </FormRow>
           <FormRow label="WhatsApp Number">
@@ -440,7 +440,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
               {...register("whatsappNumber")}
               disabled={fieldDisabled}
               placeholder="WhatsApp number"
-              className={`${getInputClass(!!errors.whatsappNumber, fieldDisabled)} w-52`}
+              className={`${getInputClass(false, fieldDisabled)} w-52`}
             />
           </FormRow>
           <FormRow label="Email ID">
@@ -530,8 +530,8 @@ function Section({ title, children }) {
 
 function FormRow({ label, children, required, alignStart }) {
   return (
-    <div className={`flex ${alignStart ? "items-start" : "items-center"} gap-3`}>
-      <label className="w-[250px] shrink-0 px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-[13px] rounded-sm self-start mt-0.5">
+    <div className={`flex flex-col md:flex-row ${alignStart ? "md:items-start" : "md:items-center"} gap-1 md:gap-3`}>
+      <label className="w-full md:w-[250px] md:shrink-0 px-3 py-1 bg-[#d6e6f2] border border-[#6f7f8f] text-[13px] rounded-sm md:self-start md:mt-0.5">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>

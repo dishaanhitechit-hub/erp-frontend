@@ -12,6 +12,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { isMasterEditable } from "@/helper/getMasterAccess";
+import LedgerFormNew from "@/components/master/ledger/LedgerFormNew";
 
 export default function Page() {
   const { ledgerId } = useParams();
@@ -64,7 +65,7 @@ export default function Page() {
   return (
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
-        <LedgerForm
+        <LedgerFormNew
           mode={canEdit ? "edit" : "view"}
           disabled={!canEdit}
           ledgerId={ledgerId}

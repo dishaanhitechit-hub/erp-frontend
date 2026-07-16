@@ -13,6 +13,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import { isMasterEditable } from "@/helper/getMasterAccess";
 import PageNotAvailable from "@/components/common/PageNotAvailable";
+import LedgerFormNew from "@/components/master/ledger/LedgerFormNew";
 
 export default function Page() {
   const [categories, setCategories] = useState(CATEGORY_OPTIONS.ledgerCategory);
@@ -57,7 +58,7 @@ export default function Page() {
   return (
     <>
       <HeaderWrapper header={<PageHeader actions={actions} />}>
-        <LedgerForm mode="create" categories={categories} />
+        <LedgerFormNew mode="create" categories={categories} />
       </HeaderWrapper>
     </>
   );
