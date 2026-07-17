@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFormWithToast as useForm } from "@/hooks/useFormWithToast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { toast } from "sonner";

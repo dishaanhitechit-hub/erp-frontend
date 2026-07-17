@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useForm } from "react-hook-form";
+import { useFormWithToast as useForm } from "@/hooks/useFormWithToast";
 
 import { z } from "zod";
 

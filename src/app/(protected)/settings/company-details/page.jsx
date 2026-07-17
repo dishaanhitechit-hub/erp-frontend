@@ -14,7 +14,7 @@ import { clearAuthCookies, getCookie, setCookie } from "@/lib/cookies";
 import { Paperclip } from "lucide-react";
 import { openFileWithAuth } from "@/lib/fileViewer";
 
-import { useForm } from "react-hook-form";
+import { useFormWithToast as useForm } from "@/hooks/useFormWithToast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageHeader from "@/components/layout/PageHeader";
