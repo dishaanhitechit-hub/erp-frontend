@@ -1,0 +1,72 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import PageHeader from "@/components/layout/PageHeader";
+import HeaderWrapper from "@/components/layout/HeaderWrapper";
+import { getPageActions } from "@/components/common/PageActionButtons";
+import { isMasterEditable } from "@/helper/getMasterAccess";
+import { apiRequest } from "@/lib/apiClient";
+import { API_ENDPOINTS } from "@/config/api.config";
+import TermsForm from "@/components/master/terms-condition/TermsForm";
+import { DUMMY_TERMS } from "@/components/master/terms-condition/terms.config";
+
+const TC = API_ENDPOINTS.MASTER.TERM;
+
+export default function Page() {
+  const { termId } = useParams();
+  const router     = useRouter();
+  const canEdit    = isMasterEditable();
+  const actions    = getPageActions({ router });
+
+  const [data,    setData]    = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!termId) return;
+    const fetchData = async () => {
+      try {
+        let item;
+        try {
+          const res = await apiRequest({ url: `${TC.GET_BY_ID}/${termId}`, method: "GET" });
+          item = res.data?.[0] || res.data || null;
+        } catch {
+          // DUMMY fallback — REMOVE after backend ready
+          item = DUMMY_TERMS.find((t) => String(t.termId) === String(termId)) || null;
+        }
+        setData(item);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [termId]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[300px]">
+        <Loader2 className="animate-spin w-6 h-6" />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center h-[300px] text-sm text-gray-500">
+        Term not found.
+      </div>
+    );
+  }
+
+  return (
+    <HeaderWrapper header={<PageHeader actions={actions} />}>
+      <TermsForm
+        mode={canEdit ? "edit" : "view"}
+        disabled={!canEdit}
+        termId={termId}
+        initialData={data}
+      />
+    </HeaderWrapper>
+  );
+}

@@ -58,6 +58,14 @@ export const routeMetaConfig = [
     basePath: "/master/terms-condition",
     breadcrumbs: ["Master", "Terms & Condition"],
   },
+  {
+    basePath: "/master/terms-condition/new",
+    breadcrumbs: ["Master", "Terms & Condition", "New"],
+  },
+  {
+    basePath: "/master/terms-condition/[termId]",
+    breadcrumbs: ["Master", "Terms & Condition", "Edit"],
+  },
   //cc code
   {
     basePath: "/master/cc-code",
