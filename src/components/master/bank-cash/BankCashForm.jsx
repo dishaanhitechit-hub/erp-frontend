@@ -62,6 +62,7 @@ export default function BankCashForm({ mode = "create", disabled = false, record
     getValues,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema), defaultValues });
 
@@ -212,13 +213,15 @@ export default function BankCashForm({ mode = "create", disabled = false, record
         <div className="flex gap-2 items-center">
           <div className={label}>IFSC Code</div>
           <Input {...register("ifscCode")} disabled={fieldDisabled || isCash} placeholder={isCash ? "N/A for Cash" : "Text"}
-            className={`flex-1 h-[30px] text-[13px] ${getInputClass(false, fieldDisabled || isCash)}`} />
+            className={`flex-1 h-[30px] text-[13px] ${getInputClass(false, fieldDisabled || isCash)}`}
+            onChange={(e) => setValue("ifscCode", e.target.value.toUpperCase())} />
         </div>
 
         <div className="flex gap-2 items-center">
           <div className={label}>MICR Code</div>
           <Input {...register("micrCode")} disabled={fieldDisabled || isCash} placeholder={isCash ? "N/A for Cash" : "Text"}
-            className={`flex-1 h-[30px] text-[13px] ${getInputClass(false, fieldDisabled || isCash)}`} />
+            className={`flex-1 h-[30px] text-[13px] ${getInputClass(false, fieldDisabled || isCash)}`}
+            onChange={(e) => setValue("micrCode", e.target.value.toUpperCase())} />
         </div>
 
         <div className="flex gap-2 items-center">

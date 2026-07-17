@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import PhoneInput from "@/components/common/PhoneInput";
 import SaveButton from "@/components/common/SaveButton";
 import EditButton from "@/components/common/EditButton";
 import { apiRequest } from "@/lib/apiClient";
@@ -43,9 +45,9 @@ const schema = z.object({
 
   contactPerson: z.string().min(1, "Required"),
 
-  contactNumber: z.string().min(10, "Invalid").max(10, "Invalid"),
+  contactNumber: z.string().refine((v) => (v || "").replace(/\D/g, "").length === 10, "Invalid number"),
 
-  whatsappNumber: z.string().min(10, "Invalid").max(10, "Invalid"),
+  whatsappNumber: z.string().refine((v) => (v || "").replace(/\D/g, "").length === 10, "Invalid number"),
 
   email: z.string().min(1, "Required").email("Invalid email"),
 });
@@ -106,6 +108,7 @@ export default function CompanyDetailsPage() {
     getValues,
     reset,
     watch,
+    control,
   } = form;
 
   //Fetch Data
@@ -207,9 +210,16 @@ export default function CompanyDetailsPage() {
         isUpdate ? "Updating company details..." : "Saving company details...",
       );
 
+      const raw = getValues();
+      const normalizePhone = (v) => {
+        const digits = (v || "").replace(/\D/g, "").slice(-10);
+        return digits.length === 10 ? `+91${digits}` : v || "";
+      };
       const values = {
-        ...getValues(),
-        stateCode: getStateCodeByName(getValues().state || ""),
+        ...raw,
+        stateCode: getStateCodeByName(raw.state || ""),
+        contactNumber: normalizePhone(raw.contactNumber),
+        whatsappNumber: normalizePhone(raw.whatsappNumber),
       };
       const formDataPayload = new FormData();
 
@@ -559,25 +569,39 @@ export default function CompanyDetailsPage() {
             <div>
               <div className="md:flex md:items-center">
                 <div className={labelClass}>Contact Number</div>
-                <Input
-                  {...register("contactNumber")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`${getInputClass(errors.contactNumber, !isEditing || isSubmitting)} w-65 -ml-px`}
+                <Controller
+                  name="contactNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      disabled={!isEditing || isSubmitting}
+                      hasError={!!errors.contactNumber}
+                      outputFormat="e164"
+                      className="w-65 -ml-px"
+                    />
+                  )}
                 />
               </div>
-              {/* <p className={errorText}>{errors.contactNumber?.message}</p> */}
             </div>
 
             <div>
               <div className="md:flex md:items-center">
                 <div className={labelClass}>WhatsApp Number</div>
-                <Input
-                  {...register("whatsappNumber")}
-                  disabled={!isEditing || isSubmitting}
-                  className={`${getInputClass(errors.whatsappNumber, !isEditing || isSubmitting)} w-65 -ml-px`}
+                <Controller
+                  name="whatsappNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      disabled={!isEditing || isSubmitting}
+                      hasError={!!errors.whatsappNumber}
+                      outputFormat="e164"
+                      className="w-65 -ml-px"
+                    />
+                  )}
                 />
               </div>
-              {/* <p className={errorText}>{errors.whatsappNumber?.message}</p> */}
             </div>
 
             <div>

@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, startTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ChevronDown, Loader2, Search, X } from "lucide-react";
 
 import SaveButton from "@/components/common/SaveButton";
+import PhoneInput from "@/components/common/PhoneInput";
 import EditButton from "@/components/common/EditButton";
 import { Input } from "@/components/ui/input";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -192,16 +193,6 @@ export default function LedgerFormNew({
   // ── Ledger code ───────────────────────────────────────────────────────────
   const [ledgerCode, setLedgerCode] = useState("");
 
-  // ── Phone fields (formatted display, raw digits stored) ──────────────────
-  const [contactNumber, setContactNumber] = useState("");
-  const [whatsappNum,   setWhatsappNum]   = useState("");
-
-  const formatPhone = (raw) => {
-    const digits = raw.replace(/\D/g, "").slice(0, 10);
-    if (digits.length <= 5) return digits;
-    return `${digits.slice(0, 5)} ${digits.slice(5)}`;
-  };
-  const rawPhone = (formatted) => formatted.replace(/\D/g, "").slice(0, 10);
 
   // ── Files ─────────────────────────────────────────────────────────────────
   const [fileNames, setFileNames] = useState({});
@@ -213,7 +204,7 @@ export default function LedgerFormNew({
   const bankRef  = useRef(null);
 
   // ── RHF ───────────────────────────────────────────────────────────────────
-  const { register, handleSubmit, reset, setValue, getValues, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, setValue, getValues, control, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       ledgerName: "", registeredAddress: "", corporateAddress: "",
@@ -276,9 +267,6 @@ export default function LedgerFormNew({
         gstn:  initialData.gstnFile,
         bank:  initialData.bankDetailsFile,
       });
-      const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
-      setContactNumber(formatPhone(stripPrefix(initialData.primaryContactNumber || "")));
-      setWhatsappNum(formatPhone(stripPrefix(initialData.whatsappNumber || "")));
       setPageLoading(false);
     });
   }, [initialData, categories]);
@@ -321,9 +309,6 @@ export default function LedgerFormNew({
     setNatureOfService(Array.isArray(s.natureOfService) ? s.natureOfService : s.natureOfService ? [s.natureOfService] : []);
     setLinkedSupplierId(String(s.supplierId));
     setSelectedSupplierId(String(s.supplierId));
-    const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
-    setContactNumber(formatPhone(stripPrefix(s.mobileNumber || "")));
-    setWhatsappNum(formatPhone(stripPrefix(s.whatsappNumber || "")));
     setShowSuggestions(false);
     setSuggestions([]);
     setPendingSuggestion(null);
@@ -382,9 +367,6 @@ export default function LedgerFormNew({
     setSupplierTypes(Array.isArray(initialData.supplierTypes) ? initialData.supplierTypes : []);
     setNatureOfService(Array.isArray(initialData.natureOfService) ? initialData.natureOfService : initialData.natureOfService ? [initialData.natureOfService] : []);
     setFileUrls({ trade: initialData.tradeLicenceFile, pan: initialData.panFile, gstn: initialData.gstnFile, bank: initialData.bankDetailsFile });
-    const stripPrefix = (v) => (v || "").replace(/^\+91/, "");
-    setContactNumber(formatPhone(stripPrefix(initialData.primaryContactNumber || "")));
-    setWhatsappNum(formatPhone(stripPrefix(initialData.whatsappNumber || "")));
     setFiles({}); setFileNames({});
     if (tradeRef.current) tradeRef.current.value = "";
     if (panRef.current)   panRef.current.value   = "";
@@ -402,13 +384,15 @@ export default function LedgerFormNew({
     let toastId;
     try {
       toastId = toast.loading("Saving...");
+      const normalizePhone = (v) => {
+        const digits = (v || "").replace(/\D/g, "").slice(-10);
+        return digits.length === 10 ? `+91${digits}` : "";
+      };
       const formData = new FormData();
       const allowed = ["ledgerName","registeredAddress","corporateAddress","pan","gstin","stateCode","stateName","primaryContactPerson","designation","bankAccountNumber","bankName","branchName","ifscCode"];
       allowed.forEach((k) => formData.append(k, data[k] ?? ""));
-      const digits1 = rawPhone(contactNumber);
-      const digits2 = rawPhone(whatsappNum);
-      formData.append("primaryContactNumber", digits1 ? `+91${digits1}` : "");
-      formData.append("whatsappNumber",       digits2 ? `+91${digits2}` : "");
+      formData.append("primaryContactNumber", normalizePhone(data.primaryContactNumber));
+      formData.append("whatsappNumber", normalizePhone(data.whatsappNumber));
 
       // Supplier-linked fields
       if (linkedSupplierId) formData.append("supplierId", linkedSupplierId);
@@ -616,34 +600,22 @@ export default function LedgerFormNew({
             <Input {...register("primaryContactPerson")} disabled={fieldDisabled} placeholder="Contact person name" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />
           </Row>
           <Row label="Contact Number">
-            <div className={`flex items-center w-52 h-[30px] rounded-sm border ${fieldDisabled ? "border-[#7fa37f] bg-[#edf8ed]" : "border-[#8f8f8f] bg-white"}`}>
-              <span className={`px-2 text-[13px] select-none border-r ${fieldDisabled ? "border-[#7fa37f] text-gray-500" : "border-[#8f8f8f] text-gray-500"}`}>+91</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                disabled={fieldDisabled}
-                value={contactNumber}
-                onChange={(e) => setContactNumber(formatPhone(e.target.value))}
-                placeholder="00000 00000"
-                maxLength={11}
-                className={`flex-1 bg-transparent outline-none text-[13px] px-2 ${fieldDisabled ? "text-gray-500 cursor-default" : ""}`}
-              />
-            </div>
+            <Controller
+              name="primaryContactNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput {...field} disabled={fieldDisabled} outputFormat="e164" className="w-52" />
+              )}
+            />
           </Row>
           <Row label="WhatsApp Number">
-            <div className={`flex items-center w-52 h-[30px] rounded-sm border ${fieldDisabled ? "border-[#7fa37f] bg-[#edf8ed]" : "border-[#8f8f8f] bg-white"}`}>
-              <span className={`px-2 text-[13px] select-none border-r ${fieldDisabled ? "border-[#7fa37f] text-gray-500" : "border-[#8f8f8f] text-gray-500"}`}>+91</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                disabled={fieldDisabled}
-                value={whatsappNum}
-                onChange={(e) => setWhatsappNum(formatPhone(e.target.value))}
-                placeholder="00000 00000"
-                maxLength={11}
-                className={`flex-1 bg-transparent outline-none text-[13px] px-2 ${fieldDisabled ? "text-gray-500 cursor-default" : ""}`}
-              />
-            </div>
+            <Controller
+              name="whatsappNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput {...field} disabled={fieldDisabled} outputFormat="e164" className="w-52" />
+              )}
+            />
           </Row>
           <Row label="Designation">
             <Input {...register("designation")} disabled={fieldDisabled} placeholder="Designation" className={`flex-1 ${getInputClass(false, fieldDisabled)}`} />

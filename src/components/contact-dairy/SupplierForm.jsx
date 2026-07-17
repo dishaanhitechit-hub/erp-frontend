@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 import { Loader2, Search, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import PhoneInput from "@/components/common/PhoneInput";
 import SaveButton from "@/components/common/SaveButton";
 import EditButton from "@/components/common/EditButton";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
@@ -156,7 +158,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
   const isUpdate = mode === "edit" || !!resolvedId;
 
   // ── React Hook Form ────────────────────────────────────────────────────────
-  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, setValue, reset, control } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       supplierName: "", registeredAddress: "", corporateAddress: "",
@@ -169,6 +171,7 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
   const [serviceDescription, setServiceDescription] = useState("");
   const [supplierTypes, setSupplierTypes] = useState([pageType]);
   const [natureOfService, setNatureOfService] = useState([]);
+
 
   // ── Suggestions ────────────────────────────────────────────────────────────
   const [nameQuery, setNameQuery] = useState("");
@@ -261,7 +264,18 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
 
   // ── Save ────────────────────────────────────────────────────────────────────
   const onSubmit = async (data) => {
-    const payload = { ...data, supplierTypes, natureOfService: natureOfService, serviceDescription };
+    const normalizePhone = (v) => {
+      const digits = (v || "").replace(/\D/g, "").slice(-10);
+      return digits.length === 10 ? `+91${digits}` : "";
+    };
+    const payload = {
+      ...data,
+      supplierTypes,
+      natureOfService,
+      serviceDescription,
+      mobileNumber:   normalizePhone(data.mobileNumber),
+      whatsappNumber: normalizePhone(data.whatsappNumber),
+    };
     let tid;
     try {
       setSaving(true);
@@ -440,19 +454,33 @@ export default function SupplierForm({ pageType, mode = "create", supplierId, in
             />
           </FormRow>
           <FormRow label="Mobile Number">
-            <Input
-              {...register("mobileNumber")}
-              disabled={fieldDisabled}
-              placeholder="Mobile number"
-              className={`${getInputClass(false, fieldDisabled)} w-52`}
+            <Controller
+              name="mobileNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={fieldDisabled}
+                  outputFormat="e164"
+                  className="w-52"
+                />
+              )}
             />
           </FormRow>
           <FormRow label="WhatsApp Number">
-            <Input
-              {...register("whatsappNumber")}
-              disabled={fieldDisabled}
-              placeholder="WhatsApp number"
-              className={`${getInputClass(false, fieldDisabled)} w-52`}
+            <Controller
+              name="whatsappNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={fieldDisabled}
+                  outputFormat="e164"
+                  className="w-52"
+                />
+              )}
             />
           </FormRow>
           <FormRow label="Email ID">

@@ -257,6 +257,7 @@ export default function ProjectForm({ mode = "create", data, projectId }) {
                 {...register("gstn")}
                 disabled={!isEditing || isSubmitting}
                 className={`w-[200px] ${getInputClass(errors.gstn, !isEditing || isSubmitting)}`}
+                onChange={(e) => setValue("gstn", e.target.value.toUpperCase(), { shouldValidate: true })}
               />
             </div>
 
