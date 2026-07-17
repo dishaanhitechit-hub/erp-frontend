@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, startTransition } from "react";
 import { ChevronDown, X } from "lucide-react";
 
 /**
@@ -36,24 +36,30 @@ export default function MultiSelectSearch({
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [openUp, setOpenUp] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
   const wrapperRef = useRef(null);
   const searchRef = useRef(null);
 
-  // Close on outside click
+  // Close on outside click or scroll
   useEffect(() => {
-    const handler = (e) => {
+    const close = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target))
         setOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    const onScroll = () => setOpen(false);
+    document.addEventListener("mousedown", close);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      window.removeEventListener("scroll", onScroll, true);
+    };
   }, []);
 
-  // Focus search when dropdown opens
+  // Focus search when dropdown opens; clear search when it closes
   useEffect(() => {
-    if (open) setTimeout(() => searchRef.current?.focus(), 50);
-    else setSearch("");
+    if (!open) { startTransition(() => setSearch("")); return; }
+    const t = setTimeout(() => searchRef.current?.focus(), 50);
+    return () => clearTimeout(t);
   }, [open]);
 
   const getLabel = (item) =>
@@ -87,7 +93,16 @@ export default function MultiSelectSearch({
     if (disabled) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const DROPDOWN_HEIGHT = 280;
-    setOpenUp(window.innerHeight - rect.bottom < DROPDOWN_HEIGHT + 8);
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < DROPDOWN_HEIGHT + 8;
+    setDropdownStyle({
+      position: "fixed",
+      left: rect.left,
+      width: rect.width,
+      ...(openUp
+        ? { bottom: window.innerHeight - rect.top + 4 }
+        : { top: rect.bottom + 4 }),
+    });
     setOpen((p) => !p);
   };
 
@@ -130,7 +145,8 @@ export default function MultiSelectSearch({
       {/* Dropdown */}
       {open && !disabled && (
         <div
-          className={`absolute left-0 right-0 z-[9999] border border-[#8f8f8f] rounded-sm bg-white shadow-xl ${openUp ? "bottom-full mb-1" : "top-full mt-1"}`}
+          style={dropdownStyle}
+          className="z-[9999] border border-[#8f8f8f] rounded-sm bg-white shadow-xl"
         >
           {/* Search */}
           <div className="p-2 border-b border-gray-200">
