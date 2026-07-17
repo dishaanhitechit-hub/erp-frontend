@@ -108,6 +108,19 @@ export default function OrderBasicSection({
     return [currentProjectData.shippingAddress, currentProjectData.shippingAddress2, currentProjectData.shippingAddress3].filter(Boolean);
   })();
 
+  // ── AUTO-SELECT billing/shipping when only one option available
+  useEffect(() => {
+    if (billingOptions.length === 1 && !watch("billingAddress")) {
+      setValue("billingAddress", billingOptions[0]);
+    }
+  }, [billingOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (shippingOptions.length === 1 && !watch("shippingAddress")) {
+      setValue("shippingAddress", shippingOptions[0]);
+    }
+  }, [shippingOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── AUTO-FILL: Customer Supply Order → from current project (create mode only)
   useEffect(() => {
     if (mode !== "create") return;
@@ -312,7 +325,7 @@ export default function OrderBasicSection({
                       options={ledgerList}
                       value={field.value ? String(field.value) : ""}
                       onChange={(val) => {
-                        field.onChange(val);
+                        field.onChange(val ? String(val) : "");
                         if (!val) {
                           setValue("partyAddress", "");
                           setValue("gstn", "");

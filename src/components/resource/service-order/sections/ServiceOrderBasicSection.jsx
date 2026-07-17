@@ -120,12 +120,14 @@ export default function ServiceOrderBasicSection({
         if (!data) return;
         const billing = [];
         const shipping = [];
-        if (data.billingAddress) billing.push(data.billingAddress);
+        if (data.companyBillingAddress) billing.push(data.companyBillingAddress);
         if (data.shippingAddress) shipping.push(data.shippingAddress);
         if (data.shippingAddress2) shipping.push(data.shippingAddress2);
         if (data.shippingAddress3) shipping.push(data.shippingAddress3);
         setBillingOptions(billing);
         setShippingOptions(shipping);
+        if (billing.length === 1 && !watch("billingAddress")) setValue("billingAddress", billing[0]);
+        if (shipping.length === 1 && !watch("shippingAddress")) setValue("shippingAddress", shipping[0]);
       } catch {
         toast.error("Failed to load project details");
       }
@@ -325,7 +327,7 @@ export default function ServiceOrderBasicSection({
                   options={ledgerList}
                   value={field.value ? String(field.value) : ""}
                   onChange={(val) => {
-                    field.onChange(val);
+                    field.onChange(val ? String(val) : "");
                     if (!val) {
                       setValue("partyAddress", ""); setValue("gstn", "");
                       return;
