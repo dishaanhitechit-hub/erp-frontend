@@ -45,9 +45,14 @@ const textareaCls = (err) =>
     err ? "border-red-500 bg-red-50" : "border-[#8f8f8f]"
   } disabled:bg-[#edf8ed] disabled:border-[#7fa37f] disabled:text-gray-500 disabled:cursor-default`;
 
-const newPoint = () => ({ pointId: crypto.randomUUID(), text: "" });
+const uid = () =>
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+const newPoint = () => ({ pointId: uid(), text: "" });
 const newGroup = () => ({
-  groupId: crypto.randomUUID(),
+  groupId: uid(),
   title: "",
   description: "",
   pointStyle: "numbered",
@@ -110,10 +115,10 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
       setGroups(
         (initialData.termGroups || []).map((g) => ({
           ...g,
-          groupId: g.groupId || crypto.randomUUID(),
+          groupId: g.groupId || uid(),
           points: (g.points || []).map((p) => ({
             ...p,
-            pointId: p.pointId || crypto.randomUUID(),
+            pointId: p.pointId || uid(),
           })),
         }))
       );
@@ -285,10 +290,10 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
       setGroups(
         (initialData.termGroups || []).map((g) => ({
           ...g,
-          groupId: g.groupId || crypto.randomUUID(),
+          groupId: g.groupId || uid(),
           points: (g.points || []).map((p) => ({
             ...p,
-            pointId: p.pointId || crypto.randomUUID(),
+            pointId: p.pointId || uid(),
           })),
         }))
       );
