@@ -12,7 +12,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import { isMasterEditable } from "@/helper/getMasterAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
-import { TERMS_MODULES, TERMS_SUB_MODULES, TERMS_TYPES, DUMMY_TERMS } from "@/components/master/terms-condition/terms.config";
+import { TERMS_MODULES, TERMS_SUB_MODULES, TERMS_TYPES, DUMMY_TERMS } from "@/config/terms.config";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 

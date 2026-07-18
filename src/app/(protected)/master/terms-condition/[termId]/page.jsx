@@ -10,7 +10,7 @@ import { isMasterEditable } from "@/helper/getMasterAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import TermsForm from "@/components/master/terms-condition/TermsForm";
-import { DUMMY_TERMS } from "@/components/master/terms-condition/terms.config";
+import { DUMMY_TERMS } from "@/config/terms.config";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 

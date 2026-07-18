@@ -15,6 +15,8 @@ export const TERMS_SUB_MODULES = {
     { label: "Work Order",           value: "Work_Order" },
     { label: "Customer Supply Order",value: "Customer_Supply_Order" },
     { label: "Site Transfer Order",  value: "Site_Transfer_Order" },
+    { label: "Hire Order",     value: "Hire_Order" },
+    { label: "Job Contract Order", value: "Job_Contract_Order" },
   ],
   Enquiry: [
     { label: "Material Enquiry", value: "Material_Enquiry" },

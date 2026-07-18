@@ -30,7 +30,7 @@ import {
   TERMS_TYPES,
   POINT_STYLES,
   DUMMY_TERMS, // REMOVE after backend APIs are ready
-} from "./terms.config";
+} from "../../../config/terms.config";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 
