@@ -15,11 +15,11 @@ const itemSchema = z.object({
 });
 
 const termSchema = z.object({
-  termId: z.any(),
-  header: z.string(),
-  subHeader: z.string(),
-  description: z.string(),
-});
+  termId:     z.any().optional(),
+  termType:   z.string().optional(),
+  sortOrder:  z.number().optional(),
+  termGroups: z.array(z.any()).optional(),
+}).passthrough();
 
 export const orderSchema = z
   .object({

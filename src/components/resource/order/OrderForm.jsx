@@ -307,7 +307,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       toast.error("Please add at least one order item");
       return;
     }
-    if (!values.terms?.filter((t) => t?.termId).length) {
+    if (!values.terms?.length) {
       toast.error("Please add at least one term & condition");
       return;
     }
@@ -407,7 +407,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       toast.error("Please add at least one order item");
       return false;
     }
-    if (!values.terms?.filter((t) => t?.termId).length) {
+    if (!values.terms?.length) {
       toast.error("Please add at least one term & condition");
       return false;
     }

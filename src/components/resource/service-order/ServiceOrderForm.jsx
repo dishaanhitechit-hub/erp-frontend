@@ -221,7 +221,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
     let toastId;
     const values = getValues();
     if (!values.items?.length) { toast.error("Please add at least one order item"); return; }
-    if (!values.terms?.filter((t) => t?.termId).length) { toast.error("Please add at least one term & condition"); return; }
+    if (!values.terms?.length) { toast.error("Please add at least one term & condition"); return; }
     if(mode ==="create" && !attachedFile) { toast.error("Please upload required file."); return;}
 
     try {
@@ -295,7 +295,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
 
   const validateTableSections = ({ values }) => {
     if (!values.items?.length) { toast.error("Please add at least one order item"); return false; }
-    if (!values.terms?.filter((t) => t?.termId).length) { toast.error("Please add at least one term & condition"); return false; }
+    if (!values.terms?.length) { toast.error("Please add at least one term & condition"); return false; }
     return true;
   };
 
