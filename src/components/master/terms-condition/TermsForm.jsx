@@ -328,51 +328,63 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
         <div className="bg-[#d6e6f2] px-4 py-2 text-[13px] font-semibold border-b border-gray-300">
           Classification
         </div>
-        <div className="p-4 grid grid-cols-[160px_1fr] sm:grid-cols-[200px_320px] gap-x-3 gap-y-2 items-center">
+        <div className="flex flex-col">
           {/* Module */}
-          <div className={labelCls}>
-            Module <span className="text-red-500 ml-1">*</span>
+          <div className="flex flex-wrap gap-2 items-center px-4 py-2 border-b border-gray-200">
+            <span className="text-[13px] font-semibold text-gray-700 min-w-[130px]">
+              Module <span className="text-red-500">*</span> :
+            </span>
+            <div className="flex-1 min-w-[180px] max-w-[320px]">
+              <Select value={module} onValueChange={handleModuleChange} disabled={fieldDisabled}>
+                <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.module ? "border-red-500 bg-red-50" : ""}`}>
+                  <SelectValue placeholder="Select Module" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TERMS_MODULES.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Select value={module} onValueChange={handleModuleChange} disabled={fieldDisabled}>
-            <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.module ? "border-red-500 bg-red-50" : ""}`}>
-              <SelectValue placeholder="Select Module" />
-            </SelectTrigger>
-            <SelectContent>
-              {TERMS_MODULES.map((m) => (
-                <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           {/* Sub Module */}
-          <div className={labelCls}>
-            Sub Module <span className="text-red-500 ml-1">*</span>
+          <div className="flex flex-wrap gap-2 items-center px-4 py-2 border-b border-gray-200">
+            <span className="text-[13px] font-semibold text-gray-700 min-w-[130px]">
+              Sub Module <span className="text-red-500">*</span> :
+            </span>
+            <div className="flex-1 min-w-[180px] max-w-[320px]">
+              <Select value={subModule} onValueChange={setSubModule} disabled={fieldDisabled || !module}>
+                <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.subModule ? "border-red-500 bg-red-50" : ""}`}>
+                  <SelectValue placeholder={module ? "Select Sub Module" : "Select Module first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {subModuleOptions.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Select value={subModule} onValueChange={setSubModule} disabled={fieldDisabled || !module}>
-            <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.subModule ? "border-red-500 bg-red-50" : ""}`}>
-              <SelectValue placeholder={module ? "Select Sub Module" : "Select Module first"} />
-            </SelectTrigger>
-            <SelectContent>
-              {subModuleOptions.map((s) => (
-                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           {/* Type */}
-          <div className={labelCls}>
-            Type <span className="text-red-500 ml-1">*</span>
+          <div className="flex flex-wrap gap-2 items-center px-4 py-2">
+            <span className="text-[13px] font-semibold text-gray-700 min-w-[130px]">
+              Type <span className="text-red-500">*</span> :
+            </span>
+            <div className="flex-1 min-w-[180px] max-w-[320px]">
+              <Select value={termType} onValueChange={setTermType} disabled={fieldDisabled}>
+                <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.termType ? "border-red-500 bg-red-50" : ""}`}>
+                  <SelectValue placeholder="Select Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TERMS_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Select value={termType} onValueChange={setTermType} disabled={fieldDisabled}>
-            <SelectTrigger className={`h-[30px] text-[13px] w-full ${errors.termType ? "border-red-500 bg-red-50" : ""}`}>
-              <SelectValue placeholder="Select Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {TERMS_TYPES.map((t) => (
-                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
@@ -469,12 +481,12 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
               )}
             </div>
 
-            {!collapsedGroups.has(group.groupId) && <div className="p-4 flex flex-col gap-3">
+            {!collapsedGroups.has(group.groupId) && <div className="p-4 flex flex-col gap-0">
               {/* Title */}
-              <div className="flex flex-wrap gap-2 items-center">
-                <div className={`${labelCls} text-[12px]`}>
-                  Title of Terms <span className="text-red-500 ml-1">*</span>
-                </div>
+              <div className="flex flex-wrap gap-2 items-center py-2 border-b border-gray-200">
+                <span className="text-[12px] text-gray-700 font-semibold min-w-[130px]">
+                  Title of Terms <span className="text-red-500">*</span> :
+                </span>
                 <input
                   type="text"
                   value={group.title}
@@ -486,10 +498,10 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
               </div>
 
               {/* Description */}
-              <div className="flex flex-wrap gap-2 items-start">
-                <div className={`${labelCls} text-[12px] mt-0.5`}>
-                  Terms Description <span className="text-red-500 ml-1">*</span>
-                </div>
+              <div className="flex flex-wrap gap-2 items-start py-2 border-b border-gray-200">
+                <span className="text-[12px] text-gray-700 font-semibold min-w-[130px] mt-1">
+                  Terms Description <span className="text-red-500">*</span> :
+                </span>
                 <ExpandableTextArea
                   value={group.description}
                   onChange={(v) => updateGroup(group.groupId, "description", v)}
@@ -505,8 +517,8 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
               </div>
 
               {/* Point style selector */}
-              <div className="flex flex-wrap gap-2 items-center">
-                <div className={`${labelCls} text-[12px]`}>Sub-point Style</div>
+              <div className="flex flex-wrap gap-2 items-center py-2 border-b border-gray-200">
+                <span className="text-[12px] text-gray-700 font-semibold min-w-[130px]">Sub-point Style :</span>
                 <div className="flex-1 min-w-[180px]">
                   <Select
                     value={group.pointStyle}
