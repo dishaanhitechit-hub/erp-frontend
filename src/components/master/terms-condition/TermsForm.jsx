@@ -31,6 +31,7 @@ import {
   POINT_STYLES,
   DUMMY_TERMS, // REMOVE after backend APIs are ready
 } from "../../../config/terms.config";
+import ExpandableTextArea from "@/components/common/ExpandableTextArea";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 
@@ -38,10 +39,6 @@ const labelCls =
   "flex items-center h-[30px] px-3 bg-[#d6e6f2] border border-black rounded-sm text-[13px] font-medium min-w-[160px]";
 const inputCls = (err) =>
   `h-[30px] rounded-sm border text-[13px] px-2 w-full bg-white outline-none ${
-    err ? "border-red-500 bg-red-50" : "border-[#8f8f8f]"
-  } disabled:bg-[#edf8ed] disabled:border-[#7fa37f] disabled:text-gray-500 disabled:cursor-default`;
-const textareaCls = (err) =>
-  `rounded-sm border text-[13px] px-2 py-1 w-full bg-white outline-none resize-none ${
     err ? "border-red-500 bg-red-50" : "border-[#8f8f8f]"
   } disabled:bg-[#edf8ed] disabled:border-[#7fa37f] disabled:text-gray-500 disabled:cursor-default`;
 
@@ -493,13 +490,17 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
                 <div className={`${labelCls} text-[12px] mt-0.5`}>
                   Terms Description <span className="text-red-500 ml-1">*</span>
                 </div>
-                <textarea
-                  rows={2}
+                <ExpandableTextArea
                   value={group.description}
-                  onChange={(e) => updateGroup(group.groupId, "description", e.target.value)}
+                  onChange={(v) => updateGroup(group.groupId, "description", v)}
                   disabled={fieldDisabled}
+                  hasError={!!errors[`group_${gi}_description`]}
                   placeholder="Brief description of this term group…"
-                  className={`${textareaCls(errors[`group_${gi}_description`])} flex-1 min-w-[180px]`}
+                  title="Terms Description"
+                  rows={2}
+                  maxInlineRows={3}
+                  modalRows={10}
+                  className="flex-1 min-w-[180px]"
                 />
               </div>
 
@@ -536,13 +537,16 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
                       <span className={`shrink-0 w-7 text-right font-mono text-gray-500 ${group.pointStyle === "bullet" ? "text-[24px] leading-[30px]" : "text-[13px]"}`}>
                         {pointPrefix(group.pointStyle, pi)}
                       </span>
-                      <input
-                        type="text"
+                      <ExpandableTextArea
                         value={pt.text}
-                        onChange={(e) => updatePoint(group.groupId, pt.pointId, e.target.value)}
+                        onChange={(v) => updatePoint(group.groupId, pt.pointId, v)}
                         disabled={fieldDisabled}
                         placeholder={`Point ${pi + 1}`}
-                        className={`${inputCls(false)} flex-1`}
+                        title={`Point ${pi + 1}`}
+                        rows={1}
+                        maxInlineRows={2}
+                        modalRows={6}
+                        className="flex-1"
                       />
                       {!fieldDisabled && (
                         <div className="flex items-center gap-0.5 shrink-0">
