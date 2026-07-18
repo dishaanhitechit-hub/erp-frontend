@@ -69,7 +69,7 @@ function TermRow({ term, idx, total, disabled, onMove, onDelete, onUpdateGroup }
             <div className="mb-1.5">
               <ExpandableTextArea
                 value={group.description}
-                onChange={(v) => onUpdateGroup(term.termId, gi, "description", v)}
+                onChange={(v) => onUpdateGroup(term.sourceTermId ?? term.termId, gi, "description", v)}
                 disabled={disabled}
                 placeholder="Description…"
                 title={group.title || "Term Description"}
@@ -104,7 +104,7 @@ function TermRow({ term, idx, total, disabled, onMove, onDelete, onUpdateGroup }
             <div className="flex flex-col items-center gap-1">
               <span className="text-[10px] text-red-500 font-medium">Remove?</span>
               <div className="flex gap-1">
-                <button type="button" onClick={() => onDelete(term.termId)}
+                <button type="button" onClick={() => onDelete(term.sourceTermId ?? term.termId)}
                   className="text-[10px] px-1.5 py-0.5 bg-red-500 text-white rounded-sm hover:bg-red-600">
                   Yes
                 </button>
@@ -134,7 +134,7 @@ export default function OrderTermsTab({
   module = "Order",
   subModule = "Purchase_Order",
 }) {
-  const [activeTab, setActiveTab] = useState("General_Terms");
+  const [activeTab, setActiveTab] = useState("Special_Terms");
 
   const terms = form.watch("terms") || [];
   const generalTerms = terms.filter((t) => t.termType !== "Special_Terms");
@@ -144,46 +144,42 @@ export default function OrderTermsTab({
   const updateTerms = (updated) => form.setValue("terms", updated);
 
   const handleMove = (idx, dir) => {
-    const list    = [...activeTerms];
-    const swap    = idx + dir;
+    const list = [...activeTerms];
+    const swap = idx + dir;
     if (swap < 0 || swap >= list.length) return;
     [list[idx], list[swap]] = [list[swap], list[idx]];
-    // rebuild full terms preserving the other tab's items
     const other = terms.filter((t) =>
       activeTab === "General_Terms" ? t.termType === "Special_Terms" : t.termType !== "Special_Terms"
     );
     updateTerms(activeTab === "General_Terms" ? [...list, ...other] : [...other, ...list]);
   };
 
-  const handleDelete = (termId) => {
-    updateTerms(terms.filter((t) => String(t.termId) !== String(termId)));
+  const handleDelete = (sourceTermId) => {
+    updateTerms(terms.filter((t) => String(t.sourceTermId ?? t.termId) !== String(sourceTermId)));
   };
 
-  const handleUpdateGroup = (termId, groupIdx, field, value) => {
+  const handleUpdateGroup = (sourceTermId, groupIdx, field, value) => {
     updateTerms(
       terms.map((t) =>
-        String(t.termId) === String(termId)
-          ? {
-              ...t,
-              termGroups: (t.termGroups || []).map((g, gi) =>
-                gi === groupIdx ? { ...g, [field]: value } : g
-              ),
-            }
+        String(t.sourceTermId ?? t.termId) === String(sourceTermId)
+          ? { ...t, termGroups: (t.termGroups || []).map((g, gi) => gi === groupIdx ? { ...g, [field]: value } : g) }
           : t
       )
     );
   };
 
   const handleConfirm = (selected) => {
-    // merge: keep any existing description edits, add new ones
-    const existing = Object.fromEntries(terms.map((t) => [String(t.termId), t]));
-    const merged   = selected.map((t) => existing[String(t.termId)] || t);
+    const existing = Object.fromEntries(terms.map((t) => [String(t.sourceTermId ?? t.termId), t]));
+    const merged   = selected.map((t) => {
+      const key = String(t.sourceTermId ?? t.termId);
+      return existing[key] ? { ...existing[key], termGroups: t.termGroups } : t;
+    });
     updateTerms(merged);
   };
 
   const tabs = [
-    { key: "General_Terms", label: "General Terms", count: generalTerms.length },
     { key: "Special_Terms", label: "Special Terms", count: specialTerms.length },
+    { key: "General_Terms", label: "General Terms", count: generalTerms.length },
   ];
 
   return (
@@ -202,14 +198,11 @@ export default function OrderTermsTab({
                 activeTab === tab.key
                   ? "border-sky-500 text-sky-600 bg-sky-50"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
+              }`}>
               {tab.label}
               <span className={`ml-2 rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                 activeTab === tab.key ? "bg-sky-100 text-sky-700" : "bg-gray-100 text-gray-500"
-              }`}>
-                {tab.count}
-              </span>
+              }`}>{tab.count}</span>
             </button>
           ))}
         </div>
@@ -235,7 +228,7 @@ export default function OrderTermsTab({
               )}
               {activeTerms.map((term, idx) => (
                 <TermRow
-                  key={term.termId}
+                  key={term.sourceTermId ?? term.termId}
                   term={term}
                   idx={idx}
                   total={activeTerms.length}

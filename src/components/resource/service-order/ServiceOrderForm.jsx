@@ -198,10 +198,11 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
       "terms",
       JSON.stringify(
         values.terms.map((term, i) => ({
-          termId:     term.termId,
-          termType:   term.termType,
-          sortOrder:  term.sortOrder ?? i,
-          termGroups: (term.termGroups || []).map((g) => ({
+          ...(term.termId ? { termId: term.termId } : {}),
+          sourceTermId: term.sourceTermId,
+          termType:     term.termType,
+          sortOrder:    i,
+          termGroups:   (term.termGroups || []).map((g) => ({
             title:       g.title,
             description: g.description || "",
             pointStyle:  g.pointStyle,
