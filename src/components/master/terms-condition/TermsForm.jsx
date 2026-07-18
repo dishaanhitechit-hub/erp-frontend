@@ -253,22 +253,12 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
       const payload = buildPayload();
 
       if (mode === "create") {
-        /* TODO: remove dummy fallback when API is ready */
-        let newId;
-        try {
-          const res = await apiRequest({ url: TC.CREATE, method: "POST", data: payload });
-          newId = res.data?.[0]?.termId || res.data?.termId;
-        } catch {
-          newId = Date.now(); // DUMMY fallback — REMOVE after backend ready
-        }
+        const res = await apiRequest({ url: TC.CREATE, method: "POST", data: payload });
+        const newId = res.data?.[0]?.termId || res.data?.termId;
         toast.success("Term created", { id: toastId });
         setTimeout(() => router.push(`/master/terms-condition/${newId}`), 400);
       } else {
-        try {
-          await apiRequest({ url: `${TC.UPDATE}/${termId}`, method: "PUT", data: payload });
-        } catch {
-          // DUMMY fallback — REMOVE after backend ready
-        }
+        await apiRequest({ url: `${TC.UPDATE}/${termId}`, method: "PUT", data: payload });
         toast.success("Term updated", { id: toastId });
         setIsEditing(false);
       }
@@ -304,11 +294,7 @@ export default function TermsForm({ mode = "create", disabled = false, termId, i
     let toastId;
     try {
       toastId = toast.loading("Deleting...");
-      try {
-        await apiRequest({ url: `${TC.DELETE}/${termId}`, method: "DELETE" });
-      } catch {
-        // DUMMY fallback — REMOVE after backend ready
-      }
+      await apiRequest({ url: `${TC.DELETE}/${termId}`, method: "DELETE" });
       toast.success("Term deleted", { id: toastId });
       setTimeout(() => router.push("/master/terms-condition"), 400);
     } catch (err) {

@@ -10,13 +10,13 @@ export const TERMS_MODULES = [
 // Sub-modules keyed by module value
 export const TERMS_SUB_MODULES = {
   Order: [
-    { label: "Purchase Order",       value: "Purchase_Order" },
+    { label: "Purchases Order",       value: "Purchases_Order" },
     { label: "Service Order",        value: "Service_Order" },
     { label: "Work Order",           value: "Work_Order" },
     { label: "Customer Supply Order",value: "Customer_Supply_Order" },
     { label: "Site Transfer Order",  value: "Site_Transfer_Order" },
-    { label: "Hire Order",     value: "Hire_Order" },
-    { label: "Job Contract Order", value: "Job_Contract_Order" },
+    { label: "Hire Order",           value: "Hire_Order" },
+    { label: "Job Contract Order",   value: "Job_Contract_Order" },
   ],
   Enquiry: [
     { label: "Material Enquiry", value: "Material_Enquiry" },
@@ -53,7 +53,7 @@ export const DUMMY_TERMS = [
   {
     termId: 1,
     module: "Order",
-    subModule: "Purchase_Order",
+    subModule: "Purchases_Order",
     termType: "General_Terms",
     termGroups: [
       {
@@ -85,7 +85,7 @@ export const DUMMY_TERMS = [
   {
     termId: 2,
     module: "Order",
-    subModule: "Service_Order",
+    subModule: "Work_Order",
     termType: "Special_Terms",
     termGroups: [
       {

@@ -281,9 +281,16 @@ export default function OrderForm({ mode = "create", orderId }) {
     formData.append(
       "terms",
       JSON.stringify(
-        values.terms.map((term) => ({
-          termId: term.termId,
-          description: term.description || "",
+        values.terms.map((term, i) => ({
+          termId:     term.termId,
+          termType:   term.termType,
+          sortOrder:  term.sortOrder ?? i,
+          termGroups: (term.termGroups || []).map((g) => ({
+            title:       g.title,
+            description: g.description || "",
+            pointStyle:  g.pointStyle,
+            points:      (g.points || []).map((p) => ({ text: p.text })),
+          })),
         })),
       ),
     );
@@ -536,6 +543,8 @@ export default function OrderForm({ mode = "create", orderId }) {
                   disabled={disabled}
                   openTermsModal={openTermsModal}
                   setOpenTermsModal={setOpenTermsModal}
+                  module="Order"
+                  subModule="Purchases_Order"
                 />
               </TabsContent>
               <TabsContent value="summary" className="m-0">

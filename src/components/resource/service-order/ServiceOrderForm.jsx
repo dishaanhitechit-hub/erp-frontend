@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 
 const defaultValues = {
-  categoryCode: "Work Order",
+  categoryCode: "Work_Order",
   subCategoryCodes: [],
   costHead: "Project Work",
   vendorId: "",
@@ -107,7 +107,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
         } catch { /* party fields stay empty if ledger API fails */ }
 
         const formattedData = {
-          categoryCode: data.categoryCode || "Work Order",
+          categoryCode: data.categoryCode || "Work_Order",
           subCategoryCodes: data.subCategoryCodes || [],
           costHead: data.costHead || "Project Work",
           vendorId: String(data.vendorId || ""),
@@ -197,10 +197,16 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
     formData.append(
       "terms",
       JSON.stringify(
-        values.terms.map((term) => ({
-          termId: term.termId,
-          description: term.description || "",
-          sequenceNo: term.sequenceNo || 0,
+        values.terms.map((term, i) => ({
+          termId:     term.termId,
+          termType:   term.termType,
+          sortOrder:  term.sortOrder ?? i,
+          termGroups: (term.termGroups || []).map((g) => ({
+            title:       g.title,
+            description: g.description || "",
+            pointStyle:  g.pointStyle,
+            points:      (g.points || []).map((p) => ({ text: p.text })),
+          })),
         }))
       )
     );
@@ -374,7 +380,14 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
                 <ServiceOrderItemsTab form={form} disabled={disabled} openItemModal={openItemModal} setOpenItemModal={setOpenItemModal} />
               </TabsContent>
               <TabsContent value="terms" className="m-0">
-                <OrderTermsTab form={form} disabled={disabled} openTermsModal={openTermsModal} setOpenTermsModal={setOpenTermsModal} />
+                <OrderTermsTab
+                  form={form}
+                  disabled={disabled}
+                  openTermsModal={openTermsModal}
+                  setOpenTermsModal={setOpenTermsModal}
+                  module="Order"
+                  subModule="Work_Order"
+                />
               </TabsContent>
               <TabsContent value="summary" className="m-0">
                 <OrderSummaryTab form={form} disabled={disabled} />
