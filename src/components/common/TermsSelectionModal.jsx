@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Search, Loader2, Check, ChevronUp, ChevronDown,
   Trash2, GripVertical, X, PanelLeftClose, PanelLeftOpen,
-  ChevronsDownUp, ChevronsUpDown,
+  ChevronsDownUp, ChevronsUpDown, Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -27,11 +27,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import ExpandableTextArea from "@/components/common/ExpandableTextArea";
-import { TERMS_TYPES } from "@/config/terms.config";
+import { TERMS_TYPES, POINT_STYLES } from "@/config/terms.config";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 const DUMMY_TERMS_API = []; // REMOVE after backend ready
 
 const fmt = (str) => (str || "").replace(/_/g, " ");
+
+// Normalize old "numbered" default → "bullet" when loading into modal
+const normalizeTerm = (t, i) => ({
+  ...t,
+  _selected: true,
+  _sortOrder: i,
+  termGroups: (t.termGroups || []).map((g) => ({
+    ...g,
+    pointStyle: g.pointStyle === "numbered" ? "bullet" : (g.pointStyle || "bullet"),
+  })),
+});
 
 function pointPrefix(style, idx) {
   if (style === "bullet")   return "•";
@@ -60,7 +74,7 @@ function TermGroupView({ group, idx }) {
         <div className="pl-6 flex flex-col gap-0.5">
           {group.points.map((pt, pi) => (
             <span key={pi} className="text-[12px] text-gray-600 flex gap-1.5">
-              <span className={`shrink-0 font-mono ${group.pointStyle === "bullet" ? "text-[16px] leading-[18px]" : ""}`}>
+              <span className={`shrink-0 font-mono ${group.pointStyle === "bullet" ? "text-[22px] leading-[20px] text-gray-500" : "text-[11px]"}`}>
                 {pointPrefix(group.pointStyle, pi)}
               </span>
               {pt.text}
@@ -90,7 +104,7 @@ function PointRow({ pt, pi, total, prefix, highlighted, onUpdate, onMove, onDele
           <ChevronDown size={10} />
         </button>
       </div>
-      <span className={`shrink-0 text-gray-400 font-mono text-[11px] mt-2 ${prefix === "•" ? "text-[15px] leading-[20px]" : ""}`}>
+      <span className={`shrink-0 font-mono mt-1.5 ${prefix === "•" ? "text-[22px] leading-[22px] text-gray-500" : "text-[11px] text-gray-400 mt-2"}`}>
         {prefix}
       </span>
       <ExpandableTextArea
@@ -124,7 +138,7 @@ function PointRow({ pt, pi, total, prefix, highlighted, onUpdate, onMove, onDele
   );
 }
 
-function TermGroupsEditor({ term, onUpdateGroupField, onMoveGroup, onDeleteGroup, onUpdatePoint, onMovePoint, onDeletePoint }) {
+function TermGroupsEditor({ term, onUpdateGroupField, onMoveGroup, onDeleteGroup, onUpdatePoint, onMovePoint, onDeletePoint, onAddPoint }) {
   const [groupConfirm,  setGroupConfirm]  = useState(null);
   const [movedGroupIdx, setMovedGroupIdx] = useState(null);
   const [movedPointKey, setMovedPointKey] = useState(null);
@@ -227,6 +241,24 @@ function TermGroupsEditor({ term, onUpdateGroupField, onMoveGroup, onDeleteGroup
                 />
               </div>
 
+              {/* Point style selector */}
+              <div className="flex items-center gap-2 py-1.5 border-b border-gray-200 mb-1.5">
+                <span className="text-[11px] text-gray-700 font-semibold shrink-0">Sub-point Style :</span>
+                <Select
+                  value={group.pointStyle || "bullet"}
+                  onValueChange={(v) => onUpdateGroupField(term.termId, gi, "pointStyle", v)}
+                >
+                  <SelectTrigger className="h-[26px] text-[12px] w-[130px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {POINT_STYLES.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Points */}
               {(group.points || []).length > 0 && (
                 <div className="flex flex-col gap-1 pl-1">
@@ -245,6 +277,15 @@ function TermGroupsEditor({ term, onUpdateGroupField, onMoveGroup, onDeleteGroup
                   ))}
                 </div>
               )}
+
+              {/* Add Point */}
+              <button
+                type="button"
+                onClick={() => onAddPoint(term.termId, gi)}
+                className="mt-1.5 flex items-center gap-1 text-[11px] text-sky-600 border border-sky-300 rounded-sm px-2 py-0.5 hover:bg-sky-50 transition self-start"
+              >
+                <Plus size={11} /> Add Point
+              </button>
             </div>
           )}
         </div>
@@ -298,9 +339,7 @@ export default function TermsSelectionModal({
     };
     fetch();
     // init tempSelected from currently selected terms
-    setTempSelected(
-      selectedTerms.map((t, i) => ({ ...t, _selected: true, _sortOrder: i }))
-    );
+    setTempSelected(selectedTerms.map((t, i) => normalizeTerm(t, i)));
     setSearch("");
     setActiveTab("General_Terms");
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -323,7 +362,7 @@ export default function TermsSelectionModal({
 
   const toggleSelect = (term, checked) => {
     if (checked) {
-      setTempSelected((prev) => [...prev, { ...term, _selected: true, _sortOrder: prev.length }]);
+      setTempSelected((prev) => [...prev, normalizeTerm(term, prev.length)]);
     } else {
       setTempSelected((prev) => prev.filter((t) => String(t.termId) !== String(term.termId)));
     }
@@ -333,7 +372,7 @@ export default function TermsSelectionModal({
   const toggleAll  = (checked) => {
     if (checked) {
       const toAdd = filteredList.filter((t) => !isSelected(t.termId));
-      setTempSelected((prev) => [...prev, ...toAdd.map((t, i) => ({ ...t, _selected: true, _sortOrder: prev.length + i }))]);
+      setTempSelected((prev) => [...prev, ...toAdd.map((t, i) => normalizeTerm(t, prev.length + i))]);
     } else {
       const ids = new Set(filteredList.map((t) => String(t.termId)));
       setTempSelected((prev) => prev.filter((t) => !ids.has(String(t.termId))));
@@ -409,6 +448,14 @@ export default function TermsSelectionModal({
       ...t,
       termGroups: t.termGroups.map((g, gIdx) =>
         gIdx !== gi ? g : { ...g, points: g.points.filter((_, i) => i !== pi) }
+      ),
+    }));
+
+  const addPoint = (termId, gi) =>
+    updateTerm(termId, (t) => ({
+      ...t,
+      termGroups: t.termGroups.map((g, gIdx) =>
+        gIdx !== gi ? g : { ...g, points: [...(g.points || []), { text: "" }] }
       ),
     }));
 
@@ -574,6 +621,7 @@ export default function TermsSelectionModal({
                       onUpdatePoint={updatePoint}
                       onMovePoint={movePoint}
                       onDeletePoint={deletePoint}
+                      onAddPoint={addPoint}
                     />
                   </div>
                 </div>

@@ -52,7 +52,7 @@ const newGroup = () => ({
   groupId: uid(),
   title: "",
   description: "",
-  pointStyle: "numbered",
+  pointStyle: "bullet",
   points: [],
 });
 
