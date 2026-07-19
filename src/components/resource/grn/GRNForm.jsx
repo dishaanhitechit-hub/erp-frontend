@@ -341,7 +341,7 @@ export default function GRNForm({ mode = "create", grnId }) {
         const newId = res.data?.grnId || res.data?.id;
         if (newId) {
           setTimeout(() => {
-            router.push(`/resource-management/material/received-note/grn/${newId}`);
+            router.push(`/resource-management/material/grn/${newId}`);
           }, 400);
         }
       }

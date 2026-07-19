@@ -230,7 +230,7 @@ export default function BSSForm({ mode = "create", bssId }) {
 
       if (mode === "create" && res.data?.bssId) {
         setTimeout(() => {
-          router.push(`/resource-management/vendor-billing/srn/${res.data.bssId}`);
+          router.push(`/resource-management/sub-contractor-billing/e-reconcile-bill/srn/${res.data.bssId}`);
         }, 400);
       }
     } catch (err) {

@@ -227,7 +227,7 @@ export default function BVSForm({ mode = "create", bvsId }) {
 
       if (mode === "create" && res.data?.bvsId) {
         setTimeout(() => {
-          router.push(`/resource-management/vendor-billing/grn/${res.data.bvsId}`);
+          router.push(`/resource-management/sub-contractor-billing/e-reconcile-bill/grn/${res.data.bvsId}`);
         }, 400);
       }
     } catch (err) {

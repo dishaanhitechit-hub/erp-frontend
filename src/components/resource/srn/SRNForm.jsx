@@ -343,7 +343,7 @@ export default function SRNForm({ mode = "create", srnId }) {
         const newId = res.data?.srnId || res.data?.id;
         if (newId) {
           setTimeout(() => {
-            router.push(`/resource-management/material/received-note/srn/${newId}`);
+            router.push(`/resource-management/services/srn/${newId}`);
           }, 400);
         }
       }

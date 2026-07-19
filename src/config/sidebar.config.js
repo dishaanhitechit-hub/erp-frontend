@@ -218,19 +218,19 @@ export const sidebarConfig = [
         title: "Sub Contractor Billing",
         children: [
           {
-            title: "Bill Receive Register(GRN)",
-            path: "/resource-management/sub-contractor-billing/grn", 
+            title: "Bill Receive Register",
+            path: "/resource-management/sub-contractor-billing/bill-receive-register",
+            permissionKey: "bill_receive_register",
+          },
+          {
+            title: "e-Reconcile Bill (GRN)",
+            path: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",
             permissionKey: "billing_by_grn",
           },
           {
-            title: "Bill Receive Register(SRN)",
-            path: "/resource-management/sub-contractor-billing/srn", 
+            title: "e-Reconcile Bill (SRN)",
+            path: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn",
             permissionKey: "billing_by_srn",
-          },
-          {
-            title: "e-reconcile Bill",
-            path: "/resource-management/sub-contractor-billing/e-reconcile-bill", 
-            permissionKey: "e_reconcile_bill", //need to be added in backend
           },
           {
             title: "Payment Request",

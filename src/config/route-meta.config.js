@@ -277,31 +277,36 @@ export const routeMetaConfig = [
     breadcrumbs: ["Resource Management", "Services","Plant Machinery" ,"Log Book Entry","Edit"],
   },
 
-  //billing by grn
+  //bill receive register
   {
-    basePath: "/resource-management/sub-contractor-billing/grn",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","List"],
+    basePath: "/resource-management/sub-contractor-billing/bill-receive-register",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "Bill Receive Register", "List"],
+  },
+  //e-reconcile bill by grn
+  {
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "List"],
   },
   {
-    basePath: "/resource-management/sub-contractor-billing/grn/new",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","New"],
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn/new",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "New"],
   },
   {
-    basePath: "/resource-management/sub-contractor-billing/grn/[id]",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By GRN","Edit"],
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn/[id]",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "Edit"],
   },
-  //billing by srn
+  //e-reconcile bill by srn
   {
-    basePath: "/resource-management/sub-contractor-billing/srn",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","List"],
-  },
-  {
-    basePath: "/resource-management/sub-contractor-billing/srn/new",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","New"],
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "List"],
   },
   {
-    basePath: "/resource-management/sub-contractor-billing/srn/[id]",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing","By SRN","Edit"],
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn/new",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "New"],
+  },
+  {
+    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn/[id]",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "Edit"],
   },
   //stock report
   {
