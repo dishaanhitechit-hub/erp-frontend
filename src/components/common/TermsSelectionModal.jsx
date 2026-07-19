@@ -15,17 +15,14 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import ExpandableTextArea from "@/components/common/ExpandableTextArea";
 import { POINT_STYLES } from "@/config/terms.config";
+import { fmtUnderscore, groupsMatch, pointPrefix } from "@/helper/termsHelpers";
 
 const DUMMY_TERMS_API = []; // REMOVE after backend ready
 
-const fmt = (str) => (str || "").replace(/_/g, " ");
-
-// Stable key for a group — prefer backend id, fall back to title
-const groupKey = (g) => String(g._id || g.id || g.groupId || g.title || "");
+const fmt = fmtUnderscore;
 
 const normalizeGroup = (g) => ({
   ...g,
-  _groupKey: groupKey(g), // snapshot master key so edits to title don't lose it
   pointStyle: (!g.pointStyle || g.pointStyle === "numbered") ? "bullet" : g.pointStyle,
 });
 
@@ -45,21 +42,6 @@ const masterToSelected = (masterTerm, i) => ({
   termGroups:   (masterTerm.termGroups || []).map(normalizeGroup),
 });
 
-function pointPrefix(style, idx) {
-  if (style === "bullet")   return "•";
-  if (style === "numbered") return `${idx + 1}.`;
-  if (style === "alpha")    return `${String.fromCharCode(97 + idx)}.`;
-  if (style === "roman") {
-    const nums = [1,4,5,9,10,40,50,90,100,400,500,900,1000];
-    const syms = ["i","iv","v","ix","x","xl","l","xc","c","cd","d","cm","m"];
-    let n = idx + 1, result = "";
-    for (let i = nums.length - 1; i >= 0; i--) {
-      while (n >= nums[i]) { result += syms[i]; n -= nums[i]; }
-    }
-    return `${result}.`;
-  }
-  return `${idx + 1}.`;
-}
 
 function TermGroupView({ group, idx }) {
   return (
@@ -126,9 +108,8 @@ function TermGroupsEditor({ term, allTerms, onUpdateGroupField, onMoveGroup, onD
 
   // Compute inactive groups: master groups NOT in active (by title)
   const masterTerm = allTerms.find((t) => String(t.termId) === String(srcId));
-  const activeKeys = new Set(activeGroups.map((g) => g._groupKey || g.title));
   const inactiveGroups = (masterTerm?.termGroups || []).filter(
-    (g) => !activeKeys.has(groupKey(g)) && !activeKeys.has(g.title)
+    (mg) => !activeGroups.some((ag) => groupsMatch(ag, mg))
   );
 
   const toggleCollapse = (gi) =>
@@ -353,10 +334,7 @@ export default function TermsSelectionModal({
 
   const isGroupActive = (masterTermId, masterGroup) => {
     const sel = findSelected(masterTermId);
-    const mk  = groupKey(masterGroup);
-    return (sel?.termGroups || []).some((g) =>
-      (g._groupKey && g._groupKey === mk) || g.title === masterGroup.title
-    );
+    return (sel?.termGroups || []).some((g) => groupsMatch(g, masterGroup));
   };
 
   const isTermSelected = (masterTermId) => {
@@ -411,10 +389,7 @@ export default function TermsSelectionModal({
       setTempSelected((prev) =>
         prev.map((t) => {
           if (String(t.sourceTermId) !== id) return t;
-          const mk = groupKey(group);
-          return { ...t, termGroups: (t.termGroups || []).filter((g) =>
-            !((g._groupKey && g._groupKey === mk) || g.title === group.title)
-          )};
+          return { ...t, termGroups: (t.termGroups || []).filter((g) => !groupsMatch(g, group)) };
         }).filter((t) => (t.termGroups || []).length > 0 || String(t.sourceTermId) !== id)
       );
     }

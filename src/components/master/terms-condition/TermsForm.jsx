@@ -32,6 +32,7 @@ import {
   DUMMY_TERMS, // REMOVE after backend APIs are ready
 } from "../../../config/terms.config";
 import ExpandableTextArea from "@/components/common/ExpandableTextArea";
+import { pointPrefix } from "@/helper/termsHelpers";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 
@@ -56,22 +57,6 @@ const newGroup = () => ({
   points: [],
 });
 
-// Render point prefix label based on style + index
-function pointPrefix(style, idx) {
-  if (style === "bullet")   return "•";
-  if (style === "numbered") return `${idx + 1}.`;
-  if (style === "alpha")    return `${String.fromCharCode(97 + idx)}.`;
-  if (style === "roman") {
-    const nums = [1,4,5,9,10,40,50,90,100,400,500,900,1000];
-    const syms = ["i","iv","v","ix","x","xl","l","xc","c","cd","d","cm","m"];
-    let n = idx + 1, result = "";
-    for (let i = nums.length - 1; i >= 0; i--) {
-      while (n >= nums[i]) { result += syms[i]; n -= nums[i]; }
-    }
-    return `${result}.`;
-  }
-  return `${idx + 1}.`;
-}
 
 export default function TermsForm({ mode = "create", disabled = false, termId, initialData }) {
   const router = useRouter();

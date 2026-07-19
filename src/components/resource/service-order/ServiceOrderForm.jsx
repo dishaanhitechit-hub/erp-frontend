@@ -202,11 +202,17 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
           sourceTermId: term.sourceTermId,
           termType:     term.termType,
           sortOrder:    i,
-          termGroups:   (term.termGroups || []).map((g) => ({
+          termGroups:   (term.termGroups || []).map((g, gi) => ({
+            ...(g.groupId != null ? { groupId: g.groupId } : {}),
             title:       g.title,
             description: g.description || "",
             pointStyle:  g.pointStyle,
-            points:      (g.points || []).map((p) => ({ text: p.text })),
+            sortOrder:   gi,
+            points:      (g.points || []).map((p, pi) => ({
+              ...(p.pointId != null ? { pointId: p.pointId } : {}),
+              text:      p.text,
+              sortOrder: pi,
+            })),
           })),
         }))
       )
