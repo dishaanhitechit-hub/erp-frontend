@@ -551,7 +551,7 @@ export default function OrderForm({ mode = "create", orderId }) {
                   openTermsModal={openTermsModal}
                   setOpenTermsModal={setOpenTermsModal}
                   module="Order"
-                  subModule="Purchases_Order"
+                  subModule={form.watch("categoryCode")}
                 />
               </TabsContent>
               <TabsContent value="summary" className="m-0">

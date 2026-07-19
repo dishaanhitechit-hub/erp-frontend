@@ -153,6 +153,7 @@ export default function OrderBasicSection({
     setValue("subCategoryCode",     "MAT_001");
     setValue("costHead",            "Project_Work");
     setValue("items",               []);
+    setValue("terms",               []);
     setValue("vendorId",            "");
     setValue("transferProjectSite", "");
     setValue("partyAddress",        "");

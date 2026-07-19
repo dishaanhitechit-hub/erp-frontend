@@ -393,7 +393,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
                   openTermsModal={openTermsModal}
                   setOpenTermsModal={setOpenTermsModal}
                   module="Order"
-                  subModule="Work_Order"
+                  subModule={form.watch("categoryCode")}
                 />
               </TabsContent>
               <TabsContent value="summary" className="m-0">

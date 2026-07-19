@@ -291,7 +291,7 @@ export default function TermsSelectionModal({
   const [secCollapsed,    setSecCollapsed]    = useState({ Special_Terms: false, General_Terms: false });
   const [tempSelected,    setTempSelected]    = useState([]);
 
-  // ── fetch on open
+  // ── re-fetch when modal opens or module/subModule changes while open
   useEffect(() => {
     if (!open) return;
     (async () => {
@@ -308,6 +308,11 @@ export default function TermsSelectionModal({
       } catch { toast.error("Failed to load terms"); }
       finally { setLoading(false); }
     })();
+  }, [open, module, subModule]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── reset UI state only when modal first opens
+  useEffect(() => {
+    if (!open) return;
     setTempSelected(selectedTerms.map((t, i) => normalizeTerm(t, i)));
     setSearch("");
     setSecCollapsed({ Special_Terms: false, General_Terms: false });

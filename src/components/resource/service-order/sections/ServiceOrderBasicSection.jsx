@@ -153,6 +153,7 @@ export default function ServiceOrderBasicSection({
       setValue("costHead", "");
     }
     setValue("items", []);
+    setValue("terms", []);
   };
 
   // Multi-select toggle
