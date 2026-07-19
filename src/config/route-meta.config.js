@@ -282,6 +282,14 @@ export const routeMetaConfig = [
     basePath: "/resource-management/sub-contractor-billing/bill-receive-register",
     breadcrumbs: ["Resources Management", "Sub Contractor Billing", "Bill Receive Register", "List"],
   },
+  {
+    basePath: "/resource-management/sub-contractor-billing/bill-receive-register/new",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "Bill Receive Register", "New"],
+  },
+  {
+    basePath: "/resource-management/sub-contractor-billing/bill-receive-register/[id]",
+    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "Bill Receive Register", "Edit"],
+  },
   //e-reconcile bill by grn
   {
     basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",

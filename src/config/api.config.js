@@ -122,6 +122,18 @@ export const API_ENDPOINTS = {
         },
       },
     },
+    BILL_RECEIVE_REGISTER: {
+      GET_VENDOR_ORDERS: "/billing/brr/vendor-orders", // vendorId projectCode orderCategory GET
+      CREATE:            "/billing/brr/create",         // POST FormData
+      LIST:              "/billing/brr/list",            // GET projectCode
+      DETAILS:           "/billing/brr/details",         // /:brrId GET
+      EDIT:              "/billing/brr/edit",            // /:brrId PUT FormData
+      SUBMIT:            "/billing/brr/submit",          // /:brrId POST
+      APPROVE:           "/billing/brr/approve",         // /:brrId POST
+      REBACK:            "/billing/brr/reback",          // /:brrId POST
+      REJECT:            "/billing/brr/reject",          // /:brrId POST
+      HISTORY:           "/billing/brr/history",         // /:brrId GET
+    },
     VENDOR_BILLING: {
       BSS: {
         GET_VENDOR_ORDERS: "/resource/bss/vendor-orders", // vendorId projectCode receivedCategory itemCategory costHead GET

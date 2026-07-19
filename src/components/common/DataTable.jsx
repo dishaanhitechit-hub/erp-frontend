@@ -3,6 +3,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowUp, ArrowDown, ArrowUpDown, ChevronDown, Search } from "lucide-react";
 
+const STATUS_STYLES = {
+  approved:  "bg-green-100 text-green-700",
+  draft:     "bg-gray-100 text-gray-600",
+  reback:    "bg-amber-100 text-amber-700",
+  reject:    "bg-red-100 text-red-600",
+  rejected:  "bg-red-100 text-red-600",
+};
+
+function StatusBadge({ value }) {
+  if (!value) return <span className="text-gray-400">-</span>;
+  const key = value.toLowerCase();
+  const isPending = key.startsWith("pending");
+  const cls = isPending
+    ? "bg-blue-100 text-blue-700"
+    : (STATUS_STYLES[key] || "bg-gray-100 text-gray-600");
+  return (
+    <span className={`inline-block text-[11px] px-2 py-0.5 rounded-full font-medium capitalize ${cls}`}>
+      {value.replace(/_/g, " ")}
+    </span>
+  );
+}
+
 export default function DataTable({
   columns = [],
   data = [],
@@ -385,7 +407,11 @@ export default function DataTable({
                               : "truncate whitespace-nowrap overflow-hidden"
                           }
                         >
-                          {col.render ? col.render(row) : (row[col.accessor] ?? "-")}
+                          {col.render
+            ? col.render(row)
+            : col.accessor?.toLowerCase().endsWith("status")
+              ? <StatusBadge value={row[col.accessor]} />
+              : (row[col.accessor] ?? "-")}
                         </div>
                       </td>
                     );
