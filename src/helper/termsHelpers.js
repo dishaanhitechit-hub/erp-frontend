@@ -1,6 +1,6 @@
 /**
  * Helpers shared across terms-related components:
- * TermsSelectionModal, OrderTermsTab, TermsForm
+ * TermsSelectionModal, TermsSection, TermsForm
  */
 
 /** Format underscore strings for display: "Work_Order" → "Work Order" */

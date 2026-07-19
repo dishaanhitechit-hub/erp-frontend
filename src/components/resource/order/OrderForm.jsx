@@ -11,7 +11,7 @@ import EditButton from "@/components/common/EditButton";
 import SaveDraftButton from "@/components/common/SaveDraftButton";
 import OrderBasicSection from "./sections/OrderBasicSection";
 import OrderItemsTab from "./tabs/OrderItemsTab";
-import OrderTermsTab from "./tabs/OrderTermsTab";
+import TermsSection from "@/components/common/TermsSection";
 import OrderSummaryTab from "./tabs/OrderSummaryTab";
 import { orderSchema } from "./schema/order.schema";
 import { apiRequest } from "@/lib/apiClient";
@@ -61,7 +61,6 @@ export default function OrderForm({ mode = "create", orderId }) {
     fileName: "",
     fileUrl: "",
   });
-  const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openItemModal, setOpenItemModal] = useState(false);
   const [withIndent, setWithIndent] = useState(true);
   const [withoutIndentItemOptions, setWithoutIndentItemOptions] = useState([]);
@@ -519,15 +518,6 @@ export default function OrderForm({ mode = "create", orderId }) {
                     + Add Order Items
                   </button>
                 )}
-                {activeTab === "terms" && !disabled && (
-                  <button
-                    type="button"
-                    onClick={() => setOpenTermsModal(true)}
-                    className="h-[34px] min-w-[150px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition"
-                  >
-                    + Add T&C
-                  </button>
-                )}
               </div>
             </div>
 
@@ -545,13 +535,12 @@ export default function OrderForm({ mode = "create", orderId }) {
                 />
               </TabsContent>
               <TabsContent value="terms" className="m-0">
-                <OrderTermsTab
-                  form={form}
-                  disabled={disabled}
-                  openTermsModal={openTermsModal}
-                  setOpenTermsModal={setOpenTermsModal}
+                <TermsSection
+                  terms={form.watch("terms") || []}
+                  onChange={(v) => form.setValue("terms", v)}
                   module="Order"
                   subModule={form.watch("categoryCode")}
+                  disabled={disabled}
                 />
               </TabsContent>
               <TabsContent value="summary" className="m-0">

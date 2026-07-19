@@ -11,7 +11,7 @@ import EditButton from "@/components/common/EditButton";
 import SaveDraftButton from "@/components/common/SaveDraftButton";
 import ServiceOrderBasicSection from "./sections/ServiceOrderBasicSection";
 import ServiceOrderItemsTab from "./tabs/ServiceOrderItemsTab";
-import OrderTermsTab from "@/components/resource/order/tabs/OrderTermsTab";
+import TermsSection from "@/components/common/TermsSection";
 import OrderSummaryTab from "@/components/resource/order/tabs/OrderSummaryTab";
 import { serviceOrderSchema } from "./schema/serviceOrder.schema";
 import { apiRequest } from "@/lib/apiClient";
@@ -53,7 +53,6 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
   const [initialData, setInitialData] = useState(null);
-  const [openTermsModal, setOpenTermsModal] = useState(false);
   const [openItemModal, setOpenItemModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -374,11 +373,6 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
                     + Add Service Items
                   </button>
                 )}
-                {activeTab === "terms" && !disabled && (
-                  <button type="button" onClick={() => setOpenTermsModal(true)} className="h-[34px] min-w-[150px] px-4 bg-[#9F96F2] border border-[#5D58A5] rounded-md text-black text-sm font-medium flex items-center justify-center hover:opacity-90 transition">
-                    + Add T&C
-                  </button>
-                )}
               </div>
             </div>
 
@@ -387,13 +381,12 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
                 <ServiceOrderItemsTab form={form} disabled={disabled} openItemModal={openItemModal} setOpenItemModal={setOpenItemModal} />
               </TabsContent>
               <TabsContent value="terms" className="m-0">
-                <OrderTermsTab
-                  form={form}
-                  disabled={disabled}
-                  openTermsModal={openTermsModal}
-                  setOpenTermsModal={setOpenTermsModal}
+                <TermsSection
+                  terms={form.watch("terms") || []}
+                  onChange={(v) => form.setValue("terms", v)}
                   module="Order"
                   subModule={form.watch("categoryCode")}
+                  disabled={disabled}
                 />
               </TabsContent>
               <TabsContent value="summary" className="m-0">
