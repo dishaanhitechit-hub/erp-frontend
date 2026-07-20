@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass, labelClass } from "@/lib/formStyles";
@@ -145,7 +146,7 @@ export default function GINLeftPanel({
         const res = await apiRequest({
           url: API_ENDPOINTS.MASTER.GET_ALL_LEDGER,
         });
-        setLedgerList(res.data || []);
+        setLedgerList((res.data || []).slice().sort((a, b) => (a.ledgerName || "").localeCompare(b.ledgerName || "")));
       } catch {
         toast.error("Failed to load vendor list");
       }
@@ -176,19 +177,6 @@ export default function GINLeftPanel({
     };
     fetch();
   }, [projectId]);
-
-  // ── AUTO-FILL PARTY INFO when vendorId changes ────────────────────────────
-  useEffect(() => {
-    if (!vendorId) {
-      setValue("partyAddress", "");
-      setValue("partyGstn", "");
-      return;
-    }
-    const v = ledgerList.find((l) => String(l.ledgerId) === String(vendorId));
-    if (!v) return;
-    setValue("partyAddress", v.corporateAddress || "");
-    setValue("partyGstn", v.gstin || "");
-  }, [vendorId, ledgerList]);
 
   // ── FETCH VENDOR ORDERS when vendor or category changes ───────────────────
   useEffect(() => {
@@ -226,7 +214,16 @@ export default function GINLeftPanel({
   // ── HANDLE VENDOR CHANGE ──────────────────────────────────────────────────
   const handleVendorChange = (val) => {
     userChangedRef.current = true;
-    setValue("vendorId", val);
+    if (!val) {
+      setValue("partyAddress", "");
+      setValue("partyGstn", "");
+    } else {
+      const vendor = ledgerList.find((l) => String(l.ledgerId) === String(val));
+      if (vendor) {
+        setValue("partyAddress", vendor.registeredAddress || vendor.corporateAddress || "");
+        setValue("partyGstn", vendor.gstin || "");
+      }
+    }
     if (mode === "create") {
       setValue("orderId", "");
       setValue("orderDate", "");
@@ -435,27 +432,20 @@ export default function GINLeftPanel({
                 control={control}
                 name="vendorId"
                 render={({ field }) => (
-                  <Select
+                  <SearchableSelect
+                    options={ledgerList}
                     value={field.value ? String(field.value) : ""}
-                    onValueChange={(v) => {
-                      field.onChange(v);
-                      handleVendorChange(v);
+                    onChange={(val) => {
+                      field.onChange(val ? String(val) : "");
+                      handleVendorChange(val ? String(val) : "");
                     }}
                     disabled={disabled}
-                  >
-                    <SelectTrigger
-                      className={`${getInputClass(!!errors.vendorId, disabled)} w-full h-[30px]`}
-                    >
-                      <SelectValue placeholder="Select from Vendor List" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ledgerList.map((l) => (
-                        <SelectItem key={l.ledgerId} value={String(l.ledgerId)}>
-                          {l.ledgerName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Select from Vendor List"
+                    labelKey="ledgerName"
+                    valueKey="ledgerId"
+                    searchKeys={["ledgerName"]}
+                    className={errors.vendorId ? "border-red-500" : ""}
+                  />
                 )}
               />
             </div>

@@ -11,7 +11,7 @@ export const TERMS_MODULES = [
 export const TERMS_SUB_MODULES = {
   Order: [
     { label: "Purchases Order",       value: "Purchases_Order" },
-    { label: "Service Order",        value: "Service_Order" },
+    // { label: "Service Order",        value: "Service_Order" },
     { label: "Work Order",           value: "Work_Order" },
     { label: "Customer Supply Order",value: "Customer_Supply_Order" },
     { label: "Site Transfer Order",  value: "Site_Transfer_Order" },

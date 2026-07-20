@@ -52,8 +52,9 @@ export default function Page() {
           partyDate:    getfmtDisplaydate(item.partyDate),
           basicAmount:  fmt(item.basicAmount),
           gstAmount:    fmt(item.gstAmount),
-          totalAmount:  fmt(item.totalAmount),
-          status:       item.workflowStatus || "",
+          totalAmount:   fmt(item.totalAmount),
+          bookedAmount:  fmt(item.bookedAmount),
+          status:        item.workflowStatus || "",
         }));
         setData(list);
         setFilteredData(list);
@@ -97,8 +98,9 @@ export default function Page() {
     { header: "Party Date",   accessor: "partyDate" },
     { header: "Basic",        accessor: "basicAmount" },
     { header: "GST",          accessor: "gstAmount" },
-    { header: "Total",        accessor: "totalAmount" },
-    { header: "Status", accessor: "status" },
+    { header: "Total",         accessor: "totalAmount" },
+    { header: "Booked Amount", accessor: "bookedAmount" },
+    { header: "Status",        accessor: "status" },
   ];
 
   const actions = getPageActions({ router });

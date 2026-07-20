@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Controller } from "react-hook-form";
 import { Loader2, FileText, Upload, Download } from "lucide-react";
+import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,7 +25,7 @@ import { useRouter } from "next/navigation";
 // All order sub-categories from terms config
 const ORDER_CATEGORIES = [
   { label: "Purchases Order",        value: "Purchases_Order" },
-  { label: "Service Order",          value: "Service_Order" },
+  // { label: "Service Order",          value: "Service_Order" },
   { label: "Work Order",             value: "Work_Order" },
   { label: "Customer Supply Order",  value: "Customer_Supply_Order" },
   { label: "Site Transfer Order",    value: "Site_Transfer_Order" },
@@ -344,9 +345,8 @@ export default function BRRForm({ mode = "create", brrId }) {
                       if (!val) { setValue("partyAddress", ""); setValue("gstn", ""); return; }
                       const vendor = ledgerList.find((v) => String(v.ledgerId) === String(val));
                       if (!vendor) return;
-                      const cur = getValues();
-                      if (!cur.partyAddress) setValue("partyAddress", vendor.corporateAddress || "");
-                      if (!cur.gstn)         setValue("gstn",         vendor.gstin            || "");
+                      setValue("partyAddress", vendor.registeredAddress || vendor.corporateAddress || "");
+                      setValue("gstn", vendor.gstin || "");
                     }}
                     disabled={disabled}
                     placeholder="Select from Vendor List"
@@ -358,8 +358,17 @@ export default function BRRForm({ mode = "create", brrId }) {
                 )} />
               </FieldRow>
               <FieldRow label="Party Address">
-                <Input {...register("partyAddress")} disabled placeholder="[Auto]"
-                  className={`${getInputClass(false, true)} w-full h-[34px]`} />
+                <Controller control={control} name="partyAddress" render={({ field }) => (
+                  <ExpandableTextField
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled
+                    title="Party Address"
+                    placeholder="[Auto]"
+                    minHeight="min-h-[34px]"
+                    modalHeight="min-h-[180px]"
+                  />
+                )} />
               </FieldRow>
               <FieldRow label="Party GSTN">
                 <Input {...register("gstn")} disabled placeholder="[Auto]"

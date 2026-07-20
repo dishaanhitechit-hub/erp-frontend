@@ -24,7 +24,7 @@ const PW = API_ENDPOINTS.RESOURCE.PROCUREMENT.ORDER.PROJECT_WORK;
 const defaultValues = {
   categoryCode: "Work_Order",
   subCategoryCodes: [],
-  costHead: "Project Work",
+  costHead: "Project_Work",
   vendorId: "",
   orderNo: "",
   orderDate: "",
@@ -99,7 +99,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
             const ledgerRes = await apiRequest({ url: API_ENDPOINTS.MASTER.GET_ALL_LEDGER, method: "GET" });
             const vendor = (ledgerRes.data || []).find((v) => String(v.ledgerId) === String(data.vendorId));
             if (vendor) {
-              partyAddress = vendor.corporateAddress || "";
+              partyAddress = vendor.registeredAddress  || "";
               gstn         = vendor.gstin            || "";
             }
           }
@@ -108,7 +108,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
         const formattedData = {
           categoryCode: data.categoryCode || "Work_Order",
           subCategoryCodes: data.subCategoryCodes || [],
-          costHead: data.costHead || "Project Work",
+          costHead: data.costHead || "Project_Work",
           vendorId: String(data.vendorId || ""),
           orderNo: data.orderNo || "",
           orderDate: data.orderDate || "",
