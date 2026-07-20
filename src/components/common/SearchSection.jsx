@@ -30,6 +30,7 @@ export default function SearchSection({
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && onSearch({ search, from, to })}
               className="h-6.5 w-65 sm:w-71 border border-[#8f8f8f] px-2 text-sm outline-none rounded-sm"
             />
           </div>
