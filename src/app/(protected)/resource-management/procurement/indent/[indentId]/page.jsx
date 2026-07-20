@@ -20,6 +20,7 @@ export default function Page() {
   const router = useRouter();
   const [openApproval, setOpenApproval] = useState(false);
   const [openTimeline, setOpenTimeline] = useState(false);
+  const [uuid, setUuid] = useState(null);
 
   const { indentId } = useParams();
   const access = getPageAccess({
@@ -35,6 +36,7 @@ export default function Page() {
     router,
     onTimeLine: () => setOpenTimeline(true),
     onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,
+    onDownload: uuid ? () => window.open(`/print/indent/${uuid}`, "_blank") : undefined,
   });
 
   return (
@@ -43,6 +45,7 @@ export default function Page() {
         mode={access.mode}
         canApprove={access.canApprove}
         indentId={indentId}
+        onUuid={setUuid}
       />
       <ApprovalActionModal
         open={openApproval}

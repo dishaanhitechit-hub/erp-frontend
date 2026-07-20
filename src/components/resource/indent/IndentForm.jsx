@@ -74,6 +74,7 @@ export default function IndentForm({
   mode = "create",
   canApprove = false,
   indentId,
+  onUuid,
 }) {
   const isViewMode = mode === "view" || mode === "approver";
 
@@ -213,6 +214,7 @@ export default function IndentForm({
         reset(formattedData);
 
         setInitialData(formattedData);
+        if (data.uuid && onUuid) onUuid(data.uuid);
         setFileUrl(data.indentFile || "");
 
         const extractedFileName = data.indentFile?.split("/")?.pop() || "";
@@ -348,6 +350,7 @@ export default function IndentForm({
       if (res?.data?.indentNo) {
         setValue("indentNo", res.data.indentNo);
       }
+      if (res?.data?.uuid && onUuid) onUuid(res.data.uuid);
       if (res?.data?.indentFile) {
         setFileUrl(res.data.indentFile);
 

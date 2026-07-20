@@ -93,6 +93,7 @@ export const API_ENDPOINTS = {
         REJECT: "/resource/indent/reject", //indenId POST
         DELETE: "/resource/indent/delete", //indentId DELETE
         HISTORY: "/resource/indent/history", //indentId GET
+        GET_BY_UUID: "/resource/indent/uuid", // /:uuid GET — no auth required
       },
       ORDER: {
         GET_ALL_ORDER: "/resource/order/list",

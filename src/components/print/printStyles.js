@@ -1,0 +1,57 @@
+/**
+ * Shared print styles — change here to affect ALL PDF/print modules.
+ * Font is set at layout level via CSS variable --font-print (Exo 2).
+ */
+
+export const PRINT_FONT   = "var(--font-print), sans-serif";
+
+// Text sizes (px as inline style numbers, or Tailwind classes)
+export const SIZE = {
+  pageTitle:    "text-[22px]",
+  sectionTitle: "text-[13px]",
+  labelText:    "text-[11px]",
+  valueText:    "text-[11px]",
+  tableHead:    "text-[11px]",
+  tableCell:    "text-[11px]",
+  subText:      "text-[9.5px]",
+  footerText:   "text-[10px]",
+};
+
+// Weights
+export const WEIGHT = {
+  light:      "font-light",    // 300
+  normal:     "font-normal",   // 400
+  medium:     "font-medium",   // 500
+  semibold:   "font-semibold", // 600
+  bold:       "font-bold",     // 700
+};
+
+// Colors (matched to Indent.docx reference)
+export const COLOR = {
+  tableHeadBg:    "bg-[#d9d9d9]",   // #D9D9D9 — doc reference gray header
+  tableRowEven:   "bg-[#f2f2f2]",
+  tableRowOdd:    "bg-white",
+  tableBorder:    "border-[#b0b0b0]",
+  signatureBg:    "bg-[#b6dde8]",   // #B6DDE8 — doc reference signature row
+  subText:        "text-gray-500",
+  labelColor:     "text-gray-700",
+  valueColor:     "text-gray-900",
+  sectionBg:      "bg-[#f0f4eb]",
+};
+
+export const fmt = {
+  date: (d) => {
+    if (!d) return "-";
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  },
+  dateTime: (d) => {
+    if (!d) return "-";
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  },
+  number: (n, decimals = 2) =>
+    Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }),
+};
