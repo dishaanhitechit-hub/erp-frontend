@@ -444,7 +444,7 @@ export default function IndentPrintPage() {
                 </thead>
                 <tbody>
                   {items.map((item, idx) => (
-                    <tr key={idx} className={COLOR.tableRowOdd}>
+                    <tr key={idx} className={COLOR.tableRowOdd} style={{ breakInside: "avoid" }}>
                       <td className={`border ${COLOR.tableBorder} px-2 py-2 ${SIZE.tableCell} text-center`}>{idx + 1}</td>
                       <td className={`border ${COLOR.tableBorder} px-2 py-2 ${SIZE.tableCell}`}>{item.itemCode}</td>
                       <td className={`border ${COLOR.tableBorder} px-2 py-2`}>

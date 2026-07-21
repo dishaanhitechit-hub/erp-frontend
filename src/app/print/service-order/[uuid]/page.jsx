@@ -389,10 +389,10 @@ export default function ServiceOrderPrintPage() {
           <tbody>
             <tr>
               <td>
-                <div className="bg-white shadow-md print:shadow-none print-body-offset">
+                <div className="bg-white shadow-md print:shadow-none print-body-cover">
 
                   {/* ── FIRST-PAGE HEADER — visible on screen and page 1 of print ── */}
-                  <div className="flex items-center justify-between px-6 pt-4 pb-3">
+                  <div className="print-full-header flex items-center justify-between px-6 pt-4 pb-3">
                     <div className="w-[160px] shrink-0">
                       <Image src="/assets/pdf-images/erp_company_img_pdf.png" alt="Logo"
                         width={160} height={80} className="object-contain" priority />
@@ -460,7 +460,7 @@ export default function ServiceOrderPrintPage() {
                         </thead>
                         <tbody>
                           {items.map((item, idx) => (
-                            <tr key={idx}>
+                            <tr key={idx} style={{ breakInside: "avoid" }}>
                               <td className={`border ${COLOR.tableBorder} px-1 py-1.5 ${SIZE.tableCell} text-center`}>{idx + 1}.</td>
                               <td className={`border ${COLOR.tableBorder} px-1 py-1.5`}>
                                 <p className={`${SIZE.tableCell} text-gray-900 ${WEIGHT.medium}`}>{item.itemName || "-"}</p>
@@ -578,11 +578,34 @@ export default function ServiceOrderPrintPage() {
           .print\\:shadow-none { box-shadow: none !important; }
           .print\\:max-w-none { max-width: none !important; }
 
-          /* Show the repeating thead logo on print */
+          /* Show the small logo thead on print — repeats on pages 2+ */
           .print-thead { display: table-header-group; }
 
-          /* Slide page-1 content up to cover the thead logo — full header visible on page 1 */
-          .print-body-offset { margin-top: -78px; }
+          /*
+           * Shift the content div UP by the thead height so the full header
+           * starts at the very top of page 1 (no blank gap).
+           * ::before (z-index:1) covers the thead logo behind it.
+           * .print-full-header (z-index:2) paints on top of the cover.
+           */
+          .print-body-cover {
+            position: relative;
+            margin-top: -79px;
+          }
+          .print-body-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 79px;
+            background: white;
+            z-index: 1;
+          }
+          .print-full-header {
+            position: relative;
+            z-index: 2;
+            background: white;
+          }
 
           /* Hide the sticky top bar */
           .print\\:hidden, [class*="print:hidden"] { display: none !important; }
