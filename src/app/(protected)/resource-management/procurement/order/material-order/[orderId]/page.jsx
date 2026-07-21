@@ -17,6 +17,7 @@ export default function Page() {
   const { orderId } = useParams();
   const [openApproval, setOpenApproval] = useState(false);
   const [openTimeline, setOpenTimeline] = useState(false);
+  const [uuid, setUuid] = useState(null);
 
   const access = getPageAccess({ pageCode: "order", pageType: "EDIT" });
 
@@ -26,11 +27,12 @@ export default function Page() {
     router,
     onTimeLine: () => setOpenTimeline(true),
     onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,
+    onDownload: uuid ? () => window.open(`/print/order/${uuid}`, "_blank") : undefined,
   });
 
   return (
     <HeaderWrapper header={<PageHeader actions={actions} />}>
-      <OrderForm mode={access.mode} canApprove={access.canApprove} orderId={orderId} />
+      <OrderForm mode={access.mode} canApprove={access.canApprove} orderId={orderId} onUuid={setUuid} />
 
       <ApprovalActionModal
         open={openApproval}

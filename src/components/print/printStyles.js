@@ -39,6 +39,28 @@ export const COLOR = {
   sectionBg:      "bg-[#f0f4eb]",
 };
 
+/**
+ * Renders a formatted currency number with the decimal part visually de-emphasised.
+ * Integer part: normal weight/size. Decimal part: 1px smaller, lighter color.
+ * Usage: <FmtNum value={item.lineTotal} />
+ */
+export function FmtNum({ value, decimals = 2 }) {
+  const formatted = Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  const dot = formatted.lastIndexOf(".");
+  if (dot === -1) return formatted;
+  const integer = formatted.slice(0, dot);
+  const frac    = formatted.slice(dot); // includes the "."
+  return (
+    <>
+      {integer}
+      <span style={{ fontSize: "0.82em", color: "#6b7280", fontWeight: 400 }}>{frac}</span>
+    </>
+  );
+}
+
 export const fmt = {
   date: (d) => {
     if (!d) return "-";

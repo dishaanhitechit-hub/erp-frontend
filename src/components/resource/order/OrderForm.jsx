@@ -47,7 +47,7 @@ const defaultValues = {
   totalAmount: 0,
 };
 
-export default function OrderForm({ mode = "create", orderId }) {
+export default function OrderForm({ mode = "create", orderId, onUuid }) {
   const [activeTab, setActiveTab] = useState("items");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(mode === "create");
@@ -119,6 +119,8 @@ export default function OrderForm({ mode = "create", orderId }) {
           method: "GET",
         });
         const data = res.data;
+
+        if (data.uuid && onUuid) onUuid(data.uuid);
 
         // Fetch party address/gstn — derived from secondary APIs
         let partyAddress = "";
@@ -337,6 +339,7 @@ export default function OrderForm({ mode = "create", orderId }) {
       });
 
       if (res?.data?.orderNo) setValue("orderNo", res.data.orderNo);
+      if (res?.data?.uuid && onUuid) onUuid(res.data.uuid);
 
       if (res?.data?.orderFile) {
         setFileUrl(res.data.orderFile);

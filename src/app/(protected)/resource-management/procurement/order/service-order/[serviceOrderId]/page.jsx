@@ -19,6 +19,7 @@ export default function Page() {
   const { serviceOrderId } = useParams();
   const [openApproval, setOpenApproval] = useState(false);
   const [openTimeline, setOpenTimeline] = useState(false);
+  const [uuid, setUuid] = useState(null);
 
   // Access uses "order" pageCode — same module access as order
   const access = getPageAccess({ pageCode: "order", pageType: "EDIT" });
@@ -29,6 +30,7 @@ export default function Page() {
     router,
     onTimeLine: () => setOpenTimeline(true),
     onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,
+    onDownload: uuid ? () => window.open(`/print/service-order/${uuid}`, "_blank") : undefined,
   });
 
   return (
@@ -37,6 +39,7 @@ export default function Page() {
         mode={access.mode}
         canApprove={access.canApprove}
         serviceOrderId={serviceOrderId}
+        onUuid={setUuid}
       />
 
       <ApprovalActionModal

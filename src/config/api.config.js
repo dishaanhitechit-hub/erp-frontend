@@ -108,6 +108,7 @@ export const API_ENDPOINTS = {
         REJECT: "/resource/order/reject", //orderId POST
         DELETE: "/resource/order/delete", //orderId DELETE
         HISTORY: "/resource/order/history", //orderId GET
+        GET_BY_UUID: "/resource/order/uuid", // /:uuid GET — no auth required
         PROJECT_WORK: {
           GET_ALL_ORDER: "/resource/pw-order/list", //projectCode GET
           CREATE_ORDER: "/resource/pw-order/create",
@@ -120,6 +121,7 @@ export const API_ENDPOINTS = {
           REJECT: "/resource/pw-order/reject", //orderId POST
           DELETE: "/resource/pw-order/delete", //orderId DELETE
           HISTORY: "/resource/pw-order/history", //orderId GET
+          GET_BY_UUID: "/resource/pw-order/uuid", // /:uuid GET — no auth required
         },
       },
     },

@@ -46,7 +46,7 @@ const defaultValues = {
   totalAmount: 0,
 };
 
-export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
+export default function ServiceOrderForm({ mode = "create", serviceOrderId, onUuid }) {
   const [activeTab, setActiveTab] = useState("items");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(mode === "create");
@@ -90,6 +90,8 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
           method: "GET",
         });
         const data = res.data;
+
+        if (data.uuid && onUuid) onUuid(data.uuid);
 
         // Fetch vendor party fields — not in service order API response
         let partyAddress = "";
@@ -242,6 +244,7 @@ export default function ServiceOrderForm({ mode = "create", serviceOrderId }) {
       });
 
       if (res?.data?.orderNo) setValue("orderNo", res.data.orderNo);
+      if (res?.data?.uuid && onUuid) onUuid(res.data.uuid);
 
       if (res?.data?.orderFile) {
         setFileUrl(res.data.orderFile);
