@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { getInputClass } from "@/lib/formStyles";
 
 // HEADER
@@ -75,6 +76,7 @@ export default function GRNItemsTable({
   items,
   onItemChange,
   disabled,
+  storeLocations = [],
 }) {
   if (!items?.length) {
     return (
@@ -300,19 +302,18 @@ export default function GRNItemsTable({
 
                   {/* STORE LOCATION */}
                   <TD>
-                    <ExpandableTextField
+                    <SearchableSelect
+                      options={storeLocations}
                       value={item.storeLocation || ""}
                       disabled={disabled}
-                      title="Store Location"
-                      placeholder="Store 1"
-                      minHeight="min-h-[28px]"
-                      onChange={(v) =>
-                        onItemChange(
-                          index,
-                          "storeLocation",
-                          v
-                        )
+                      onChange={(value) =>
+                        onItemChange(index, "storeLocation", value)
                       }
+                      placeholder="Select store"
+                      labelKey="locationName"
+                      valueKey="locationName"
+                      searchKeys={["locationName"]}
+                      className="rounded-none border-0"
                     />
                   </TD>
 

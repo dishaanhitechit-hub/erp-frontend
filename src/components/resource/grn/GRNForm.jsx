@@ -75,6 +75,7 @@ export default function GRNForm({ mode = "create", grnId }) {
 
   // ── STATE ─────────────────────────────────────────────────────────────────
   const [isEditing, setIsEditing] = useState(mode === "create");
+  const [storeLocations, setStoreLocations] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [allowSubmit, setAllowSubmit] = useState(mode === "edit");
   const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +102,20 @@ export default function GRNForm({ mode = "create", grnId }) {
   } = form;
 
   const disabled = isViewMode || !isEditing || isSubmitting || isSubmitted;
+
+  // ── FETCH STORE LOCATIONS ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!projectCode) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setStoreLocations(data.filter((l) => l.locationType === "Store"));
+      })
+      .catch(() => setStoreLocations([]));
+  }, [projectCode]);
 
   // ── LOAD GRN DETAILS (edit / view / approver) ─────────────────────────────
   useEffect(() => {
@@ -483,6 +498,7 @@ export default function GRNForm({ mode = "create", grnId }) {
               items={items}
               onItemChange={handleItemChange}
               disabled={disabled}
+              storeLocations={storeLocations}
             />
           </div>
 
