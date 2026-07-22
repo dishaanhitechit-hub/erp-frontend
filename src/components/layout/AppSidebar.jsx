@@ -33,6 +33,7 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
   const hasActiveChild = (item) => {
     if (!item) return false;
     if (item.path && pathname.startsWith(item.path)) return true;
+    if (item.activePaths?.some((p) => pathname.startsWith(p))) return true;
     if (item.children && Array.isArray(item.children)) {
       return item.children.some((child) => hasActiveChild(child));
     }
@@ -101,7 +102,8 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
       const hasChildren = item.children && Array.isArray(item.children);
       const open = isMenuOpen(key, item);
       const isParentActive = hasActiveChild(item);
-      const isChildActive = isActive(item.path);
+      const isChildActive = isActive(item.path) ||
+        (item.activePaths?.some((p) => pathname.startsWith(p)) ?? false);
       const isLastLevel = !item.children || item.children.length === 0;
 
       return (
@@ -292,7 +294,7 @@ export default function AppSidebar({ collapsed, setCollapsed }) {
         {/* Children list */}
         {item.children?.map((child, ci) => {
           const hasNested = child.children && child.children.length > 0;
-          const childActive = child.path ? isActive(child.path) : hasActiveChild(child);
+          const childActive = hasActiveChild(child);
 
           return (
             <div

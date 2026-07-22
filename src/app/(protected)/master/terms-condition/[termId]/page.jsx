@@ -10,7 +10,6 @@ import { isMasterEditable } from "@/helper/getMasterAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import TermsForm from "@/components/master/terms-condition/TermsForm";
-import { DUMMY_TERMS } from "@/config/terms.config";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 
@@ -28,13 +27,8 @@ export default function Page() {
     const fetchData = async () => {
       try {
         let item;
-        try {
           const res = await apiRequest({ url: `${TC.GET_BY_ID}/${termId}`, method: "GET" });
           item = res.data?.[0] || res.data || null;
-        } catch {
-          // DUMMY fallback — REMOVE after backend ready
-          item = DUMMY_TERMS.find((t) => String(t.termId) === String(termId)) || null;
-        }
         setData(item);
       } finally {
         setLoading(false);

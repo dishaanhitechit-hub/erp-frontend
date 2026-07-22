@@ -258,7 +258,7 @@ export default function DataTable({
                     checked={selected.length === 0 ? false : selected.includes(val)}
                     className="cursor-pointer accent-blue-500 shrink-0"
                   />
-                  <span className="text-xs text-gray-700 truncate">{val}</span>
+                  <span className="text-xs text-gray-700 whitespace-normal break-words">{val}</span>
                 </div>
               );
             })

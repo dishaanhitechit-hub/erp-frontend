@@ -29,7 +29,6 @@ import {
   TERMS_SUB_MODULES,
   TERMS_TYPES,
   POINT_STYLES,
-  DUMMY_TERMS, // REMOVE after backend APIs are ready
 } from "../../../config/terms.config";
 import ExpandableTextArea from "@/components/common/ExpandableTextArea";
 import { pointPrefix } from "@/helper/termsHelpers";

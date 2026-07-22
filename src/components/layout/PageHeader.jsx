@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { getBreadcrumbs } from "@/lib/breadcrumbs";
 import { routeMetaConfig } from "@/config/route-meta.config";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function PageHeader({ actions = [] }) {
   const pathname = usePathname();
@@ -32,6 +33,7 @@ export default function PageHeader({ actions = [] }) {
       </div>
 
       {/* RIGHT → RIBBON */}
+      <TooltipProvider delayDuration={400}>
       <div className="flex items-center flex-wrap sm:flex-nowrap">
         {/* SLASH STYLE DIVIDER */}
         {actions.length > 0 && (
@@ -54,6 +56,7 @@ export default function PageHeader({ actions = [] }) {
           })}
         </div>
       </div>
+      </TooltipProvider>
     </div>
   );
 }

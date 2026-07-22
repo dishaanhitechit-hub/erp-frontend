@@ -17,7 +17,6 @@ import ExpandableTextArea from "@/components/common/ExpandableTextArea";
 import { POINT_STYLES } from "@/config/terms.config";
 import { fmtUnderscore, groupsMatch, pointPrefix } from "@/helper/termsHelpers";
 
-const DUMMY_TERMS_API = []; // REMOVE after backend ready
 
 const fmt = fmtUnderscore;
 
@@ -298,12 +297,11 @@ export default function TermsSelectionModal({
       setLoading(true);
       try {
         let data;
-        try {
+        
           const params = new URLSearchParams({ module });
           if (subModule) params.append("subModule", subModule);
           const res = await apiRequest({ url: `${API_ENDPOINTS.MASTER.TERM.LIST}?${params}`, method: "GET" });
           data = res.data || [];
-        } catch { data = DUMMY_TERMS_API; }
         setAllTerms(data);
       } catch { toast.error("Failed to load terms"); }
       finally { setLoading(false); }

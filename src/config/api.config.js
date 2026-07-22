@@ -137,6 +137,30 @@ export const API_ENDPOINTS = {
       REJECT:            "/billing/brr/reject",          // /:brrId POST
       HISTORY:           "/billing/brr/history",         // /:brrId GET
     },
+    BRG: {
+      GRNS_BY_BRR: "/billing/brg/grns-by-brr", // /:brrId GET
+      CREATE:      "/billing/brg/create",        // POST JSON
+      LIST:        "/billing/brg/list",           // GET
+      DETAILS:     "/billing/brg/details",        // /:brgId GET
+      EDIT:        "/billing/brg/edit",           // /:brgId PUT JSON
+      SUBMIT:      "/billing/brg/submit",         // /:brgId POST
+      APPROVE:     "/billing/brg/approve",        // /:brgId POST
+      REBACK:      "/billing/brg/reback",         // /:brgId POST
+      REJECT:      "/billing/brg/reject",         // /:brgId POST
+      HISTORY:     "/billing/brg/history",        // /:brgId GET
+    },
+    BRS: {
+      SRNS_BY_BRR: "/billing/brs/srns-by-brr", // /:brrId GET
+      CREATE:      "/billing/brs/create",         // POST JSON
+      LIST:        "/billing/brs/list",            // GET
+      DETAILS:     "/billing/brs/details",         // /:brsId GET
+      EDIT:        "/billing/brs/edit",            // /:brsId PUT JSON
+      SUBMIT:      "/billing/brs/submit",          // /:brsId POST
+      APPROVE:     "/billing/brs/approve",         // /:brsId POST
+      REBACK:      "/billing/brs/reback",          // /:brsId POST
+      REJECT:      "/billing/brs/reject",          // /:brsId POST
+      HISTORY:     "/billing/brs/history",         // /:brsId GET
+    },
     VENDOR_BILLING: {
       BSS: {
         GET_VENDOR_ORDERS: "/resource/bss/vendor-orders", // vendorId projectCode receivedCategory itemCategory costHead GET
@@ -204,6 +228,7 @@ export const API_ENDPOINTS = {
         REBACK: "/resource/gin/reback", // /:ginId POST
         REJECT: "/resource/gin/reject", // /:ginId POST
         HISTORY: "/resource/gin/history", // /:ginId GET
+        GET_BY_UUID: "/gin/uuid", // /:uuid GET — no auth required
       },
       //resource/grn
       GRN: {
@@ -218,6 +243,7 @@ export const API_ENDPOINTS = {
         REBACK: "/resource/grn/reback", // /:grnId POST
         REJECT: "/resource/grn/reject", // /:grnId POST
         HISTORY: "/resource/grn/history", // /:grnId GET
+        GET_BY_UUID: "/grn/uuid", // /:uuid GET — no auth required
       },
       SRN: {
         GET_VENDOR_ORDERS: "/resource/srn/vendor-orders", // vendorId projectCode filters GET
@@ -231,6 +257,7 @@ export const API_ENDPOINTS = {
         REBACK: "/resource/srn/reback", // /:srnId POST
         REJECT: "/resource/srn/reject", // /:srnId POST
         HISTORY: "/resource/srn/history", // /:srnId GET
+        GET_BY_UUID: "/srn/uuid", // /:uuid GET — no auth required
       },
       LOGISTICS: {
         DC: {

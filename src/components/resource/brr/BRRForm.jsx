@@ -76,18 +76,19 @@ const defaultValues = {
 };
 
 /* ─── Field row helper ─────────────────────────────────────── */
-function FieldRow({ label, children, error }) {
+function FieldRow({ label, children, required }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-h-[34px]">
-      <div className={`${labelClass} w-full sm:w-[200px] sm:min-w-[200px] sm:max-w-[200px]`}>{label}</div>
+      <div className={`${labelClass} w-full sm:w-[200px] sm:min-w-[200px] sm:max-w-[200px]`}>
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </div>
       <div className="flex-1 min-w-0">{children}</div>
-      {error && <p className="text-[11px] text-red-500 mt-0.5 sm:ml-1">{error}</p>}
     </div>
   );
 }
 
 /* ─── BRRForm ──────────────────────────────────────────────── */
-export default function BRRForm({ mode = "create", brrId }) {
+export default function BRRForm({ mode = "create", brrId, onDataLoaded }) {
   const [loading, setLoading]       = useState(false);
   const [isEditing, setIsEditing]   = useState(mode === "create");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -96,6 +97,7 @@ export default function BRRForm({ mode = "create", brrId }) {
 
   const [ledgerList, setLedgerList]     = useState([]);
   const [vendorOrders, setVendorOrders] = useState([]);
+  const [orderMaxTotal, setOrderMaxTotal] = useState(null);
 
   // File state
   const [fileName, setFileName]       = useState("");
@@ -192,6 +194,7 @@ export default function BRRForm({ mode = "create", brrId }) {
         };
         reset(data);
         setInitialData(data);
+        onDataLoaded?.({ workflowStatus: d.workflowStatus || "", orderCategory: d.orderCategory || "" });
         if (d.attachedDoc) {
           setFileUrl(d.attachedDoc);
           setInitialFileUrl(d.attachedDoc);
@@ -308,6 +311,7 @@ export default function BRRForm({ mode = "create", brrId }) {
   }
 
   const totalAmount = (Number(basicAmount) || 0) + (Number(gstAmount) || 0);
+  const totalExceedsOrder = orderMaxTotal !== null && totalAmount > orderMaxTotal;
 
   return (
     <>
@@ -332,7 +336,7 @@ export default function BRRForm({ mode = "create", brrId }) {
 
             {/* Party info */}
             <div className="flex flex-col gap-[2px] mb-3">
-              <FieldRow label="Party Name" error={errors.vendorId?.message}>
+              <FieldRow label="Party Name" required>
                 <Controller control={control} name="vendorId" render={({ field }) => (
                   <SearchableSelect
                     options={ledgerList}
@@ -433,6 +437,7 @@ export default function BRRForm({ mode = "create", brrId }) {
                       field.onChange(val);
                       const order = vendorOrders.find((o) => String(o.orderId ?? o.id) === String(val));
                       setValue("orderDate", order?.orderDate || "");
+                      setOrderMaxTotal(order ? Number(order.totalAmount) : null);
                     }}
                     disabled={disabled || !vendorId}
                   >
@@ -456,11 +461,11 @@ export default function BRRForm({ mode = "create", brrId }) {
 
             {/* Party bill */}
             <div className="flex flex-col gap-[2px] mb-3">
-              <FieldRow label="Party Bill No" error={errors.partyBillNo?.message}>
+              <FieldRow label="Party Bill No" required>
                 <Input {...register("partyBillNo")} disabled={disabled}
                   className={`${getInputClass(errors.partyBillNo, disabled)} w-full h-[34px]`} />
               </FieldRow>
-              <FieldRow label="Party Date" error={errors.partyDate?.message}>
+              <FieldRow label="Party Date" required>
                 <Input type="date" {...register("partyDate")} disabled={disabled}
                   className={`${getInputClass(errors.partyDate, disabled)} w-full h-[34px]`} />
               </FieldRow>
@@ -468,7 +473,7 @@ export default function BRRForm({ mode = "create", brrId }) {
 
             {/* Amounts */}
             <div className="flex flex-col gap-[2px] mb-4">
-              <FieldRow label="Basic Amount" error={errors.basicAmount?.message}>
+              <FieldRow label="Basic Amount" required>
                 <Input
                   type="number"
                   step="0.01"
@@ -478,7 +483,7 @@ export default function BRRForm({ mode = "create", brrId }) {
                   className={`${getInputClass(errors.basicAmount, disabled)} w-full h-[34px]`}
                 />
               </FieldRow>
-              <FieldRow label="GST Amount" error={errors.gstAmount?.message}>
+              <FieldRow label="GST Amount" required>
                 <Input
                   type="number"
                   step="0.01"
@@ -489,11 +494,18 @@ export default function BRRForm({ mode = "create", brrId }) {
                 />
               </FieldRow>
               <FieldRow label="Total Amount">
-                <Input
-                  value={totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  disabled
-                  className={`${getInputClass(false, true)} w-full h-[34px] bg-orange-50`}
-                />
+                <div>
+                  <Input
+                    value={totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    disabled
+                    className={`${getInputClass(false, true)} w-full h-[34px] ${totalExceedsOrder ? "bg-red-50 border-red-400" : "bg-orange-50"}`}
+                  />
+                  {totalExceedsOrder && (
+                    <p className="text-[11px] text-red-500 mt-0.5">
+                      Total exceeds order max ({Number(orderMaxTotal).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                    </p>
+                  )}
+                </div>
               </FieldRow>
             </div>
 

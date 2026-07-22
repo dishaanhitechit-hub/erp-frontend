@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import SearchSection from "@/components/common/SearchSection";
-import DataTable from "@/components/common/DataTable";
 import PageHeader from "@/components/layout/PageHeader";
 import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import PageNotAvailable from "@/components/common/PageNotAvailable";
@@ -15,18 +14,23 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 import { getfmtDisplaydate } from "@/helper/getfmtDisplayDate";
+import BRRExpandableTable from "@/components/resource/brr/BRRExpandableTable";
 
 const fmt = (v) =>
   Number(v || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+// Categories linked to GRN (BRG) billing
+const GRN_CATEGORIES = ["Purchases_Order", "Site_Transfer_Order", "Customer_Supply_Order"];
 
 export default function Page() {
   const router = useRouter();
   const access = getPageAccess({ pageCode: "bill_receive_register", pageType: "LIST" });
 
-  const [data, setData]             = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [loading, setLoading]       = useState(true);
+  const [data, setData]       = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch]   = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate]     = useState("");
   const [projectCode, setProjectCode] = useState("");
 
   useEffect(() => {
@@ -36,72 +40,104 @@ export default function Page() {
 
   useEffect(() => {
     if (!projectCode || !access.allowed) return;
-    const fetch = async () => {
+    const fetchList = async () => {
       try {
         const res = await apiRequest({
           url: `${API_ENDPOINTS.RESOURCE.BILL_RECEIVE_REGISTER.LIST}?projectCode=${projectCode}`,
           method: "GET",
         });
-        const list = (res.data || []).map((item, idx) => ({
-          id:           item.brrId ?? item.id,
-          sl:           idx + 1,
-          brrNo:        item.brrNo || "",
-          brrDate:      getfmtDisplaydate(item.brrDate),
-          partyName:    item.partyName || "",
-          partyBillNo:  item.partyBillNo || "",
-          partyDate:    getfmtDisplaydate(item.partyDate),
-          basicAmount:  fmt(item.basicAmount),
-          gstAmount:    fmt(item.gstAmount),
-          totalAmount:   fmt(item.totalAmount),
-          bookedAmount:  fmt(item.bookedAmount),
-          status:        item.workflowStatus || "",
-        }));
+        const list = (res.data || []).map((item, idx) => {
+          const billingType = GRN_CATEGORIES.includes(item.orderCategory) ? "grn" : "srn";
+
+          // Normalize nested billing rows
+          const grnBillings = (item.grnBillings || []).map((b) => ({
+            billingNo:      b.brgNo || "",
+            billingDate:    getfmtDisplaydate(b.brgDate),
+            _rawDate:       b.brgDate || "",
+            workflowStatus: b.workflowStatus || "",
+            basicAmount:    fmt(b.basicAmount),
+            gstAmount:      fmt(b.gstAmount),
+            totalAmount:    fmt(b.totalAmount),
+            itemCount:      b.itemCount ?? "-",
+            _type:          "brg",
+            _id:            b.brgId,
+            _brrId:         item.id ?? item.brrId,
+          }));
+
+          const srnBillings = (item.srnBillings || []).map((b) => ({
+            billingNo:      b.brsNo || "",
+            billingDate:    getfmtDisplaydate(b.brsDate),
+            _rawDate:       b.brsDate || "",
+            workflowStatus: b.workflowStatus || "",
+            basicAmount:    fmt(b.basicAmount),
+            gstAmount:      fmt(b.gstAmount),
+            totalAmount:    fmt(b.totalAmount),
+            itemCount:      b.itemCount ?? "-",
+            _type:          "brs",
+            _id:            b.brsId,
+            _brrId:         item.id ?? item.brrId,
+          }));
+
+          return {
+            id:            item.id ?? item.brrId,
+            _origIdx:      idx,
+            brrNo:         item.brrNo || "",
+            brrDate:       getfmtDisplaydate(item.brrDate),
+            _rawDate:      item.brrDate || "",
+            partyName:     item.partyName || "",
+            orderCategory: item.orderCategory || "",
+            orderNo:       item.orderNo || "",
+            partyBillNo:   item.partyBillNo || "",
+            partyDate:     getfmtDisplaydate(item.partyDate),
+            basicAmount:   fmt(item.basicAmount),
+            bookedAmount:  item.bookedAmount != null ? fmt(item.bookedAmount) : null,
+            totalAmount:   fmt(item.totalAmount),
+            status:        item.workflowStatus || "",
+            billingType,
+            grnBillings,
+            srnBillings,
+          };
+        });
         setData(list);
-        setFilteredData(list);
       } catch (err) {
         toast.error(err.message || "Failed to fetch BRR list");
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+    fetchList();
   }, [projectCode, access.allowed]);
 
-  const handleSearch = ({ search, from, to }) => {
-    let filtered = [...data];
-    if (search) {
-      filtered = filtered.filter((item) =>
-        Object.values(item).some((val) =>
-          String(val).toLowerCase().includes(search.toLowerCase()),
-        ),
-      );
-    }
-    if (from || to) {
-      filtered = filtered.filter((item) => {
-        if (!item.brrDate) return false;
-        const d = new Date(item.brrDate);
-        d.setHours(0, 0, 0, 0);
-        if (from) { const f = new Date(from); f.setHours(0,0,0,0); if (d < f) return false; }
-        if (to)   { const t = new Date(to);   t.setHours(0,0,0,0); if (d > t) return false; }
-        return true;
-      });
-    }
-    setFilteredData(filtered);
+  const handleSearch = ({ search: s, from, to }) => {
+    setSearch(s || "");
+    setFromDate(from || "");
+    setToDate(to || "");
   };
 
-  const columns = [
-    { header: "Sl. No",       accessor: "sl" },
-    { header: "BRR No",       accessor: "brrNo" },
-    { header: "Date",         accessor: "brrDate" },
-    { header: "Party Name",   accessor: "partyName" },
-    { header: "Party Bill No",accessor: "partyBillNo" },
-    { header: "Party Date",   accessor: "partyDate" },
-    { header: "Basic",        accessor: "basicAmount" },
-    { header: "GST",          accessor: "gstAmount" },
-    { header: "Total",         accessor: "totalAmount" },
-    { header: "Booked Amount", accessor: "bookedAmount" },
-    { header: "Status",        accessor: "status" },
-  ];
+  const displayData = data.filter((row) => {
+    if (fromDate && row._rawDate && row._rawDate < fromDate) return false;
+    if (toDate   && row._rawDate && row._rawDate > toDate)   return false;
+    return true;
+  });
+
+  const handleParentRowClick = (row) => {
+    router.push(`/resource-management/sub-contractor-billing/bill-receive-register/${row.id}`);
+  };
+
+  const handleCreateBilling = (row) => {
+    router.push(
+      `/resource-management/sub-contractor-billing/e-reconcile-bill/new?brrId=${row.id}&billingType=${row.billingType}`
+    );
+  };
+
+  const handleChildRowClick = (childRow) => {
+    const type = childRow._type; // "brg" or "brs"
+    const id = childRow._id;
+    const billingType = type === "brg" ? "brg" : "brs";
+    router.push(
+      `/resource-management/sub-contractor-billing/e-reconcile-bill/${id}?billingType=${billingType}`
+    );
+  };
 
   const actions = getPageActions({ router });
 
@@ -120,19 +156,22 @@ export default function Page() {
       <div className="p-3">
         <SearchSection
           onSearch={handleSearch}
-          showDateRange={true}
+          showDateRange
           actions={
             access.canAdd
               ? [{ label: "+ Create BRR", onClick: () => router.push("/resource-management/sub-contractor-billing/bill-receive-register/new") }]
               : []
           }
         />
-        <DataTable
-          columns={columns}
-          data={filteredData}
-          onRowClick={(row) =>
-            router.push(`/resource-management/sub-contractor-billing/bill-receive-register/${row.id}`)
-          }
+        <div className="mt-1 text-xs text-gray-500 mb-2">
+          Click a BRR row to expand billing records · Click <span className="font-semibold text-blue-600">BRR No</span> to open details · Click a billing row to open e-reconcile bill
+        </div>
+        <BRRExpandableTable
+          data={displayData}
+          onParentRowClick={handleParentRowClick}
+          onChildRowClick={handleChildRowClick}
+          onCreateBilling={handleCreateBilling}
+          search={search}
         />
       </div>
     </HeaderWrapper>

@@ -221,17 +221,21 @@ export const sidebarConfig = [
             title: "Bill Receive Register",
             path: "/resource-management/sub-contractor-billing/bill-receive-register",
             permissionKey: "bill_receive_register",
+            // Also highlight when on the BRR-linked e-reconcile bill pages
+            activePaths: [
+              "/resource-management/sub-contractor-billing/e-reconcile-bill",
+            ],
           },
-          {
-            title: "e-Reconcile Bill (GRN)",
-            path: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",
-            permissionKey: "billing_by_grn",
-          },
-          {
-            title: "e-Reconcile Bill (SRN)",
-            path: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn",
-            permissionKey: "billing_by_srn",
-          },
+          // {
+          //   title: "e-Reconcile Bill (GRN)",
+          //   path: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",
+          //   permissionKey: "billing_by_grn",
+          // },
+          // {
+          //   title: "e-Reconcile Bill (SRN)",
+          //   path: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn",
+          //   permissionKey: "billing_by_srn",
+          // },
           {
             title: "Payment Request",
             path: "/resource-management/sub-contractor-billing/payment-request",

@@ -12,7 +12,7 @@ import { getPageActions } from "@/components/common/PageActionButtons";
 import { isMasterEditable } from "@/helper/getMasterAccess";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
-import { TERMS_MODULES, TERMS_SUB_MODULES, TERMS_TYPES, DUMMY_TERMS } from "@/config/terms.config";
+import { TERMS_MODULES, TERMS_SUB_MODULES, TERMS_TYPES } from "@/config/terms.config";
 
 const TC = API_ENDPOINTS.MASTER.TERM;
 
@@ -33,12 +33,8 @@ export default function Page() {
     const fetchList = async () => {
       try {
         let list;
-        try {
           const res = await apiRequest({ url: TC.LIST, method: "GET" });
           list = res.data || [];
-        } catch {
-          list = DUMMY_TERMS; // DUMMY fallback — REMOVE after backend ready
-        }
 
         const mapped = list.map((item, idx) => ({
           termId:    item.termId,
