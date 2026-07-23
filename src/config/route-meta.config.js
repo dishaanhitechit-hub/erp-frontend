@@ -290,33 +290,7 @@ export const routeMetaConfig = [
     basePath: "/resource-management/sub-contractor-billing/bill-receive-register/[id]",
     breadcrumbs: ["Resources Management", "Sub Contractor Billing", "Bill Receive Register", "Edit"],
   },
-  //e-reconcile bill by grn
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "List"],
-  },
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn/new",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "New"],
-  },
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/grn/[id]",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (GRN)", "Edit"],
-  },
-  //e-reconcile bill by srn
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "List"],
-  },
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn/new",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "New"],
-  },
-  {
-    basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/srn/[id]",
-    breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill (SRN)", "Edit"],
-  },
-  //e-reconcile bill by brr (unified grn/srn via [id])
+  //e-reconcile bill (unified grn/srn via [id])
   {
     basePath: "/resource-management/sub-contractor-billing/e-reconcile-bill/new",
     breadcrumbs: ["Resources Management", "Sub Contractor Billing", "e-Reconcile Bill", "New"],

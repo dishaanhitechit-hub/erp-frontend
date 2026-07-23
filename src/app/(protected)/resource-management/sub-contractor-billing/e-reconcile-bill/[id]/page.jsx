@@ -17,11 +17,11 @@ export default function Page() {
   const { id }  = useParams();
   const params  = useSearchParams();
 
-  const billingType = params.get("billingType") || "grn"; // grn | srn | brg | brs
+  const billingType = params.get("billingType") || "grn"; // grn | srn
   const brrId       = params.get("brrId");
 
   const isNew = id === "new";
-  const isGRN = billingType === "grn" || billingType === "brg";
+  const isGRN = billingType === "grn";
 
   const pageCode = isGRN ? "billing_by_grn" : "billing_by_srn";
   const pageType = isNew ? "ADD" : "EDIT";
@@ -33,8 +33,8 @@ export default function Page() {
 
   if (!access.allowed) return <PageNotAvailable />;
 
-  const ENDPOINT = isGRN ? API_ENDPOINTS.RESOURCE.BRG : API_ENDPOINTS.RESOURCE.BRS;
-  const billingLabel = isGRN ? "BRG" : "BRS";
+  const ENDPOINT = API_ENDPOINTS.RESOURCE.BRB;
+  const billingLabel = "BRB";
 
   const actions = getPageActions({
     router,

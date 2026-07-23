@@ -137,57 +137,17 @@ export const API_ENDPOINTS = {
       REJECT:            "/billing/brr/reject",          // /:brrId POST
       HISTORY:           "/billing/brr/history",         // /:brrId GET
     },
-    BRG: {
-      GRNS_BY_BRR: "/billing/brg/grns-by-brr", // /:brrId GET
-      CREATE:      "/billing/brg/create",        // POST JSON
-      LIST:        "/billing/brg/list",           // GET
-      DETAILS:     "/billing/brg/details",        // /:brgId GET
-      EDIT:        "/billing/brg/edit",           // /:brgId PUT JSON
-      SUBMIT:      "/billing/brg/submit",         // /:brgId POST
-      APPROVE:     "/billing/brg/approve",        // /:brgId POST
-      REBACK:      "/billing/brg/reback",         // /:brgId POST
-      REJECT:      "/billing/brg/reject",         // /:brgId POST
-      HISTORY:     "/billing/brg/history",        // /:brgId GET
-    },
-    BRS: {
-      SRNS_BY_BRR: "/billing/brs/srns-by-brr", // /:brrId GET
-      CREATE:      "/billing/brs/create",         // POST JSON
-      LIST:        "/billing/brs/list",            // GET
-      DETAILS:     "/billing/brs/details",         // /:brsId GET
-      EDIT:        "/billing/brs/edit",            // /:brsId PUT JSON
-      SUBMIT:      "/billing/brs/submit",          // /:brsId POST
-      APPROVE:     "/billing/brs/approve",         // /:brsId POST
-      REBACK:      "/billing/brs/reback",          // /:brsId POST
-      REJECT:      "/billing/brs/reject",          // /:brsId POST
-      HISTORY:     "/billing/brs/history",         // /:brsId GET
-    },
-    VENDOR_BILLING: {
-      BSS: {
-        GET_VENDOR_ORDERS: "/resource/bss/vendor-orders", // vendorId projectCode receivedCategory itemCategory costHead GET
-        GET_SRNS_BY_ORDER: "/resource/bss/srns-by-order", // /:orderId GET
-        CREATE_BSS: "/resource/bss/create", // POST JSON
-        GET_ALL_BSS: "/resource/bss/list", // GET
-        GET_BSS_BY_ID: "/resource/bss/details", // /:bssId GET
-        UPDATE_BSS_BY_ID: "/resource/bss/edit", // /:bssId PUT JSON
-        SUBMIT_BSS_BY_ID: "/resource/bss/submit", // /:bssId POST
-        APPROVE: "/resource/bss/approve", // /:bssId POST
-        REBACK: "/resource/bss/reback", // /:bssId POST
-        REJECT: "/resource/bss/reject", // /:bssId POST
-        HISTORY: "/resource/bss/history", // /:bssId GET
-      },
-      BVS: {
-        GET_VENDOR_ORDERS: "/resource/bvs/vendor-orders", // vendorId projectCode categoryCode costHead GET
-        GET_GRNS_BY_ORDER: "/resource/bvs/grns-by-order", // /:orderId GET
-        CREATE_BVS: "/resource/bvs/create", // POST JSON
-        GET_ALL_BVS: "/resource/bvs/list", // GET
-        GET_BVS_BY_ID: "/resource/bvs/details", // /:bvsId GET
-        UPDATE_BVS_BY_ID: "/resource/bvs/edit", // /:bvsId PUT JSON
-        SUBMIT_BVS_BY_ID: "/resource/bvs/submit", // /:bvsId POST
-        APPROVE: "/resource/bvs/approve", // /:bvsId POST
-        REBACK: "/resource/bvs/reback", // /:bvsId POST
-        REJECT: "/resource/bvs/reject", // /:bvsId POST
-        HISTORY: "/resource/bvs/history", // /:bvsId GET
-      },
+    BRB: {
+      ITEMS_BY_BRR: "/billing/brb/items-by-brr", // /:brrId GET — returns grns[] or srns[] based on billingType
+      CREATE:       "/billing/brb/create",         // POST JSON
+      LIST:         "/billing/brb/list",            // GET
+      DETAILS:      "/billing/brb/details",         // /:brbId GET
+      EDIT:         "/billing/brb/edit",            // /:brbId PUT JSON
+      SUBMIT:       "/billing/brb/submit",          // /:brbId POST
+      APPROVE:      "/billing/brb/approve",         // /:brbId POST
+      REBACK:       "/billing/brb/reback",          // /:brbId POST
+      REJECT:       "/billing/brb/reject",          // /:brbId POST
+      HISTORY:      "/billing/brb/history",         // /:brbId GET
     },
     MACHINERY: {
       LOG_BOOK: {

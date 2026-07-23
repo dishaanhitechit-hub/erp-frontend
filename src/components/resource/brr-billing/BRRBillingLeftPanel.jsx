@@ -2,9 +2,6 @@
 
 import { Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { getInputClass, labelClass } from "@/lib/formStyles";
 import { getLocalStorage } from "@/lib/localStorage";
@@ -18,13 +15,13 @@ function Row({ label, children }) {
   );
 }
 
-export default function BRRBillingLeftPanel({ form, disabled, billingType, shippingOptions = [] }) {
+export default function BRRBillingLeftPanel({ form, disabled, billingType }) {
   const { register, control, formState: { errors } } = form;
 
   const projectInfo = getLocalStorage("projectInfo");
   const projectCode = projectInfo?.projectCode;
 
-  const isGRN = billingType === "grn" || billingType === "brg";
+  const isGRN = billingType === "grn";
 
   return (
     <div className="flex flex-col gap-y-3 w-full xl:w-[410px] shrink-0 xl:overflow-y-auto xl:max-h-[calc(100vh-110px)] pr-1">
@@ -33,25 +30,25 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType, shipp
         {/* Billing type badge */}
         <div className="inline-flex items-center gap-2 mb-1">
           <span className={`px-3 py-0.5 rounded-full text-xs font-semibold ${isGRN ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
-            {isGRN ? "GRN Billing (BRG)" : "SRN Billing (BRS)"}
+            {isGRN ? "GRN Billing (BRB)" : "SRN Billing (BRB)"}
           </span>
         </div>
 
-        {/* BRR Info — all auto-filled and disabled */}
+        {/* BRR + BRB identifiers — all read-only */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="BRR No">
             <Input {...register("brrNo")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
           </Row>
-          <Row label={isGRN ? "BRG No" : "BRS No"}>
+          <Row label="BRB No">
             <Input {...register("billingNo")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
           </Row>
-          <Row label={isGRN ? "BRG Date" : "BRS Date"}>
+          <Row label="BRB Date">
             <Input type="date" {...register("billingDate")} disabled={disabled}
               className={`${getInputClass(errors.billingDate, disabled)} w-full h-[34px]`} />
           </Row>
         </div>
 
-        {/* Party info */}
+        {/* Party info — read-only (from BRR → Order chain) */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Party Name">
             <Input {...register("partyName")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
@@ -68,7 +65,7 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType, shipp
           </Row>
         </div>
 
-        {/* Order info */}
+        {/* Order info — read-only */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Order Category">
             <Input {...register("orderCategory")} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
@@ -81,17 +78,19 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType, shipp
           </Row>
         </div>
 
-        {/* Party bill */}
+        {/* Party bill info — editable */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Party Bill No">
-            <Input {...register("partyBillNo")} disabled placeholder="[Auto from BRR]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
+            <Input {...register("partyBillNo")} disabled={disabled} placeholder="Party Bill No"
+              className={`${getInputClass(errors.partyBillNo, disabled)} w-full h-[34px]`} />
           </Row>
           <Row label="Party Bill Date">
-            <Input {...register("partyDate")} disabled placeholder="[Auto from BRR]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
+            <Input type="date" {...register("partyDate")} disabled={disabled}
+              className={`${getInputClass(errors.partyDate, disabled)} w-full h-[34px]`} />
           </Row>
         </div>
 
-        {/* Site + Addresses — addresses are editable */}
+        {/* Site + Addresses — all read-only (derived from BRR → Order chain, not editable on BRB) */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Site">
             <Input value={projectCode || ""} disabled placeholder="[Auto]" className={`${getInputClass(false, true)} w-full h-[34px]`} />
@@ -101,9 +100,9 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType, shipp
               <ExpandableTextField
                 value={field.value}
                 onChange={field.onChange}
-                disabled={disabled}
+                disabled
                 title="Billing Address"
-                placeholder="Billing Address"
+                placeholder="[Auto from order]"
                 minHeight="min-h-[34px]"
                 modalHeight="min-h-[180px]"
               />
@@ -111,17 +110,39 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType, shipp
           </Row>
           <Row label="Shipping Address">
             <Controller control={control} name="shippingAddress" render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
-                <SelectTrigger className={`${getInputClass(errors.shippingAddress, disabled)} w-full`}>
-                  <SelectValue placeholder="Select Shipping Address" />
-                </SelectTrigger>
-                <SelectContent>
-                  {shippingOptions.map((item, idx) => <SelectItem key={idx} value={item}>{item}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <ExpandableTextField
+                value={field.value}
+                onChange={field.onChange}
+                disabled
+                title="Shipping Address"
+                placeholder="[Auto from order]"
+                minHeight="min-h-[34px]"
+                modalHeight="min-h-[180px]"
+              />
             )} />
           </Row>
         </div>
+
+        {/* Item category + cost head — editable */}
+        <div className="flex flex-col gap-[2px] break-inside-avoid">
+          <Row label="Item Category">
+            <Input
+              {...register("itemCategory")}
+              disabled={disabled}
+              placeholder="e.g. CEMENT, STEEL"
+              className={`${getInputClass(errors.itemCategory, disabled)} w-full h-[34px]`}
+            />
+          </Row>
+          <Row label="Cost Head">
+            <Input
+              {...register("costHead")}
+              disabled={disabled}
+              placeholder="e.g. MATERIAL"
+              className={`${getInputClass(errors.costHead, disabled)} w-full h-[34px]`}
+            />
+          </Row>
+        </div>
+
       </div>
     </div>
   );

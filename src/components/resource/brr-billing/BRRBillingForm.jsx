@@ -18,8 +18,6 @@ import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 import { useRouter } from "next/navigation";
 
-const GRN_CATEGORIES = ["Purchases_Order", "Site_Transfer_Order", "Customer_Supply_Order"];
-
 const schema = z.object({
   brrNo:           z.string().optional(),
   billingNo:       z.string().optional(),
@@ -32,9 +30,10 @@ const schema = z.object({
   orderDate:       z.string().optional(),
   partyBillNo:     z.string().optional(),
   partyDate:       z.string().optional(),
-  billingAddress:  z.string().min(1, "Required"),
-  shippingAddress: z.string().min(1, "Required"),
-  gstType:         z.string().optional(),
+  billingAddress:  z.string().optional(),
+  shippingAddress: z.string().optional(),
+  itemCategory:    z.string().optional(),
+  costHead:        z.string().optional(),
   items:           z.array(z.any()).optional(),
   ccSummary:       z.array(z.any()).optional(),
   basicAmount:     z.number().optional(),
@@ -50,13 +49,13 @@ const defaultValues = {
   orderCategory: "", orderNo: "", orderDate: "",
   partyBillNo: "", partyDate: "",
   billingAddress: "", shippingAddress: "",
-  gstType: "", items: [], ccSummary: [],
+  itemCategory: "", costHead: "",
+  items: [], ccSummary: [],
   basicAmount: 0, gstAmount: 0, totalAmount: 0,
 };
 
 export default function BRRBillingForm({ mode = "create", billingType, brrId, billingId }) {
   const [activeTab, setActiveTab]     = useState("details");
-  // Start loading=true when we have data to fetch — prevents LeftPanel from flash-mounting
   const [loading, setLoading]         = useState(!!(brrId || billingId));
   const [isEditing, setIsEditing]     = useState(mode === "create");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -64,22 +63,15 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
   const [initialData, setInitialData] = useState(null);
   const [openItemModal, setOpenItemModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  // Tracks the BRR ID in edit mode (needed for item selection modal)
   const [effectiveBrrId, setEffectiveBrrId] = useState(brrId);
-  const [companyBillingAddress, setCompanyBillingAddress] = useState("");
-  const [shippingOptions, setShippingOptions] = useState([]);
+  // Cached items-by-brr response for create mode — passed to modals to avoid refetch
+  const [brrContext, setBrrContext]   = useState(null);
   const router = useRouter();
 
   const projectInfo = getLocalStorage("projectInfo");
   const projectCode = projectInfo?.projectCode;
-  const projectId   = projectInfo?.projectId;
 
-  const isGRN = billingType === "grn" || billingType === "brg";
-  const ENDPOINT = isGRN ? API_ENDPOINTS.RESOURCE.BRG : API_ENDPOINTS.RESOURCE.BRS;
-  const billingNoKey = isGRN ? "brgNo" : "brsNo";
-  const billingDateKey = isGRN ? "brgDate" : "brsDate";
-  const billingIdKey = isGRN ? "brgId" : "brsId";
-  const pageCode = isGRN ? "billing_by_brr_grn" : "billing_by_brr_srn";
+  const isGRN = billingType === "grn";
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -87,7 +79,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     mode: "onChange",
   });
 
-  const { reset, watch, getValues, setValue, handleSubmit, formState: { isSubmitting } } = form;
+  const { reset, getValues, handleSubmit, formState: { isSubmitting } } = form;
 
   const disabled =
     mode === "view" ||
@@ -96,20 +88,20 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     isSubmitted ||
     isSubmitting;
 
-  // ── Load BRR details to pre-fill form (create mode) ─────────────────────
+  // ── Create mode: single items-by-brr fetch covers all header data ────────
   useEffect(() => {
     if (mode !== "create" || !brrId) return;
-    const fetchBRR = async () => {
+    const fetchBrrContext = async () => {
       try {
         setLoading(true);
         const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.BILL_RECEIVE_REGISTER.DETAILS}/${brrId}`,
+          url: `${API_ENDPOINTS.RESOURCE.BRB.ITEMS_BY_BRR}/${brrId}`,
           method: "GET",
         });
         const d = res.data;
 
-        // If the URL billingType doesn't match the BRR's actual category, correct it silently
-        const correctType = GRN_CATEGORIES.includes(d.orderCategory) ? "grn" : "srn";
+        // Auto-redirect if the URL billingType doesn't match BRR's actual type
+        const correctType = d.billingType === "GRN" ? "grn" : "srn";
         if (correctType !== billingType) {
           router.replace(
             `/resource-management/sub-contractor-billing/e-reconcile-bill/new?brrId=${brrId}&billingType=${correctType}`
@@ -117,19 +109,18 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
           return;
         }
 
+        setBrrContext(d);
         reset({
           ...defaultValues,
-          brrNo:          d.brrNo || "",
-          partyName:      d.partyName || "",
-          partyAddress:   d.partyAddress || "",
-          partyGstn:      d.partyGstn || d.gstn || "",
-          orderCategory:  d.orderCategory?.replace(/_/g, " ") || "",
-          orderNo:        d.orderNo || "",
-          orderDate:      d.orderDate || "",
-          partyBillNo:    d.partyBillNo || "",
-          partyDate:      d.partyDate || "",
-          // preserve billing address if project fetch already resolved
-          billingAddress: getValues("billingAddress") || "",
+          brrNo:           d.brrNo || "",
+          partyName:       d.partyName || "",
+          partyAddress:    d.partyAddress || "",
+          partyGstn:       d.partyGstn || "",
+          orderCategory:   d.billingType || "",
+          orderNo:         d.orderNo || "",
+          orderDate:       d.orderDate || "",
+          billingAddress:  d.billingAddress || "",
+          shippingAddress: d.shippingAddress || "",
         });
       } catch (err) {
         toast.error(err.message || "Failed to load BRR details");
@@ -137,44 +128,17 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
         setLoading(false);
       }
     };
-    fetchBRR();
+    fetchBrrContext();
   }, [brrId, billingType, mode, reset]);
 
-  // ── Fetch project addresses once — lifted here so LeftPanel never re-fetches ──
-  useEffect(() => {
-    if (!projectId) return;
-    apiRequest({ url: `${API_ENDPOINTS.SETTINGS.GET_PROJECT_BY_ID}/${projectId}`, method: "GET" })
-      .then((res) => {
-        const data = res.data?.[0];
-        if (!data) return;
-        const shipping = [];
-        if (data.shippingAddress)  shipping.push(data.shippingAddress);
-        if (data.shippingAddress2) shipping.push(data.shippingAddress2);
-        if (data.shippingAddress3) shipping.push(data.shippingAddress3);
-        setShippingOptions(shipping);
-        setCompanyBillingAddress(data.companyBillingAddress || data.billingAddress || "");
-      })
-      .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
-
-  // ── Pre-fill billing address from project data (create mode only) ────────
-  useEffect(() => {
-    if (!companyBillingAddress || mode !== "create") return;
-    if (!form.getValues("billingAddress")) {
-      setValue("billingAddress", companyBillingAddress);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyBillingAddress, mode]);
-
-  // ── Load existing BRG/BRS details (edit/view mode) ──────────────────────
+  // ── Edit/view mode: load BRB details ─────────────────────────────────────
   useEffect(() => {
     if (mode === "create" || !billingId) return;
     const fetchBilling = async () => {
       try {
         setLoading(true);
         const res = await apiRequest({
-          url: `${ENDPOINT.DETAILS}/${billingId}`,
+          url: `${API_ENDPOINTS.RESOURCE.BRB.DETAILS}/${billingId}`,
           method: "GET",
         });
         const d = res.data;
@@ -184,29 +148,29 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
           effectiveAvailableQty: Number(it.availableQty ?? 0) + Number(it.billingQty ?? 0),
         }));
 
-        // Store brrId from the billing response so item modals work in edit mode
         if (d.brrId) setEffectiveBrrId(d.brrId);
 
         const formattedData = {
-          brrNo:          d.brrNo || "",
-          billingNo:      d[billingNoKey] || "",
-          billingDate:    d[billingDateKey] || today,
-          partyName:      d.partyName || "",
-          partyAddress:   d.partyAddress || "",
-          partyGstn:      d.partyGstn || "",
-          orderCategory:  d.orderCategory?.replace(/_/g, " ") || d.receivedCategory?.replace(/_/g, " ") || "",
-          orderNo:        d.orderNo || "",
-          orderDate:      d.orderDate || "",
-          partyBillNo:    d.partyBillNo || "",
-          partyDate:      d.partyDate || "",
-          billingAddress: d.billingAddress || "",
+          brrNo:           d.brrNo || "",
+          billingNo:       d.brbNo || "",
+          billingDate:     d.brbDate || today,
+          partyName:       d.partyName || "",
+          partyAddress:    d.partyAddress || "",
+          partyGstn:       d.partyGstn || "",
+          orderCategory:   d.orderCategory?.replace(/_/g, " ") || "",
+          orderNo:         d.orderNo || "",
+          orderDate:       d.orderDate || "",
+          partyBillNo:     d.partyBillNo || "",
+          partyDate:       d.partyDate || "",
+          billingAddress:  d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
-          gstType:        d.gstType || "",
+          itemCategory:    (d.itemCategory || []).join(", "),
+          costHead:        d.costHead || "",
           items,
-          ccSummary:      d.ccSummary || [],
-          basicAmount:    Number(d.basicAmount || 0),
-          gstAmount:      Number(d.gstAmount || 0),
-          totalAmount:    Number(d.totalAmount || 0),
+          ccSummary:       d.ccSummary || [],
+          basicAmount:     Number(d.basicAmount || 0),
+          gstAmount:       Number(d.gstAmount || 0),
+          totalAmount:     Number(d.totalAmount || 0),
         };
 
         reset(formattedData);
@@ -230,33 +194,25 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     fetchBilling();
   }, [billingId, mode, reset]);
 
-  // ── Build create payload ─────────────────────────────────────────────────
+  // ── Build payload ─────────────────────────────────────────────────────────
   const buildPayload = () => {
     const values = getValues();
+    const itemCategoryArr = values.itemCategory
+      ? values.itemCategory.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
     const base = {
-      brrId:          Number(brrId),
+      brbDate:      values.billingDate,
       projectCode,
-      vendorId:       undefined, // pulled from BRR on backend
-      site:           projectCode,
-      billingAddress: values.billingAddress,
-      shippingAddress: values.shippingAddress,
-      gstType:        values.gstType || "",
+      itemCategory: itemCategoryArr,
+      costHead:     values.costHead || "",
+      partyBillNo:  values.partyBillNo || "",
+      partyDate:    values.partyDate || "",
     };
-    if (isGRN) {
-      return {
-        ...base,
-        brgDate: values.billingDate,
-        items:   (values.items || []).map((it) => ({
-          grnItemId:  it.grnItemId,
-          billingQty: Number(it.billingQty),
-        })),
-      };
-    }
+    if (mode === "create") base.brrId = Number(brrId);
     return {
       ...base,
-      brsDate: values.billingDate,
-      items:   (values.items || []).map((it) => ({
-        srnItemId:  it.srnItemId,
+      items: (values.items || []).map((it) => ({
+        ...(isGRN ? { grnItemId: it.grnItemId } : { srnItemId: it.srnItemId }),
         billingQty: Number(it.billingQty),
       })),
     };
@@ -283,25 +239,25 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     return true;
   };
 
-  // ── Save Draft ──────────────────────────────────────────────────────────
+  // ── Save Draft ────────────────────────────────────────────────────────────
   const handleSaveDraft = async () => {
     if (!validateItems()) return;
     let toastId;
     try {
-      toastId = toast.loading(mode === "create" ? `Creating ${isGRN ? "BRG" : "BRS"}...` : `Updating ${isGRN ? "BRG" : "BRS"}...`);
+      toastId = toast.loading(mode === "create" ? "Creating BRB..." : "Updating BRB...");
       const res = await apiRequest({
         url: mode === "create"
-          ? ENDPOINT.CREATE
-          : `${ENDPOINT.EDIT}/${billingId}`,
+          ? API_ENDPOINTS.RESOURCE.BRB.CREATE
+          : `${API_ENDPOINTS.RESOURCE.BRB.EDIT}/${billingId}`,
         method: mode === "create" ? "POST" : "PUT",
         data: buildPayload(),
       });
 
-      const newBillingId = res.data?.[billingIdKey];
-      if (res.data?.[billingNoKey]) form.setValue("billingNo", res.data[billingNoKey]);
-      if (res.data?.ccSummary)      form.setValue("ccSummary", res.data.ccSummary);
+      const newBillingId = res.data?.brbId;
+      if (res.data?.brbNo)              form.setValue("billingNo",    res.data.brbNo);
+      if (res.data?.ccSummary)          form.setValue("ccSummary",    res.data.ccSummary);
       if (res.data?.basicAmount != null) form.setValue("basicAmount", Number(res.data.basicAmount));
-      if (res.data?.gstAmount != null)   form.setValue("gstAmount",   Number(res.data.gstAmount));
+      if (res.data?.gstAmount   != null) form.setValue("gstAmount",   Number(res.data.gstAmount));
       if (res.data?.totalAmount != null) form.setValue("totalAmount", Number(res.data.totalAmount));
 
       setInitialData(getValues());
@@ -310,7 +266,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
       toast.success("Draft saved", { id: toastId });
 
       if (mode === "create" && newBillingId) {
-        const bt = isGRN ? "brg" : "brs";
+        const bt = isGRN ? "grn" : "srn";
         setTimeout(() => {
           router.push(
             `/resource-management/sub-contractor-billing/e-reconcile-bill/${newBillingId}?billingType=${bt}`
@@ -322,14 +278,14 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     }
   };
 
-  // ── Submit ───────────────────────────────────────────────────────────────
+  // ── Submit ────────────────────────────────────────────────────────────────
   const onSubmit = async () => {
     if (!validateItems()) return;
     let toastId;
     try {
-      toastId = toast.loading(`Submitting ${isGRN ? "BRG" : "BRS"}...`);
+      toastId = toast.loading("Submitting BRB...");
       await apiRequest({
-        url: `${ENDPOINT.SUBMIT}/${billingId}`,
+        url: `${API_ENDPOINTS.RESOURCE.BRB.SUBMIT}/${billingId}`,
         method: "POST",
       });
       toast.success("Submitted for approval", { id: toastId });
@@ -341,7 +297,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
     }
   };
 
-  // ── Edit / Cancel ────────────────────────────────────────────────────────
+  // ── Edit / Cancel ─────────────────────────────────────────────────────────
   const handleEdit = () => {
     if (isEditing) {
       if (initialData) reset(initialData);
@@ -370,7 +326,6 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
             form={form}
             disabled={disabled}
             billingType={billingType}
-            shippingOptions={shippingOptions}
           />
         )}
 
@@ -428,6 +383,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
                     disabled={disabled}
                     billingType={billingType}
                     brrId={effectiveBrrId}
+                    brrContext={brrContext}
                     openItemModal={openItemModal}
                     setOpenItemModal={setOpenItemModal}
                   />
@@ -458,7 +414,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
             loading={isSubmitting}
             disabled={!allowSubmit || isEditing || isSubmitted || isSubmitting}
             requireConfirmation
-            confirmationTitle={`Submit ${isGRN ? "BRG" : "BRS"}?`}
+            confirmationTitle="Submit BRB?"
             confirmationMessage="Once submitted, this will go for approval."
           >
             Submit

@@ -51,30 +51,32 @@ export default function Page() {
 
           // Normalize nested billing rows
           const grnBillings = (item.grnBillings || []).map((b) => ({
-            billingNo:      b.brgNo || "",
-            billingDate:    getfmtDisplaydate(b.brgDate),
-            _rawDate:       b.brgDate || "",
+            billingNo:      b.brbNo || "",
+            billingDate:    getfmtDisplaydate(b.brbDate),
+            _rawDate:       b.brbDate || "",
             workflowStatus: b.workflowStatus || "",
             basicAmount:    fmt(b.basicAmount),
             gstAmount:      fmt(b.gstAmount),
             totalAmount:    fmt(b.totalAmount),
             itemCount:      b.itemCount ?? "-",
-            _type:          "brg",
-            _id:            b.brgId,
+            _type:          "brb",
+            _billingType:   "grn",
+            _id:            b.brbId,
             _brrId:         item.id ?? item.brrId,
           }));
 
           const srnBillings = (item.srnBillings || []).map((b) => ({
-            billingNo:      b.brsNo || "",
-            billingDate:    getfmtDisplaydate(b.brsDate),
-            _rawDate:       b.brsDate || "",
+            billingNo:      b.brbNo || "",
+            billingDate:    getfmtDisplaydate(b.brbDate),
+            _rawDate:       b.brbDate || "",
             workflowStatus: b.workflowStatus || "",
             basicAmount:    fmt(b.basicAmount),
             gstAmount:      fmt(b.gstAmount),
             totalAmount:    fmt(b.totalAmount),
             itemCount:      b.itemCount ?? "-",
-            _type:          "brs",
-            _id:            b.brsId,
+            _type:          "brb",
+            _billingType:   "srn",
+            _id:            b.brbId,
             _brrId:         item.id ?? item.brrId,
           }));
 
@@ -131,11 +133,8 @@ export default function Page() {
   };
 
   const handleChildRowClick = (childRow) => {
-    const type = childRow._type; // "brg" or "brs"
-    const id = childRow._id;
-    const billingType = type === "brg" ? "brg" : "brs";
     router.push(
-      `/resource-management/sub-contractor-billing/e-reconcile-bill/${id}?billingType=${billingType}`
+      `/resource-management/sub-contractor-billing/e-reconcile-bill/${childRow._id}?billingType=${childRow._billingType}`
     );
   };
 

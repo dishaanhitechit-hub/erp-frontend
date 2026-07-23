@@ -45,11 +45,12 @@ export default function BRRBillingDetailsTab({
   disabled,
   billingType,
   brrId,
+  brrContext = null,
   openItemModal,
   setOpenItemModal,
 }) {
   const items = form.watch("items") || [];
-  const isGRN = billingType === "grn" || billingType === "brg";
+  const isGRN = billingType === "grn";
 
   const onItemChange = (index, field, value) => {
     const updated = [...items];
@@ -243,8 +244,8 @@ export default function BRRBillingDetailsTab({
       </div>
 
       {isGRN
-        ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} />
-        : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} />
+        ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} />
+        : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} />
       }
     </div>
   );

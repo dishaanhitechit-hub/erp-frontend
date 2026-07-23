@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass } from "@/lib/formStyles";
 
-export default function SRNItemSelectionModal({ open, onClose, form, brrId }) {
+export default function SRNItemSelectionModal({ open, onClose, form, brrId, initialData = null }) {
   const [loading, setLoading] = useState(false);
   const [search, setSearch]   = useState("");
   const [tempRows, setTempRows] = useState([]);
@@ -28,11 +28,13 @@ export default function SRNItemSelectionModal({ open, onClose, form, brrId }) {
     const fetchItems = async () => {
       try {
         setLoading(true);
-        const res = await apiRequest({
-          url: `${API_ENDPOINTS.RESOURCE.BRS.SRNS_BY_BRR}/${brrId}`,
-          method: "GET",
-        });
-        const srns = res.data?.srns || [];
+        // Use cached data from form load if available (create mode), else fetch fresh
+        const srns = initialData?.srns
+          ? initialData.srns
+          : await apiRequest({
+              url: `${API_ENDPOINTS.RESOURCE.BRB.ITEMS_BY_BRR}/${brrId}`,
+              method: "GET",
+            }).then((res) => res.data?.srns || []);
         const rows = [];
         for (const srn of srns) {
           for (const item of srn.items || []) {

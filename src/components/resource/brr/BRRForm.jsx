@@ -164,6 +164,15 @@ export default function BRRForm({ mode = "create", brrId, onDataLoaded }) {
       .catch(() => toast.error("Failed to load orders"));
   }, [vendorId, orderCategory, projectCode]);
 
+  // Sync orderMaxTotal when vendor orders load in edit mode (order already selected)
+  useEffect(() => {
+    if (vendorOrders.length === 0) return;
+    const currentOrderId = getValues("orderId");
+    if (!currentOrderId) return;
+    const order = vendorOrders.find((o) => String(o.orderId ?? o.id) === String(currentOrderId));
+    setOrderMaxTotal(order ? Number(order.totalAmount) : null);
+  }, [vendorOrders]);
+
   // Load BRR in edit/view/approver mode
   useEffect(() => {
     if (mode === "create" || !brrId) return;
@@ -241,6 +250,13 @@ export default function BRRForm({ mode = "create", brrId, onDataLoaded }) {
 
   // Save draft
   const handleSaveDraft = async () => {
+    if (totalExceedsOrder) {
+      const fmt = (n) => Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      toast.error(
+        `BRR total ₹${fmt(totalAmount)} exceeds order total ₹${fmt(orderMaxTotal)}. Please reduce the amounts.`
+      );
+      return;
+    }
     let toastId;
     try {
       toastId = toast.loading(mode === "create" ? "Creating BRR…" : "Updating BRR…");
@@ -500,11 +516,6 @@ export default function BRRForm({ mode = "create", brrId, onDataLoaded }) {
                     disabled
                     className={`${getInputClass(false, true)} w-full h-[34px] ${totalExceedsOrder ? "bg-red-50 border-red-400" : "bg-orange-50"}`}
                   />
-                  {totalExceedsOrder && (
-                    <p className="text-[11px] text-red-500 mt-0.5">
-                      Total exceeds order max ({Number(orderMaxTotal).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                    </p>
-                  )}
                 </div>
               </FieldRow>
             </div>
