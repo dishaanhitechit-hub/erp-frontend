@@ -113,6 +113,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
         reset({
           ...defaultValues,
           brrNo:           d.brrNo || "",
+          partyBillNo:     d.brrNo || "",
           partyName:       d.partyName || "",
           partyAddress:    d.partyAddress || "",
           partyGstn:       d.partyGstn || "",
@@ -263,6 +264,8 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
       setInitialData(getValues());
       setIsEditing(false);
       setAllowSubmit(true);
+      // Clear cached items context so next modal open fetches fresh available quantities
+      if (mode === "edit") setBrrContext(null);
       toast.success("Draft saved", { id: toastId });
 
       if (mode === "create" && newBillingId) {
@@ -384,6 +387,7 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
                     billingType={billingType}
                     brrId={effectiveBrrId}
                     brrContext={brrContext}
+                    onContextFetched={setBrrContext}
                     openItemModal={openItemModal}
                     setOpenItemModal={setOpenItemModal}
                   />

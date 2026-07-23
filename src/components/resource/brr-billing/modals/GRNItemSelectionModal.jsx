@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getInputClass } from "@/lib/formStyles";
 
-export default function GRNItemSelectionModal({ open, onClose, form, brrId, initialData = null }) {
+export default function GRNItemSelectionModal({ open, onClose, form, brrId, initialData = null, onFetched }) {
   const [loading, setLoading] = useState(false);
   const [search, setSearch]   = useState("");
   const [tempRows, setTempRows] = useState([]);
@@ -28,13 +28,18 @@ export default function GRNItemSelectionModal({ open, onClose, form, brrId, init
     const fetchItems = async () => {
       try {
         setLoading(true);
-        // Use cached data from form load if available (create mode), else fetch fresh
-        const grns = initialData?.grns
-          ? initialData.grns
-          : await apiRequest({
-              url: `${API_ENDPOINTS.RESOURCE.BRB.ITEMS_BY_BRR}/${brrId}`,
-              method: "GET",
-            }).then((res) => res.data?.grns || []);
+        // Use cached data if available, else fetch and notify parent to cache
+        let grns;
+        if (initialData?.grns) {
+          grns = initialData.grns;
+        } else {
+          const res = await apiRequest({
+            url: `${API_ENDPOINTS.RESOURCE.BRB.ITEMS_BY_BRR}/${brrId}`,
+            method: "GET",
+          });
+          grns = res.data?.grns || [];
+          onFetched?.(res.data);
+        }
         const rows = [];
         for (const grn of grns) {
           for (const item of grn.items || []) {

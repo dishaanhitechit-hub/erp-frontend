@@ -46,6 +46,7 @@ export default function BRRBillingDetailsTab({
   billingType,
   brrId,
   brrContext = null,
+  onContextFetched,
   openItemModal,
   setOpenItemModal,
 }) {
@@ -65,8 +66,8 @@ export default function BRRBillingDetailsTab({
           {isGRN ? "Add GRN items using the button above" : "Add SRN items using the button above"}
         </div>
         {isGRN
-          ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} />
-          : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} />
+          ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} onFetched={onContextFetched} />
+          : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} onFetched={onContextFetched} />
         }
       </>
     );
@@ -244,8 +245,8 @@ export default function BRRBillingDetailsTab({
       </div>
 
       {isGRN
-        ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} />
-        : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} />
+        ? <GRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} onFetched={onContextFetched} />
+        : <SRNItemSelectionModal open={openItemModal} onClose={() => setOpenItemModal(false)} form={form} brrId={brrId} initialData={brrContext} onFetched={onContextFetched} />
       }
     </div>
   );

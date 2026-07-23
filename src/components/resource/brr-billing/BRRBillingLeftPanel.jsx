@@ -81,8 +81,8 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType }) {
         {/* Party bill info — editable */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Party Bill No">
-            <Input {...register("partyBillNo")} disabled={disabled} placeholder="Party Bill No"
-              className={`${getInputClass(errors.partyBillNo, disabled)} w-full h-[34px]`} />
+            <Input {...register("partyBillNo")} disabled placeholder="[Auto from BRR]"
+              className={`${getInputClass(false, true)} w-full h-[34px]`} />
           </Row>
           <Row label="Party Bill Date">
             <Input type="date" {...register("partyDate")} disabled={disabled}
