@@ -11,6 +11,7 @@ import ApprovalActionModal from "@/components/common/ApprovalActionModal";
 import HistoryTimelineSheet from "@/components/common/HistoryTimelineSheet";
 import { API_ENDPOINTS } from "@/config/api.config";
 import BRRBillingForm from "@/components/resource/brr-billing/BRRBillingForm";
+import BRRSelector from "@/components/resource/brr-billing/BRRSelector";
 
 export default function Page() {
   const router  = useRouter();
@@ -45,6 +46,20 @@ export default function Page() {
           onApprove: access.canApprove ? () => setOpenApproval(true) : undefined,
         }),
   });
+
+  if (isNew && !brrId) {
+    return (
+      <HeaderWrapper header={<PageHeader actions={getPageActions({ router })} />}>
+        <BRRSelector
+          onSelect={(selectedBrrId, selectedBillingType) =>
+            router.replace(
+              `/resource-management/sub-contractor-billing/e-reconcile-bill/new?brrId=${selectedBrrId}&billingType=${selectedBillingType}`
+            )
+          }
+        />
+      </HeaderWrapper>
+    );
+  }
 
   return (
     <HeaderWrapper header={<PageHeader actions={actions} />}>
