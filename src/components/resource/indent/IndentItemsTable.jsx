@@ -3,21 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
-
-import { Trash2, FileText } from "lucide-react";
-
+import { Trash2 } from "lucide-react";
 import { getInputClass } from "@/lib/formStyles";
-
 import SearchableSelect from "@/components/common/SearchableSelect";
+import ExpandableTextField from "@/components/common/ExpandableTextField";
 import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 
@@ -44,8 +33,6 @@ export default function IndentItemsTable({
     location: "",
   };
 
-  const [activeModal, setActiveModal] = useState(null);
-  const [tempValue, setTempValue] = useState("");
   const scrollRef = useRef(null);
 
   const [useLocations, setUseLocations] = useState([]);
@@ -93,39 +80,6 @@ export default function IndentItemsTable({
     return value;
   };
 
-  const renderPreviewText = (text) => {
-    if (!text) {
-      return (
-        <span className="text-[#888] italic text-[13px]">No content added</span>
-      );
-    }
-
-    if (text.length <= 28) {
-      return text;
-    }
-
-    return `${text.trim().slice(0, 28).trim()}...`;
-  };
-
-  const openModal = (index, field) => {
-    const currentValue = watch(`items.${index}.${field}`) || "";
-    setTempValue(currentValue);
-    setActiveModal({ index, field });
-  };
-
-  const closeModal = () => {
-    setTempValue("");
-    setActiveModal(null);
-  };
-  const handleSave = () => {
-    if (!activeModal) return;
-    const fieldPath = `items.${activeModal.index}.${activeModal.field}`;
-    setValue(fieldPath, tempValue.trim(), {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    closeModal();
-  };
 
   return (
     <div className="flex-1 min-w-0">
@@ -233,45 +187,16 @@ export default function IndentItemsTable({
 
                       {/* NOTE */}
                       <td className="border border-[#b5b5b5] p-0">
-                        <button
-                          type="button"
-                          onClick={() => openModal(index, "note")}
-                          className={`
-                            w-full
-                            h-[36px]
-                            px-2
-                            flex
-                            items-center
-                            justify-between
-                            gap-2
-                            text-left
-                            transition-colors
-                            cursor-pointer
-                            ${
-                              !isEditing || isSubmitting
-                                ? "bg-[#edf8ed] cursor-default"
-                                : "bg-white hover:bg-[#f7f7f7] cursor-pointer"
-                            }
-                          `}
-                        >
-                          <span className="truncate text-[13px]">
-                            {renderPreviewText(noteValue)}
-                          </span>
-
-                          <span
-                            className="
-                              text-blue-600
-                              text-[11px]
-                              shrink-0
-                              flex
-                              items-center
-                              gap-1
-                            "
-                          >
-                            <FileText className="w-3 h-3" />
-                            more
-                          </span>
-                        </button>
+                        <ExpandableTextField
+                          value={noteValue || ""}
+                          onChange={(v) => setValue(`items.${index}.note`, v, { shouldDirty: true })}
+                          disabled={!isEditing || isSubmitting}
+                          title="Note"
+                          placeholder="Enter detailed note..."
+                          subHeader="Add detailed note information below."
+                          minHeight="min-h-[36px]"
+                          modalHeight="min-h-[220px]"
+                        />
                       </td>
 
                       {/* UNIT */}
@@ -430,80 +355,6 @@ export default function IndentItemsTable({
         </div>
       )}
 
-      {/* MODAL */}
-      <Dialog
-        open={!!activeModal}
-        onOpenChange={(open) => {
-          if (!open) closeModal();
-        }}
-      >
-        <DialogContent className="sm:max-w-[650px]">
-          <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold">
-              Note Details
-            </DialogTitle>
-          </DialogHeader>
-
-          {activeModal && (
-            <div className="space-y-3">
-              <div className="text-[13px] text-[#666]">
-                Add detailed note information below.
-              </div>
-
-              <textarea
-                value={tempValue}
-                onChange={(e) => setTempValue(e.target.value)}
-                disabled={!isEditing || isSubmitting}
-                placeholder="Enter detailed note..."
-                className={`
-            ${getInputClass(
-              errors?.items?.[activeModal.index]?.[activeModal.field],
-              !isEditing || isSubmitting,
-            )}
-            w-full
-            min-h-[220px]
-            resize-none
-            border
-            rounded-md
-            px-3
-            py-3
-            text-sm
-            leading-6
-            outline-none
-          `}
-              />
-
-              <div className="flex justify-between items-center">
-                <div className="text-[12px] text-[#888]">
-                  Character Count : {tempValue.trim().length}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={closeModal}
-                    className="h-[34px] bg"
-                  >
-                    Close
-                  </Button>
-
-                  {/* Save only in edit mode */}
-                  {isEditing && !isSubmitting && (
-                    <Button
-                      type="button"
-                      onClick={handleSave}
-                      className="h-[34px]"
-                    >
-                      Save
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

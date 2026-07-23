@@ -153,7 +153,7 @@ export default function ExpandableTextArea({
 
       {/* ── MODAL ── */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleCancel(); }}>
-        <DialogContent className={`${modalWidth} p-0 gap-0 overflow-hidden`}>
+        <DialogContent showCloseButton={false} className={`${modalWidth} p-0 gap-0 overflow-hidden`}>
 
           {/* Header */}
           <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-[#f5f9ff]">

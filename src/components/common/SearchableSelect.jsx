@@ -72,7 +72,7 @@ export default function SearchableSelect({
     // >
     <div
       ref={wrapperRef}
-      className={`relative w-full overflow-visible ${className}`}
+      className={`searchable-select relative w-full overflow-visible ${className}`}
     >
       {/* SELECT BUTTON */}
       <button

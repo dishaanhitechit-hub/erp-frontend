@@ -71,7 +71,7 @@ export default function ExpandableTextField({
         tabIndex={0}
         onClick={handleOpen}
         onKeyDown={(e) => e.key === "Enter" && handleOpen()}
-        className={` ${className}
+        className={`expandable-field ${className}
           relative
 
           ${getInputClass(error, disabled)}
@@ -82,12 +82,8 @@ export default function ExpandableTextField({
           py-2
 
           flex
-          items-start
+          items-center
 
-          break-words
-
-          whitespace-pre-wrap
-          overflow-hidden
           cursor-pointer
         `}
       >
@@ -118,15 +114,8 @@ export default function ExpandableTextField({
           </p>
         )}
 
-        <span
-          className="
-            absolute
-            top-2
-            right-2
-            text-gray-500
-          "
-        >
-          <Maximize2 className="w-4 h-4" />
+        <span className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 pointer-events-none">
+          <Maximize2 className="w-3.5 h-3.5" />
         </span>
       </div>
 

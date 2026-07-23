@@ -157,3 +157,123 @@
 body {
   font-family: "Bahnschrift", "Segoe UI", system-ui, sans-serif;
 }
+
+/*
+ * ── EXCEL-STYLE TABLE CELL INPUTS ────────────────────────────────────────────
+ *
+ * WHAT THIS DOES:
+ *   All <input> and <textarea> elements inside <td> are stripped of their own
+ *   borders, backgrounds, shadows, and radius so they look like native table
+ *   cells — exactly like editing a cell in Excel/Google Sheets.
+ *
+ *   Custom components get matching class hooks:
+ *     - ExpandableTextField  → outer div gets class "expandable-field"
+ *     - SearchableSelect     → wrapper div gets class "searchable-select"
+ *
+ *   Active-cell highlight: a soft blue outline is drawn on the <td> itself
+ *   (via :has()) when any child input/textarea/select-trigger is focused.
+ *
+ *   Error state: the <td> cell background turns light red — NOT the input
+ *   itself — so there is no "box within a box" (red border inside blue border).
+ *   The error class "has-error" is added by getInputClass() in formStyles.js.
+ *   On focus the cell outline switches from blue → red.
+ *   Error tooltip is set via the `title` attribute on the input element.
+ *
+ * HOW TO REVERT TO DEFAULT (bordered inputs inside cells):
+ *   1. Delete or comment out this entire section below.
+ *   2. In src/lib/formStyles.js, remove "has-error" from the error branch
+ *      (the class is only needed as a CSS hook for the rules below).
+ *   3. In BRRBillingDetailsTab.jsx, restore the <div> wrapper + <p> error
+ *      text that was removed from the Billing Qty cells:
+ *        <div>
+ *          <Input ... className={`${getInputClass(qtyError, disabled)} h-[28px]`} />
+ *          {qtyError && <p className="text-red-500 text-[10px] mt-1">Max {effectiveAvailableQty}</p>}
+ *        </div>
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* Strip all visual chrome from inputs/textareas inside table cells */
+td input,
+td textarea {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  width: 100%;
+}
+
+td input:focus,
+td input:focus-visible,
+td textarea:focus,
+td textarea:focus-visible {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ExpandableTextField inside table cell */
+td .expandable-field {
+  border: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Active-cell highlight on the <td> itself (blue outline on focus) */
+td:has(input:focus),
+td:has(textarea:focus),
+td:has(.searchable-select > button:focus) {
+  outline: 1.5px solid #6b9fd4;
+  outline-offset: -1px;
+  background-color: rgba(148, 184, 214, 0.12) !important;
+}
+
+/* SearchableSelect trigger in table cell: transparent, no border */
+td .searchable-select > button {
+  border: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Disabled select: hide the chevron arrow — reads as plain text */
+td .searchable-select > button:disabled svg {
+  display: none;
+}
+
+/* Editable select hover: subtle tint so user knows it's clickable */
+td .searchable-select > button:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Search input INSIDE the dropdown popup needs its own border restored */
+td .searchable-select input {
+  border: 1px solid #8f8f8f !important;
+  background-color: white !important;
+  border-radius: 2px !important;
+}
+
+/*
+ * Error state — cell-level, not input-level (avoids box-within-box).
+ * The input keeps border:none; the <td> gets the red background instead.
+ * On focus the cell outline switches from blue to red.
+ */
+td input.has-error,
+td textarea.has-error {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+td:has(input.has-error),
+td:has(textarea.has-error) {
+  background-color: rgb(254 242 242) !important;
+}
+
+td:has(input.has-error:focus),
+td:has(input.has-error:focus-visible),
+td:has(textarea.has-error:focus) {
+  outline: 1.5px solid rgb(239 68 68) !important;
+  outline-offset: -1px;
+  background-color: rgb(254 242 242) !important;
+}

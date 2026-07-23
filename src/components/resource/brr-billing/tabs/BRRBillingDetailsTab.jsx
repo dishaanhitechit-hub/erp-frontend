@@ -130,15 +130,13 @@ export default function BRRBillingDetailsTab({
                       <TD center><ReadCell value={item.alreadyBilled} /></TD>
                       <TD center><ReadCell value={item.availableQty} /></TD>
                       <TD>
-                        <div>
-                          <Input
-                            type="number" value={currQty ?? ""} min="0" step="any"
-                            disabled={disabled}
-                            onChange={(e) => onItemChange(index, "billingQty", e.target.value)}
-                            className={`${getInputClass(qtyError, disabled)} h-[28px]`}
-                          />
-                          {qtyError && <p className="text-red-500 text-[10px] mt-1">Max {effectiveAvailableQty}</p>}
-                        </div>
+                        <Input
+                          type="number" value={currQty ?? ""} min="0" step="any"
+                          disabled={disabled}
+                          onChange={(e) => onItemChange(index, "billingQty", e.target.value)}
+                          title={qtyError ? `Max allowed: ${effectiveAvailableQty}` : undefined}
+                          className={`${getInputClass(qtyError, disabled)} h-[28px]`}
+                        />
                       </TD>
                       <TD center><ReadCell value={item.rate} /></TD>
                       <TD center><ReadCell value={amount} /></TD>
@@ -208,15 +206,13 @@ export default function BRRBillingDetailsTab({
                       <TD center><ReadCell value={item.alreadyBilled} /></TD>
                       <TD center><ReadCell value={item.availableQty} /></TD>
                       <TD>
-                        <div>
-                          <Input
-                            type="number" value={currQty ?? ""} min="0" step="any"
-                            disabled={disabled}
-                            onChange={(e) => onItemChange(index, "billingQty", e.target.value)}
-                            className={`${getInputClass(qtyError, disabled)} h-[28px]`}
-                          />
-                          {qtyError && <p className="text-red-500 text-[10px] mt-1">Max {effectiveAvailableQty}</p>}
-                        </div>
+                        <Input
+                          type="number" value={currQty ?? ""} min="0" step="any"
+                          disabled={disabled}
+                          onChange={(e) => onItemChange(index, "billingQty", e.target.value)}
+                          title={qtyError ? `Max allowed: ${effectiveAvailableQty}` : undefined}
+                          className={`${getInputClass(qtyError, disabled)} h-[28px]`}
+                        />
                       </TD>
                       <TD center><ReadCell value={item.rate} /></TD>
                       <TD center><ReadCell value={amount} /></TD>

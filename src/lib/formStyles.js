@@ -9,7 +9,7 @@ export const getInputClass = (
    placeholder:text-sm placeholder:font-normal
    ${
      hasError
-       ? "border-red-500 bg-red-50 focus-visible:ring-red-500"
+       ? "has-error border-red-500 bg-red-50 focus-visible:ring-red-500"
        : disabled
        ? "border-[#7fa37f] bg-[#edf8ed] disabled:bg-[#edf8ed] disabled:text-gray-500"
        : "border-[#8f8f8f] bg-white"
