@@ -17,6 +17,7 @@ import { apiRequest } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/config/api.config";
 import { getLocalStorage } from "@/lib/localStorage";
 import { useRouter } from "next/navigation";
+import { CATEGORY_OPTIONS } from "@/config/categoryOptions.config";
 
 const schema = z.object({
   brrNo:           z.string().optional(),
@@ -113,15 +114,20 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
         reset({
           ...defaultValues,
           brrNo:           d.brrNo || "",
-          partyBillNo:     d.brrNo || "",
+          partyBillNo:     d.brrPartyBillNo || "",
+          partyDate:       d.brrPartyDate || "",
           partyName:       d.partyName || "",
           partyAddress:    d.partyAddress || "",
           partyGstn:       d.partyGstn || "",
-          orderCategory:   d.billingType || "",
+          orderCategory:   d.orderCategory?.replace(/_/g, " ") || "",
           orderNo:         d.orderNo || "",
           orderDate:       d.orderDate || "",
           billingAddress:  d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
+          itemCategory:    (d.subCategoryCodes || [])
+            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code)
+            .join(", "),
+          costHead:        d.costHead || "",
         });
       } catch (err) {
         toast.error(err.message || "Failed to load BRR details");
@@ -165,7 +171,9 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
           partyDate:       d.partyDate || "",
           billingAddress:  d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
-          itemCategory:    (d.itemCategory || []).join(", "),
+          itemCategory:    (d.itemCategory || [])
+            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code)
+            .join(", "),
           costHead:        d.costHead || "",
           items,
           ccSummary:       d.ccSummary || [],
@@ -198,16 +206,11 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
   // ── Build payload ─────────────────────────────────────────────────────────
   const buildPayload = () => {
     const values = getValues();
-    const itemCategoryArr = values.itemCategory
-      ? values.itemCategory.split(",").map((s) => s.trim()).filter(Boolean)
-      : [];
     const base = {
-      brbDate:      values.billingDate,
+      brbDate:     values.billingDate,
       projectCode,
-      itemCategory: itemCategoryArr,
-      costHead:     values.costHead || "",
-      partyBillNo:  values.partyBillNo || "",
-      partyDate:    values.partyDate || "",
+      partyBillNo: values.partyBillNo || "",
+      partyDate:   values.partyDate || "",
     };
     if (mode === "create") base.brrId = Number(brrId);
     return {

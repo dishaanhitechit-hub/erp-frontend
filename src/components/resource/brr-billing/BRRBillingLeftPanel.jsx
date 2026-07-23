@@ -85,8 +85,8 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType }) {
               className={`${getInputClass(false, true)} w-full h-[34px]`} />
           </Row>
           <Row label="Party Bill Date">
-            <Input type="date" {...register("partyDate")} disabled={disabled}
-              className={`${getInputClass(errors.partyDate, disabled)} w-full h-[34px]`} />
+            <Input type="date" {...register("partyDate")} disabled
+              className={`${getInputClass(false, true)} w-full h-[34px]`} />
           </Row>
         </div>
 
@@ -123,22 +123,22 @@ export default function BRRBillingLeftPanel({ form, disabled, billingType }) {
           </Row>
         </div>
 
-        {/* Item category + cost head — editable */}
+        {/* Item category + cost head — read-only (auto from BRR) */}
         <div className="flex flex-col gap-[2px] break-inside-avoid">
           <Row label="Item Category">
             <Input
               {...register("itemCategory")}
-              disabled={disabled}
-              placeholder="e.g. CEMENT, STEEL"
-              className={`${getInputClass(errors.itemCategory, disabled)} w-full h-[34px]`}
+              disabled
+              placeholder="[Auto from BRR]"
+              className={`${getInputClass(false, true)} w-full h-[34px]`}
             />
           </Row>
           <Row label="Cost Head">
             <Input
               {...register("costHead")}
-              disabled={disabled}
-              placeholder="e.g. MATERIAL"
-              className={`${getInputClass(errors.costHead, disabled)} w-full h-[34px]`}
+              disabled
+              placeholder="[Auto from BRR]"
+              className={`${getInputClass(false, true)} w-full h-[34px]`}
             />
           </Row>
         </div>
