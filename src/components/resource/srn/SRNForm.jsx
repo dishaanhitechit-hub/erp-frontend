@@ -85,7 +85,8 @@ export default function SRNForm({ mode = "create", srnId }) {
   const [existingFileUrl, setExistingFileUrl] = useState("");
   const [initialFileUrl, setInitialFileUrl] = useState("");
   const [initialFormData, setInitialFormData] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen,    setSidebarOpen]    = useState(true);
+  const [storeLocations, setStoreLocations] = useState([]);
 
   // ── FORM ──────────────────────────────────────────────────────────────────
   const form = useForm({
@@ -101,6 +102,20 @@ export default function SRNForm({ mode = "create", srnId }) {
   } = form;
 
   const disabled = isViewMode || !isEditing || isSubmitting || isSubmitted;
+
+  // ── FETCH PROJECT LOCATIONS ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!projectCode) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setStoreLocations(data.filter((l) => l.locationType === "Store"));
+      })
+      .catch(() => setStoreLocations([]));
+  }, [projectCode]);
 
   // ── LOAD SRN DETAILS (edit / view / approver) ─────────────────────────────
   useEffect(() => {
@@ -212,8 +227,8 @@ export default function SRNForm({ mode = "create", srnId }) {
       balanceQty: it.balanceQty,
       currentReceivedQty: 0,
       effectiveMax: Number(it.balanceQty ?? 0),
-      useLocation: "",
-      storeLocation: "",
+      useLocation:  it.useLocation  || "",
+      storeLocation: it.storeLocation || "",
     }));
     setItems(mapped);
     setInitialItems(mapped);
@@ -480,6 +495,7 @@ export default function SRNForm({ mode = "create", srnId }) {
               items={items}
               onItemChange={handleItemChange}
               disabled={disabled}
+              storeLocations={storeLocations}
             />
           </div>
         </div>

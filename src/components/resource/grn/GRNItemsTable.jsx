@@ -251,52 +251,32 @@ export default function GRNItemsTable({
 
                   {/* CURRENT */}
                   <TD>
-                    <div>
-                      <Input
-                        type="number"
-                        value={currQty ?? ""}
-                        min="0"
-                        step="any"
-                        disabled={disabled}
-                        onChange={(e) =>
-                          onItemChange(
-                            index,
-                            "currentReceivedQty",
-                            e.target.value
-                          )
-                        }
-                        className={`
-                          ${getInputClass(
-                            qtyError,
-                            disabled
-                          )}
-                          h-[28px]
-                        `}
-                      />
-
-                      {qtyError && (
-                        <p className="text-red-500 text-[10px] mt-1">
-                          Max {effectiveMax}
-                        </p>
-                      )}
-                    </div>
+                    <Input
+                      type="number"
+                      value={currQty ?? ""}
+                      min="0"
+                      step="any"
+                      disabled={disabled}
+                      onChange={(e) =>
+                        onItemChange(
+                          index,
+                          "currentReceivedQty",
+                          e.target.value
+                        )
+                      }
+                      title={qtyError ? `Max allowed: ${effectiveMax}` : undefined}
+                      className={`${getInputClass(qtyError, disabled)} h-[28px]`}
+                    />
                   </TD>
 
-                  {/* USE LOCATION */}
+                  {/* USE LOCATION — always read-only, comes from API */}
                   <TD>
                     <ExpandableTextField
                       value={item.useLocation || ""}
-                      disabled={disabled}
+                      disabled
                       title="Use Location"
-                      placeholder="Block A"
                       minHeight="min-h-[28px]"
-                      onChange={(v) =>
-                        onItemChange(
-                          index,
-                          "useLocation",
-                          v
-                        )
-                      }
+                      onChange={() => {}}
                     />
                   </TD>
 

@@ -225,8 +225,8 @@ export default function GRNForm({ mode = "create", grnId }) {
       balanceQty: it.balanceQty,
       currentReceivedQty: 0,
       effectiveMax: Number(it.balanceQty ?? 0),
-      useLocation: "",
-      storeLocation: "",
+      useLocation:  it.useLocation  || "",
+      storeLocation: it.storeLocation || "",
     }));
     setItems(mapped);
     setInitialItems(mapped);

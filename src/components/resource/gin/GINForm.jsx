@@ -79,7 +79,8 @@ export default function GINForm({ mode = "create", ginId }) {
   const [existingFileUrl, setExistingFileUrl] = useState("");
   const [initialFileUrl,  setInitialFileUrl]  = useState("");
   const [initialFormData, setInitialFormData] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen,    setSidebarOpen]    = useState(true);
+  const [storeLocations, setStoreLocations] = useState([]);
 
   // ── FORM ───────────────────────────────────────────────────────────────────
   const form = useForm({
@@ -93,6 +94,19 @@ export default function GINForm({ mode = "create", ginId }) {
   const disabled = isViewMode || !isEditing || isSubmitting || isSubmitted;
 
   // ── LOAD GIN DETAILS (edit / view / approver) ──────────────────────────────
+  useEffect(() => {
+    if (!projectCode) return;
+    apiRequest({
+      url: `${API_ENDPOINTS.SETTINGS.PROJECT_LOCATION.LIST}/${projectCode}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setStoreLocations(data.filter((l) => l.locationType === "Store"));
+      })
+      .catch(() => setStoreLocations([]));
+  }, [projectCode]);
+
   useEffect(() => {
     if (mode === "create" || !ginId) return;
 
@@ -445,6 +459,7 @@ export default function GINForm({ mode = "create", ginId }) {
             items={items}
             onItemChange={handleItemChange}
             disabled={disabled}
+            storeLocations={storeLocations}
           />
         </div>
 

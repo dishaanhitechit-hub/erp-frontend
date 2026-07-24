@@ -124,10 +124,10 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
           orderDate:       d.orderDate || "",
           billingAddress:  d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
-          itemCategory:    (d.subCategoryCodes || [])
-            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code)
+          itemCategory:    (d.itemCategory || [])
+            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code.replace(/_/g, " "))
             .join(", "),
-          costHead:        d.costHead || "",
+          costHead:        d.costHead?.replace(/_/g, " ") || "",
         });
       } catch (err) {
         toast.error(err.message || "Failed to load BRR details");
@@ -172,9 +172,9 @@ export default function BRRBillingForm({ mode = "create", billingType, brrId, bi
           billingAddress:  d.billingAddress || "",
           shippingAddress: d.shippingAddress || "",
           itemCategory:    (d.itemCategory || [])
-            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code)
+            .map((code) => CATEGORY_OPTIONS.itemCategory.find((o) => o.value === code)?.label || code.replace(/_/g, " "))
             .join(", "),
-          costHead:        d.costHead || "",
+          costHead:        d.costHead?.replace(/_/g, " ") || "",
           items,
           ccSummary:       d.ccSummary || [],
           basicAmount:     Number(d.basicAmount || 0),

@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import ExpandableTextField from "@/components/common/ExpandableTextField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { getInputClass } from "@/lib/formStyles";
 
 // ── HEADER CELL ───────────────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ const ReadCell = ({ value, disabled = true }) => (
 );
 
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
-export default function GINItemsTable({ items, onItemChange, disabled }) {
+export default function GINItemsTable({ items, onItemChange, disabled, storeLocations = [] }) {
   if (!items?.length) {
     return (
       <div className="border rounded-sm p-4 text-center text-[13px] text-gray-400 italic">
@@ -75,17 +76,17 @@ export default function GINItemsTable({ items, onItemChange, disabled }) {
               <TH w="70px"  center>Unit</TH>
               <TH w="100px" center>Stock Qty</TH>
               <TH w="130px" center>Issue Qty</TH>
-              <TH w="200px">Stock Location</TH>
+              <TH w="200px">Store Location</TH>
               <TH w="200px">Item Used Location</TH>
             </tr>
           </thead>
 
           <tbody>
             {items.map((item, index) => {
-              const stockQty  = Number(item.stockQty ?? 0);
-              const issueQty  = item.issueQty;
-              const issueNum  = issueQty === "" || issueQty == null ? 0 : Number(issueQty);
-              const qtyError  = issueNum > stockQty && issueNum > 0;
+              const stockQty = Number(item.stockQty ?? 0);
+              const issueQty = item.issueQty;
+              const issueNum = issueQty === "" || issueQty == null ? 0 : Number(issueQty);
+              const qtyError = issueNum > stockQty && issueNum > 0;
 
               return (
                 <tr key={item.orderItemId ?? index}>
@@ -96,7 +97,7 @@ export default function GINItemsTable({ items, onItemChange, disabled }) {
                     <ReadCell value={item.itemCode} />
                   </TD>
 
-                  {/* ITEM NAME — expandable */}
+                  {/* ITEM NAME — expandable read-only */}
                   <TD>
                     <ExpandableTextField
                       value={item.itemName || ""}
@@ -117,49 +118,43 @@ export default function GINItemsTable({ items, onItemChange, disabled }) {
                     <ReadCell value={stockQty} />
                   </TD>
 
-                  {/* ISSUE QTY — editable, red if > stockQty */}
+                  {/* ISSUE QTY — editable, cell turns red if > stockQty */}
                   <TD>
-                    <div>
-                      <Input
-                        type="number"
-                        value={issueQty ?? ""}
-                        min="0"
-                        step="any"
-                        disabled={disabled}
-                        onChange={(e) =>
-                          onItemChange(index, "issueQty", e.target.value)
-                        }
-                        className={`${getInputClass(qtyError, disabled)} h-[28px]`}
-                      />
-                      {qtyError && (
-                        <p className="text-red-500 text-[10px] mt-0.5">
-                          Max {stockQty}
-                        </p>
-                      )}
-                    </div>
-                  </TD>
-
-                  {/* STOCK LOCATION — editable expandable */}
-                  <TD>
-                    <ExpandableTextField
-                      value={item.stockLocation || ""}
+                    <Input
+                      type="number"
+                      value={issueQty ?? ""}
+                      min="0"
+                      step="any"
                       disabled={disabled}
-                      title="Stock Location"
-                      placeholder="Store 1"
-                      minHeight="min-h-[28px]"
-                      onChange={(v) => onItemChange(index, "stockLocation", v)}
+                      onChange={(e) => onItemChange(index, "issueQty", e.target.value)}
+                      title={qtyError ? `Max allowed: ${stockQty}` : undefined}
+                      className={`${getInputClass(qtyError, disabled)} h-[28px]`}
                     />
                   </TD>
 
-                  {/* ITEM USED LOCATION — editable expandable */}
+                  {/* STORE LOCATION — searchable select */}
+                  <TD>
+                    <SearchableSelect
+                      options={storeLocations}
+                      value={item.stockLocation || ""}
+                      disabled={disabled}
+                      onChange={(value) => onItemChange(index, "stockLocation", value)}
+                      placeholder="Select store"
+                      labelKey="locationName"
+                      valueKey="locationName"
+                      searchKeys={["locationName"]}
+                      className="rounded-none border-0"
+                    />
+                  </TD>
+
+                  {/* ITEM USED LOCATION — always read-only, comes from API */}
                   <TD>
                     <ExpandableTextField
                       value={item.itemUsedLocation || ""}
-                      disabled={disabled}
+                      onChange={() => {}}
+                      disabled
                       title="Item Used Location"
-                      placeholder="Block A"
                       minHeight="min-h-[28px]"
-                      onChange={(v) => onItemChange(index, "itemUsedLocation", v)}
                     />
                   </TD>
 
