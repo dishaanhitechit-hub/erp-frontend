@@ -203,15 +203,13 @@ export default function GRNItemSelectionModal({ open, onClose, form, brrId, init
                     <td className="border p-2 text-sm text-center">{row.alreadyBilled}</td>
                     <td className="border p-2 text-sm text-center">{row.effectiveAvailableQty}</td>
                     <td className="border p-2">
-                      <div>
-                        <Input
-                          type="number" step="0.001" value={row.billingQty ?? ""}
-                          disabled={!row.selected}
-                          onChange={(e) => handleBillingQtyChange(row.grnItemId, e.target.value)}
-                          className={getInputClass(qtyError, !row.selected)}
-                        />
-                        {qtyError && <p className="text-red-500 text-[10px] mt-1">Max {row.effectiveAvailableQty}</p>}
-                      </div>
+                      <Input
+                        type="number" step="0.001" value={row.billingQty ?? ""}
+                        disabled={!row.selected}
+                        onChange={(e) => handleBillingQtyChange(row.grnItemId, e.target.value)}
+                        title={qtyError ? `Max allowed: ${row.effectiveAvailableQty}` : undefined}
+                        className={getInputClass(qtyError, !row.selected)}
+                      />
                     </td>
                     <td className="border p-2 text-sm text-center">{row.rate}</td>
                     <td className="border p-2 text-sm text-center">{row.gstPercent}</td>

@@ -110,22 +110,16 @@ export default function DCItemsTable({ items, onItemChange, disabled }) {
                   </TD>
 
                   <TD>
-                    <div>
-                      <Input
-                        type="number"
-                        value={issueQty ?? ""}
-                        min="0"
-                        step="any"
-                        disabled={disabled}
-                        onChange={(e) => onItemChange(index, "issueQty", e.target.value)}
-                        className={`${getInputClass(qtyError, disabled)} h-[28px]`}
-                      />
-                      {qtyError && (
-                        <p className="text-red-500 text-[10px] mt-0.5">
-                          Max {balanceQty}
-                        </p>
-                      )}
-                    </div>
+                    <Input
+                      type="number"
+                      value={issueQty ?? ""}
+                      min="0"
+                      step="any"
+                      disabled={disabled}
+                      onChange={(e) => onItemChange(index, "issueQty", e.target.value)}
+                      title={qtyError ? `Max allowed: ${balanceQty}` : undefined}
+                      className={`${getInputClass(qtyError, disabled)} h-[28px]`}
+                    />
                   </TD>
 
                   <TD>
