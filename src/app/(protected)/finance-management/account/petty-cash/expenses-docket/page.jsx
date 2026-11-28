@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter }           from "next/navigation";
 import { EdoxMark } from "@/components/common/EdoxLoader";
 import { toast }               from "sonner";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import SearchSection    from "@/components/common/SearchSection";
 import BulkWorkflowTable from "@/components/common/BulkWorkflowTable";
@@ -29,6 +30,7 @@ export default function DocketVoucherListPage() {
   const [loading,      setLoading]      = useState(true);
 
   const [pickedHead,   setCcHead]       = useState("");   // "" = all CC heads
+  const [ccOpen,       setCcOpen]       = useState(false);
 
   const projectCode = getLocalStorage("projectInfo")?.projectCode || "";
 
@@ -168,29 +170,46 @@ export default function DocketVoucherListPage() {
           }
         />
 
-        {/* CC head picker with the total spent on each head */}
-        <div className="flex flex-wrap items-center gap-2 rounded-sm border border-gray-200 bg-white p-2 text-[12px]">
-          <span className="font-semibold text-[#144664]">CC Head:</span>
+        {/* CC head picker with the total spent on each head — collapsed to one line by default */}
+        <div className="rounded-sm border border-[#6d9dc5] bg-white text-[12px]">
           <button
             type="button"
-            onClick={() => setCcHead("")}
-            className={`rounded-sm border px-2 py-[2px] ${!ccHead ? "border-[#144664] bg-[#144664] text-white" : "border-[#6d9dc5] bg-[#e8f2ff] text-[#144664] hover:brightness-95"}`}
+            onClick={() => setCcOpen((v) => !v)}
+            className="flex w-full items-center gap-2 bg-[#e8f2ff] px-3 py-[6px] text-left font-bold text-[#144664] hover:brightness-95"
           >
-            All · ₹ {fmt(grandTotal)} <span className="opacity-70">({filteredData.length})</span>
+            {ccOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+            <span>CC Head:</span>
+            <span className="rounded-sm bg-[#144664] px-2 py-[1px] text-white">{ccHead || "All"}</span>
+            <span className="font-medium text-gray-600">
+              {ccOpen ? "click to hide" : `${ccTotals.length} heads · click to choose`}
+            </span>
+            <span className="ml-auto text-[13px]">
+              {ccHead ? `${ccHead} spent` : "Total spent"}: ₹ {fmt(ccHead ? ccTotals.find((t) => t.ccName === ccHead)?.amount : grandTotal)}
+            </span>
           </button>
-          {ccTotals.map((t) => (
-            <button
-              key={t.ccName}
-              type="button"
-              onClick={() => setCcHead(ccHead === t.ccName ? "" : t.ccName)}
-              className={`rounded-sm border px-2 py-[2px] ${ccHead === t.ccName ? "border-[#144664] bg-[#144664] text-white" : "border-gray-300 bg-gray-50 text-gray-800 hover:bg-gray-100"}`}
-            >
-              {t.ccName} · ₹ {fmt(t.amount)} <span className="opacity-70">({t.count})</span>
-            </button>
-          ))}
-          <span className="ml-auto font-semibold text-[#144664]">
-            {ccHead ? `${ccHead} spent: ₹ ${fmt(ccTotals.find((t) => t.ccName === ccHead)?.amount)}` : `Total spent: ₹ ${fmt(grandTotal)}`}
-          </span>
+
+          {ccOpen && (
+            <div className="flex max-h-[160px] flex-wrap gap-[6px] overflow-y-auto border-t border-[#6d9dc5] p-2">
+              <button
+                type="button"
+                onClick={() => setCcHead("")}
+                className={`rounded-sm border px-2 py-[2px] font-semibold ${!ccHead ? "border-[#144664] bg-[#144664] text-white" : "border-[#6d9dc5] bg-[#e8f2ff] text-[#144664] hover:brightness-95"}`}
+              >
+                All · ₹ {fmt(grandTotal)} <span className="font-normal opacity-80">({filteredData.length})</span>
+              </button>
+              {ccTotals.map((t) => (
+                <button
+                  key={t.ccName}
+                  type="button"
+                  onClick={() => setCcHead(ccHead === t.ccName ? "" : t.ccName)}
+                  className={`rounded-sm border px-2 py-[2px] font-semibold ${ccHead === t.ccName ? "border-[#144664] bg-[#144664] text-white" : "border-gray-400 bg-white text-gray-900 hover:bg-[#e8f2ff]"}`}
+                >
+                  {t.ccName} · <span className={ccHead === t.ccName ? "" : "text-[#144664]"}>₹ {fmt(t.amount)}</span>{" "}
+                  <span className="font-normal opacity-80">({t.count})</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <BulkWorkflowTable module="petty_cash_docket" canAct={access.canApprove} rowId="_id" statusKey="workflowStatus"
