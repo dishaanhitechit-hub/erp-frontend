@@ -29,7 +29,9 @@ export default function DocketVoucherListPage() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading,      setLoading]      = useState(true);
 
-  const [pickedHead,   setCcHead]       = useState("");   // "" = all CC heads
+  // CC heads picked — shared by the picker above the table and the table's
+  // own CC Head column filter ([] = all heads)
+  const [pickedHeads,  setPickedHeads]  = useState([]);
   const [ccOpen,       setCcOpen]       = useState(false);
 
   const projectCode = getLocalStorage("projectInfo")?.projectCode || "";
@@ -110,15 +112,34 @@ export default function DocketVoucherListPage() {
   const grandTotal = useMemo(() => filteredData.reduce((s, r) => s + r._total, 0), [filteredData]);
 
   // Picked head no longer present (search / date changed) → treat as all
-  const ccHead = ccTotals.some((t) => t.ccName === pickedHead) ? pickedHead : "";
+  // Heads no longer in view (search / date changed) drop out; ticking every head = all
+  const heads = useMemo(() => {
+    const live = pickedHeads.filter((h) => ccTotals.some((t) => t.ccName === h));
+    return live.length === ccTotals.length ? [] : live;
+  }, [pickedHeads, ccTotals]);
+  const headLabel = heads.length === 1 ? heads[0] : `${heads.length} CC heads`;
+  const headsSpent = ccTotals.filter((t) => heads.includes(t.ccName)).reduce((s, t) => s + t.amount, 0);
+
+  // Click = only that head (again = all); Ctrl/⌘-click = add / remove it
+  const pickHead = (name, e) => {
+    if (e?.ctrlKey || e?.metaKey) {
+      setPickedHeads(heads.includes(name) ? heads.filter((h) => h !== name) : [...heads, name]);
+    } else {
+      setPickedHeads(heads.length === 1 && heads[0] === name ? [] : [name]);
+    }
+  };
 
   // With a head picked: only dockets that have it, plus that head's own amount
+  // Rows are filtered by the table (CC Head column filter); here only the
+  // picked heads' own share of each docket is added
   const tableData = useMemo(() => {
-    if (!ccHead) return filteredData;
-    return filteredData
-      .filter((r) => r._cc.some((c) => c.ccName === ccHead))
-      .map((r) => ({ ...r, ccAmount: fmt(r._cc.filter((c) => c.ccName === ccHead).reduce((s, c) => s + Number(c.amount || 0), 0)) }));
-  }, [filteredData, ccHead]);
+    if (!heads.length) return filteredData;
+    return filteredData.map((r) => ({
+      ...r,
+      ccAmount: fmt(r._cc.filter((c) => heads.includes(c.ccName)).reduce((s, c) => s + Number(c.amount || 0), 0)),
+    }));
+  }, [filteredData, heads]);
+  const tableFilters = useMemo(() => ({ ccNames: heads }), [heads]);
 
   const columns = [
     { header: "Sl. no",       accessor: "sl",             width: "55px"  },
@@ -129,14 +150,14 @@ export default function DocketVoucherListPage() {
     { header: "Payment Mode", accessor: "modeOfPayment",  width: "120px" },
     { header: "Account",      accessor: "bankCode",       width: "110px" },
     { header: "Trans. ID",    accessor: "paymentRefId",   width: "120px" },
-    { header: "CC Head",      accessor: "ccNames",        width: "150px" },
-    ...(ccHead ? [{ header: `${ccHead} Amt`, accessor: "ccAmount", width: "120px", align: "right" }] : []),
+    { header: "CC Head",      accessor: "ccNames",        width: "150px", filterValues: (r) => r._cc.map((c) => c.ccName) },
+    ...(heads.length ? [{ header: `${headLabel} Amt`, accessor: "ccAmount", width: "120px", align: "right" }] : []),
     { header: "Docket Amount", accessor: "amount",        width: "110px", align: "right" },
     { header: "Status",       accessor: "workflowStatus", width: "110px" },
     { header: "Created By",   accessor: "createdBy",      width: "120px" },
   ];
 
-  const summaryRow = ccHead
+  const summaryRow = heads.length
     ? { ccAmount: { align: "right" }, amount: { align: "right" } }
     : { amount: { align: "right" } };
 
@@ -179,12 +200,12 @@ export default function DocketVoucherListPage() {
           >
             {ccOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
             <span>CC Head:</span>
-            <span className="rounded-sm bg-[#144664] px-2 py-[1px] text-white">{ccHead || "All"}</span>
+            <span className="rounded-sm bg-[#144664] px-2 py-[1px] text-white">{heads.length ? headLabel : "All"}</span>
             <span className="font-medium text-gray-600">
               {ccOpen ? "click to hide" : `${ccTotals.length} heads · click to choose`}
             </span>
             <span className="ml-auto text-[13px]">
-              {ccHead ? `${ccHead} spent` : "Total spent"}: ₹ {fmt(ccHead ? ccTotals.find((t) => t.ccName === ccHead)?.amount : grandTotal)}
+              {heads.length ? `${headLabel} spent` : "Total spent"}: ₹ {fmt(heads.length ? headsSpent : grandTotal)}
             </span>
           </button>
 
@@ -192,8 +213,8 @@ export default function DocketVoucherListPage() {
             <div className="flex max-h-[160px] flex-wrap gap-[6px] overflow-y-auto border-t border-[#6d9dc5] p-2">
               <button
                 type="button"
-                onClick={() => setCcHead("")}
-                className={`rounded-sm border px-2 py-[2px] font-semibold ${!ccHead ? "border-[#144664] bg-[#144664] text-white" : "border-[#6d9dc5] bg-[#e8f2ff] text-[#144664] hover:brightness-95"}`}
+                onClick={() => setPickedHeads([])}
+                className={`rounded-sm border px-2 py-[2px] font-semibold ${!heads.length ? "border-[#144664] bg-[#144664] text-white" : "border-[#6d9dc5] bg-[#e8f2ff] text-[#144664] hover:brightness-95"}`}
               >
                 All · ₹ {fmt(grandTotal)} <span className="font-normal opacity-80">({filteredData.length})</span>
               </button>
@@ -201,10 +222,11 @@ export default function DocketVoucherListPage() {
                 <button
                   key={t.ccName}
                   type="button"
-                  onClick={() => setCcHead(ccHead === t.ccName ? "" : t.ccName)}
-                  className={`rounded-sm border px-2 py-[2px] font-semibold ${ccHead === t.ccName ? "border-[#144664] bg-[#144664] text-white" : "border-gray-400 bg-white text-gray-900 hover:bg-[#e8f2ff]"}`}
+                  title="Click: only this head · Ctrl/⌘-click: add or remove"
+                  onClick={(e) => pickHead(t.ccName, e)}
+                  className={`rounded-sm border px-2 py-[2px] font-semibold ${heads.includes(t.ccName) ? "border-[#144664] bg-[#144664] text-white" : "border-gray-400 bg-white text-gray-900 hover:bg-[#e8f2ff]"}`}
                 >
-                  {t.ccName} · <span className={ccHead === t.ccName ? "" : "text-[#144664]"}>₹ {fmt(t.amount)}</span>{" "}
+                  {t.ccName} · <span className={heads.includes(t.ccName) ? "" : "text-[#144664]"}>₹ {fmt(t.amount)}</span>{" "}
                   <span className="font-normal opacity-80">({t.count})</span>
                 </button>
               ))}
@@ -215,6 +237,8 @@ export default function DocketVoucherListPage() {
         <BulkWorkflowTable module="petty_cash_docket" canAct={access.canApprove} rowId="_id" statusKey="workflowStatus"
           columns={columns}
           data={tableData}
+          filters={tableFilters}
+          onFiltersChange={(f) => setPickedHeads(f.ccNames || [])}
           summaryRow={summaryRow}
           onRowClick={(row) => {
             if (!access.canOpenDetails) return;

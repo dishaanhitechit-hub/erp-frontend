@@ -111,6 +111,12 @@ export default function DataTable({
   //   selection: { keys: Set, getKey: (row) => key, isSelectable: (row) => bool,
   //                onChange: (nextSet) => void }
   selection,
+  // ─── CONTROLLED COLUMN FILTERS (opt-in): { [accessor]: string[] } owned by the
+  // page, e.g. to keep a picker above the table in step with a column filter.
+  // Accessors listed here ignore the table's own saved filter; every change to
+  // them is reported through onFiltersChange(nextFilters).
+  filters,
+  onFiltersChange,
 }) {
   // ─── CREATED ON (auto column, before trailing action columns)
   const hasCreated = showCreatedOn
@@ -154,7 +160,20 @@ export default function DataTable({
   // ─── FILTER
   // filterConfig: { [accessor]: string[] } — selected values per column
   // Empty array or missing key = no filter on that column (show all)
-  const [filterConfig, setFilterConfig] = useState(saved?.filterConfig ?? {});
+  // Column option `filterValues: (row) => string[]` — a cell holding several
+  // values (e.g. "A, B"): the dropdown lists each value on its own and a row
+  // passes when any of its values is ticked.
+  const [innerFilterConfig, setFilterConfig] = useState(saved?.filterConfig ?? {});
+  const filterConfig = useMemo(
+    () => (filters ? { ...innerFilterConfig, ...filters } : innerFilterConfig),
+    [innerFilterConfig, filters],
+  );
+  const cellFilterValues = (accessor, row) => {
+    const col = columnsProp.find((c) => c.accessor === accessor);
+    if (col?.filterValues) return col.filterValues(row).map(String);
+    const v = row[accessor];
+    return [v === null || v === undefined ? "-" : String(v)];
+  };
 
   // Which column's dropdown is open + its screen position
   const [activeFilterCol, setActiveFilterCol] = useState(null);
@@ -202,19 +221,21 @@ export default function DataTable({
   // Unique values for active column — derived from original data (like Excel)
   const getUniqueValues = useCallback((accessor) => {
     const seen = new Set();
-    data.forEach((row) => {
-      const v = row[accessor];
-      seen.add(v === null || v === undefined ? "-" : String(v));
-    });
+    data.forEach((row) => cellFilterValues(accessor, row).forEach((v) => seen.add(v)));
     return [...seen].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, columnsProp]);
 
   const updateFilterConfig = (updater) => {
-    setFilterConfig((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      writeSession(tableKey, { ...readSession(tableKey), filterConfig: next });
-      return next;
-    });
+    const next = typeof updater === "function" ? updater(filterConfig) : updater;
+    const own = { ...next };
+    if (filters) Object.keys(filters).forEach((k) => delete own[k]);
+    writeSession(tableKey, { ...readSession(tableKey), filterConfig: own });
+    setFilterConfig(own);
+    if (filters && onFiltersChange) {
+      const changed = Object.keys(filters).some((k) => JSON.stringify(next[k] || []) !== JSON.stringify(filters[k] || []));
+      if (changed) onFiltersChange(Object.fromEntries(Object.keys(filters).map((k) => [k, next[k] || []])));
+    }
   };
 
   const toggleFilterValue = (accessor, value) => {
@@ -251,9 +272,7 @@ export default function DataTable({
   const filteredData = data.filter((row) =>
     Object.entries(filterConfig).every(([accessor, selected]) => {
       if (!selected || selected.length === 0) return true;
-      const val = row[accessor];
-      const strVal = val === null || val === undefined ? "-" : String(val);
-      return selected.includes(strVal);
+      return cellFilterValues(accessor, row).some((v) => selected.includes(v));
     })
   );
 
